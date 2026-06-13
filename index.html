@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Ristoflow</title>
+  <link rel="manifest" href="/manifest.json"/>
+  <meta name="theme-color" content="#0E5A7A"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <link rel="apple-touch-icon" href="/favicon-192.png"/>
+  <link rel="icon" href="/favicon.ico"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand: #0E5A7A;
+      --brand-light: #e8f4f8;
+      --brand-mid: #1a8fb5;
+      --accent: #00c896;
+      --accent-light: #e6fff9;
+      --bg: #f0f6fa;
+      --surface: #ffffff;
+      --text: #111827;
+      --text-2: #64748b;
+      --text-3: #94a3b8;
+      --border: #e5e7eb;
+      --radius: 18px;
+      --radius-sm: 12px;
+      --nav-h: 64px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── SPINNER ── */
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--brand-light);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .page-loader {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 100vh; gap: 14px;
+      color: var(--text-2); font-size: 13px; font-weight: 600;
+    }
+
+    /* ── AUTH SCREEN ── */
+    #auth-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px 20px calc(24px + var(--safe-bottom));
+      background: linear-gradient(160deg, #0E5A7A 0%, #1a8fb5 60%, #00c896 100%);
+    }
+
+    .auth-logo {
+      width: 72px; height: 72px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; margin-bottom: 16px;
+      backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255,255,255,0.2);
+    }
+
+    .auth-title {
+      font-size: 28px; font-weight: 900; color: #fff;
+      letter-spacing: -0.5px; margin-bottom: 4px;
+    }
+    .auth-sub {
+      font-size: 14px; color: rgba(255,255,255,0.75);
+      margin-bottom: 32px; text-align: center; line-height: 1.5;
+    }
+
+    .auth-card {
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%; max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .auth-tabs {
+      display: flex; gap: 4px;
+      background: var(--bg); border-radius: 12px; padding: 4px;
+      margin-bottom: 20px;
+    }
+    .auth-tab {
+      flex: 1; padding: 9px; border: none; border-radius: 9px;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      background: transparent; color: var(--text-2);
+      transition: all .2s;
+    }
+    .auth-tab.active {
+      background: #fff; color: var(--brand);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .auth-form { display: flex; flex-direction: column; gap: 12px; }
+
+    .auth-input {
+      width: 100%; padding: 13px 16px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 15px; font-family: inherit; outline: none;
+      transition: border-color .2s; background: var(--bg);
+    }
+    .auth-input:focus { border-color: var(--brand); background: #fff; }
+
+    .auth-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-mid));
+      color: #fff; border: none; border-radius: var(--radius-sm);
+      font-size: 15px; font-weight: 800; cursor: pointer;
+      transition: opacity .2s; margin-top: 4px;
+    }
+    .auth-btn:active { opacity: .85; }
+
+    .auth-divider {
+      text-align: center; font-size: 12px; color: var(--text-3);
+      margin: 12px 0; position: relative;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ""; position: absolute; top: 50%;
+      width: 40%; height: 1px; background: var(--border);
+    }
+    .auth-divider::before { left: 0; }
+    .auth-divider::after { right: 0; }
+
+    .auth-guest {
+      width: 100%; padding: 12px;
+      background: var(--bg); color: var(--text-2);
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+
+    .auth-error {
+      background: #fef2f2; border: 1px solid #fecaca;
+      color: #dc2626; border-radius: 10px;
+      padding: 10px 14px; font-size: 13px; font-weight: 600;
+      display: none;
+    }
+
+    /* ── APP SHELL ── */
+    #app-shell {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      padding-top: calc(12px + env(safe-area-inset-top, 0px));
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .top-bar-logo {
+      font-size: 20px; font-weight: 900; color: var(--brand);
+      letter-spacing: -0.5px;
+    }
+    .top-bar-logo span { color: var(--accent); }
+
+    .top-bar-actions { display: flex; gap: 8px; align-items: center; }
+
+    .top-bar-btn {
+      width: 36px; height: 36px;
+      border: none; background: var(--bg); border-radius: 10px;
+      font-size: 18px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+
+    .notif-badge {
+      position: relative;
+    }
+    .notif-badge::after {
+      content: ""; position: absolute;
+      top: 6px; right: 6px;
+      width: 8px; height: 8px;
+      background: #ef4444; border-radius: 50%;
+      border: 2px solid var(--surface);
+    }
+
+    /* MAIN CONTENT */
+    #page-content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    /* BOTTOM NAV */
+    .bottom-nav {
+      display: flex;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding-bottom: var(--safe-bottom);
+      flex-shrink: 0;
+    }
+
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 3px; padding: 10px 0;
+      border: none; background: none; cursor: pointer;
+      color: var(--text-3);
+      transition: color .2s;
+      position: relative;
+    }
+    .nav-item.active { color: var(--brand); }
+
+    .nav-icon { font-size: 22px; line-height: 1; }
+    .nav-label { font-size: 10px; font-weight: 700; letter-spacing: 0.02em; }
+
+    .nav-item.active .nav-icon {
+      transform: translateY(-1px);
+      transition: transform .2s;
+    }
+
+    /* STORIE button speciale (centro) */
+    .nav-item.nav-center .nav-icon-wrap {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(14,90,122,0.35);
+      margin-top: -8px;
+    }
+    .nav-item.nav-center { color: var(--brand); }
+
+    /* ── PAGINE ── */
+
+    /* HOME / FEED */
+    .feed-header {
+      padding: 16px 16px 8px;
+    }
+    .feed-greeting {
+      font-size: 22px; font-weight: 900; color: var(--text);
+      letter-spacing: -0.3px;
+    }
+    .feed-greeting span { color: var(--brand); }
+
+    /* STORIE PREVIEW */
+    .storie-strip {
+      display: flex; gap: 12px;
+      padding: 12px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .storie-strip::-webkit-scrollbar { display: none; }
+
+    .storia-bubble {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; flex-shrink: 0; cursor: pointer;
+    }
+    .storia-ring {
+      width: 64px; height: 64px; border-radius: 50%;
+      padding: 2.5px;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+    }
+    .storia-ring.seen {
+      background: var(--border);
+    }
+    .storia-avatar {
+      width: 100%; height: 100%; border-radius: 50%;
+      object-fit: cover; border: 2.5px solid #fff;
+      background: var(--brand-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; overflow: hidden;
+    }
+    .storia-label {
+      font-size: 10px; font-weight: 700; color: var(--text-2);
+      max-width: 64px; text-align: center;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .storia-add .storia-ring {
+      background: var(--bg); border: 2px dashed var(--brand);
+    }
+    .storia-add .storia-avatar {
+      border: none; font-size: 28px; color: var(--brand);
+      background: var(--brand-light);
+    }
+
+    /* FEED CARD */
+    .feed-section-title {
+      font-size: 13px; font-weight: 800; color: var(--text-2);
+      padding: 4px 16px 8px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+
+    .feed-card {
+      background: var(--surface); margin: 0 12px 12px;
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .feed-card-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+    }
+    .feed-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--brand-light); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; overflow: hidden;
+    }
+    .feed-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .feed-meta { flex: 1; min-width: 0; }
+    .feed-meta-name { font-size: 14px; font-weight: 800; color: var(--text); }
+    .feed-meta-sub { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+    .feed-locale-badge {
+      background: var(--brand-light); color: var(--brand);
+      border-radius: 999px; padding: 4px 10px;
+      font-size: 11px; font-weight: 700;
+    }
+
+    .feed-img {
+      width: 100%; aspect-ratio: 4/3;
+      object-fit: cover; display: block;
+      background: var(--bg);
+    }
+    .feed-img-placeholder {
+      width: 100%; aspect-ratio: 4/3;
+      background: linear-gradient(135deg, var(--brand-light), #dbeafe);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px;
+    }
+
+    .feed-body { padding: 12px 14px; }
+    .feed-text { font-size: 14px; line-height: 1.55; color: var(--text); }
+    .feed-tag { color: var(--brand); font-weight: 700; }
+
+    .feed-reactions {
+      display: flex; gap: 4px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .reaction-btn {
+      display: flex; align-items: center; gap: 5px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 999px; padding: 5px 12px;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      transition: all .15s; border: none;
+    }
+    .reaction-btn:active { transform: scale(0.95); }
+    .reaction-btn.reacted {
+      background: var(--brand-light); color: var(--brand);
+    }
+    .reaction-count { color: var(--text-2); font-size: 12px; }
+
+    .feed-points-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: linear-gradient(135deg, #f59e0b, #fbbf24);
+      color: #fff; border-radius: 999px; padding: 3px 10px;
+      font-size: 11px; font-weight: 800; margin-top: 8px;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 48px 24px; gap: 12px; text-align: center;
+    }
+    .empty-icon { font-size: 48px; }
+    .empty-title { font-size: 17px; font-weight: 800; color: var(--text); }
+    .empty-sub { font-size: 13px; color: var(--text-2); line-height: 1.5; max-width: 260px; }
+    .empty-btn {
+      background: var(--brand); color: #fff;
+      border: none; border-radius: var(--radius-sm); padding: 12px 24px;
+      font-size: 14px; font-weight: 800; cursor: pointer; margin-top: 4px;
+    }
+
+    /* TESSERA PAGE */
+    .tessera-page { padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px); }
+
+    /* PROFILO PAGE */
+    .profilo-header {
+      background: linear-gradient(135deg, var(--brand), var(--brand-mid));
+      padding: 24px 20px;
+      padding-top: calc(24px);
+      text-align: center; color: #fff;
+    }
+    .profilo-avatar-wrap {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 3px solid rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; margin: 0 auto 12px;
+      overflow: hidden;
+    }
+    .profilo-nome { font-size: 20px; font-weight: 800; }
+    .profilo-email { font-size: 13px; opacity: .75; margin-top: 2px; }
+
+    .profilo-stats {
+      display: flex; gap: 0;
+      background: var(--surface); margin: 0 16px;
+      border-radius: var(--radius); margin-top: -20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .profilo-stat {
+      flex: 1; padding: 16px 8px; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .profilo-stat:last-child { border-right: none; }
+    .profilo-stat-val { font-size: 22px; font-weight: 900; color: var(--brand); }
+    .profilo-stat-label { font-size: 10px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+    .profilo-section { margin: 12px 16px; }
+    .profilo-section-title { font-size: 12px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; padding: 0 4px; }
+
+    .profilo-row {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--surface); border-radius: var(--radius-sm);
+      padding: 14px 16px; margin-bottom: 2px;
+      cursor: pointer;
+    }
+    .profilo-row-icon { font-size: 20px; width: 32px; text-align: center; }
+    .profilo-row-text { flex: 1; font-size: 14px; font-weight: 600; }
+    .profilo-row-arrow { color: var(--text-3); font-size: 16px; }
+
+    .profilo-logout {
+      margin: 12px 16px 32px;
+      width: calc(100% - 32px);
+      padding: 13px; border: 1.5px solid #fecaca;
+      background: #fff; color: #dc2626;
+      border-radius: var(--radius-sm); font-size: 14px; font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* RICETTE PAGE */
+    .ricetta-card {
+      background: var(--surface); margin: 0 12px 12px;
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+      cursor: pointer;
+    }
+    .ricetta-img {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      background: var(--brand-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 48px;
+    }
+    .ricetta-body { padding: 12px 14px; }
+    .ricetta-nome { font-size: 16px; font-weight: 800; }
+    .ricetta-meta { font-size: 12px; color: var(--text-3); margin-top: 4px; display: flex; gap: 12px; }
+    .ricetta-tag {
+      display: inline-block; background: var(--brand-light); color: var(--brand);
+      border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 700;
+      margin-top: 8px; margin-right: 4px;
+    }
+
+    /* NOTIFICA WA BANNER */
+    .wa-banner {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      margin: 12px 12px 0; border-radius: var(--radius);
+      padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+      cursor: pointer;
+    }
+    .wa-banner-icon { font-size: 28px; flex-shrink: 0; }
+    .wa-banner-text { flex: 1; }
+    .wa-banner-title { font-size: 14px; font-weight: 800; color: #fff; }
+    .wa-banner-sub { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+    .wa-banner-pts { background: rgba(255,255,255,0.2); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0; }
+
+    /* SEZIONE CARD generica */
+    .section-card {
+      background: var(--surface); margin: 0 12px 12px;
+      border-radius: var(--radius); padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .section-card-title {
+      font-size: 14px; font-weight: 800; color: var(--text);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+    }
+
+    /* UTILITY */
+    .pb-nav { padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px); }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<!-- LOADER INIZIALE -->
+<div id="initial-loader" class="page-loader">
+  <div class="spinner"></div>
+  Caricamento...
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-logo">🍽️</div>
+  <div class="auth-title">Ristoflow</div>
+  <div class="auth-sub">Il social della ristorazione.<br>Accumula punti, scopri ricette, condividi esperienze.</div>
+
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Accedi</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Registrati</button>
+    </div>
+
+    <div id="auth-error" class="auth-error"></div>
+
+    <!-- LOGIN -->
+    <div id="form-login" class="auth-form">
+      <input class="auth-input" type="email" id="login-email" placeholder="Email" autocomplete="email"/>
+      <input class="auth-input" type="password" id="login-pwd" placeholder="Password" autocomplete="current-password"/>
+      <button class="auth-btn" onclick="doLogin()">Entra →</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="form-register" class="auth-form hidden">
+      <input class="auth-input" type="text" id="reg-nome" placeholder="Nome e cognome"/>
+      <input class="auth-input" type="email" id="reg-email" placeholder="Email" autocomplete="email"/>
+      <input class="auth-input" type="tel" id="reg-tel" placeholder="Telefono (per WhatsApp)"/>
+      <input class="auth-input" type="password" id="reg-pwd" placeholder="Password (min 6 caratteri)" autocomplete="new-password"/>
+      <button class="auth-btn" onclick="doRegister()">Crea account →</button>
+    </div>
+
+    <div class="auth-divider">oppure</div>
+    <button class="auth-guest" onclick="doGuest()">👀 Esplora senza account</button>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app-shell">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-logo">Risto<span>flow</span></div>
+    <div class="top-bar-actions">
+      <button class="top-bar-btn notif-badge" onclick="navTo('notifiche')" title="Notifiche">🔔</button>
+      <button class="top-bar-btn" onclick="navTo('profilo')" title="Profilo">
+        <span id="topbar-avatar">👤</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="page-content"></div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-page="home" onclick="navTo('home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" data-page="ricette" onclick="navTo('ricette')">
+      <span class="nav-icon">👨‍🍳</span>
+      <span class="nav-label">Ricette</span>
+    </button>
+    <button class="nav-item nav-center" data-page="storie" onclick="navTo('storie')">
+      <div class="nav-icon-wrap">
+        <span class="nav-icon">📸</span>
+      </div>
+      <span class="nav-label" style="margin-top:4px;">Storie</span>
+    </button>
+    <button class="nav-item" data-page="tessera" onclick="navTo('tessera')">
+      <span class="nav-icon">🎫</span>
+      <span class="nav-label">Tessera</span>
+    </button>
+    <button class="nav-item" data-page="profilo" onclick="navTo('profilo')">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">Profilo</span>
+    </button>
+  </nav>
+</div>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function() {
+  // ── CONFIG ──────────────────────────────────────────────────────
+  var SUPABASE_URL  = "https://cuhcscpvhypoaplcmtjk.supabase.co";
+  var SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0";
+  var supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  var currentUser = null;
+  var currentPage = 'home';
+  var isGuest = false;
+
+  // ── INIT ────────────────────────────────────────────────────────
+  async function init() {
+    var { data: { session } } = await supa.auth.getSession();
+    hide('initial-loader');
+    if (session) {
+      currentUser = session.user;
+      showApp();
+    } else {
+      showAuth();
+    }
+
+    supa.auth.onAuthStateChange(function(event, session) {
+      if (event === 'SIGNED_IN' && session) {
+        currentUser = session.user;
+        isGuest = false;
+        showApp();
+      } else if (event === 'SIGNED_OUT') {
+        currentUser = null;
+        showAuth();
+      }
+    });
+  }
+
+  // ── AUTH ────────────────────────────────────────────────────────
+  window.switchAuthTab = function(tab) {
+    document.querySelectorAll('.auth-tab').forEach(function(t) { t.classList.remove('active'); });
+    event.target.classList.add('active');
+    if (tab === 'login') {
+      show('form-login'); hide('form-register');
+    } else {
+      hide('form-login'); show('form-register');
+    }
+    hideAuthError();
+  };
+
+  window.doLogin = async function() {
+    var email = val('login-email');
+    var pwd = val('login-pwd');
+    if (!email || !pwd) { showAuthError('Inserisci email e password'); return; }
+    var btn = document.querySelector('#form-login .auth-btn');
+    btn.textContent = 'Accesso...'; btn.disabled = true;
+    var { error } = await supa.auth.signInWithPassword({ email, password: pwd });
+    btn.textContent = 'Entra →'; btn.disabled = false;
+    if (error) showAuthError(error.message === 'Invalid login credentials' ? 'Email o password errati' : error.message);
+  };
+
+  window.doRegister = async function() {
+    var nome = val('reg-nome');
+    var email = val('reg-email');
+    var tel = val('reg-tel');
+    var pwd = val('reg-pwd');
+    if (!nome || !email || !pwd) { showAuthError('Compila tutti i campi'); return; }
+    if (pwd.length < 6) { showAuthError('Password minimo 6 caratteri'); return; }
+    var btn = document.querySelector('#form-register .auth-btn');
+    btn.textContent = 'Creazione...'; btn.disabled = true;
+    var { data, error } = await supa.auth.signUp({
+      email, password: pwd,
+      options: { data: { nome_completo: nome, telefono: tel } }
+    });
+    btn.textContent = 'Crea account →'; btn.disabled = false;
+    if (error) { showAuthError(error.message); return; }
+    // Salva profilo cliente
+    if (data.user) {
+      await supa.from('clienti_profilo').upsert({
+        user_id: data.user.id,
+        nome_completo: nome,
+        email: email,
+        telefono: tel
+      }, { onConflict: 'user_id' });
+    }
+    showAuthError('✅ Controlla la tua email per confermare l\'account!');
+  };
+
+  window.doGuest = function() {
+    isGuest = true;
+    currentUser = null;
+    hide('auth-screen');
+    showApp();
+  };
+
+  function showAuthError(msg) {
+    var el = document.getElementById('auth-error');
+    el.textContent = msg; el.style.display = 'block';
+  }
+  function hideAuthError() {
+    document.getElementById('auth-error').style.display = 'none';
+  }
+
+  // ── APP ─────────────────────────────────────────────────────────
+  function showAuth() {
+    hide('app-shell');
+    show('auth-screen', 'flex');
+  }
+
+  function showApp() {
+    hide('auth-screen');
+    show('app-shell', 'flex');
+    updateTopbarAvatar();
+    navTo('home');
+  }
+
+  function updateTopbarAvatar() {
+    var el = document.getElementById('topbar-avatar');
+    if (!el) return;
+    if (currentUser && currentUser.user_metadata && currentUser.user_metadata.nome_completo) {
+      var initiale = currentUser.user_metadata.nome_completo.charAt(0).toUpperCase();
+      el.textContent = initiale;
+    } else {
+      el.textContent = '👤';
+    }
+  }
+
+  // ── ROUTER ──────────────────────────────────────────────────────
+  window.navTo = function(page) {
+    currentPage = page;
+
+    // Aggiorna nav
+    document.querySelectorAll('.nav-item').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.page === page);
+    });
+
+    // Render pagina
+    var content = document.getElementById('page-content');
+    switch (page) {
+      case 'home':     renderHome(content); break;
+      case 'storie':   renderStorie(content); break;
+      case 'ricette':  renderRicette(content); break;
+      case 'tessera':  renderTessera(content); break;
+      case 'profilo':  renderProfilo(content); break;
+      default:         renderHome(content);
+    }
+    content.scrollTop = 0;
+  };
+
+  // ── HOME / FEED ──────────────────────────────────────────────────
+  async function renderHome(container) {
+    var nomeUtente = currentUser
+      ? (currentUser.user_metadata?.nome_completo || 'Cliente').split(' ')[0]
+      : 'Ospite';
+
+    container.innerHTML = '<div class="page-loader"><div class="spinner"></div></div>';
+
+    // Carica feed dal DB
+    var { data: posts } = await supa
+      .from('social_post')
+      .select('*, clienti_profilo(nome_completo, avatar_url), sedi(nome)')
+      .eq('visibile', true)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    var html = '<div class="pb-nav">';
+
+    // Greeting
+    html += '<div class="feed-header">';
+    html += '<div class="feed-greeting">Ciao, <span>' + esc(nomeUtente) + '</span> 👋</div>';
+    html += '</div>';
+
+    // Banner WA post-visita (solo se utente loggato)
+    if (currentUser) {
+      html += '<div class="wa-banner" onclick="navTo(\'storie\')">';
+      html += '<div class="wa-banner-icon">📸</div>';
+      html += '<div class="wa-banner-text"><div class="wa-banner-title">Pubblica una storia</div><div class="wa-banner-sub">Guadagna punti fidelity</div></div>';
+      html += '<div class="wa-banner-pts">+50 pt</div>';
+      html += '</div>';
+    }
+
+    // Storie strip
+    html += '<div class="storie-strip">';
+    if (currentUser) {
+      html += '<div class="storia-bubble storia-add" onclick="navTo(\'storie\')">';
+      html += '<div class="storia-ring"><div class="storia-avatar">＋</div></div>';
+      html += '<div class="storia-label">La tua</div>';
+      html += '</div>';
+    }
+    // Placeholder storie (verranno caricate da DB)
+    var storieLocali = ['Campo Antico', 'Trattoria', 'Catering'];
+    storieLocali.forEach(function(nome) {
+      html += '<div class="storia-bubble" onclick="navTo(\'storie\')">';
+      html += '<div class="storia-ring"><div class="storia-avatar">🍽️</div></div>';
+      html += '<div class="storia-label">' + esc(nome) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    // Feed post
+    html += '<div class="feed-section-title">Dal network</div>';
+
+    if (!posts || posts.length === 0) {
+      html += '<div class="empty-state">';
+      html += '<div class="empty-icon">🍽️</div>';
+      html += '<div class="empty-title">Il feed è ancora vuoto</div>';
+      html += '<div class="empty-sub">Sii il primo a condividere una foto del tuo piatto preferito!</div>';
+      if (currentUser) html += '<button class="empty-btn" onclick="navTo(\'storie\')">Pubblica ora</button>';
+      html += '</div>';
+    } else {
+      posts.forEach(function(post) {
+        var nomeAutore = post.clienti_profilo?.nome_completo || 'Anonimo';
+        var nomeLocale = post.sedi?.nome || '';
+        var data = formatData(post.created_at);
+        html += '<div class="feed-card">';
+        html += '<div class="feed-card-header">';
+        html += '<div class="feed-avatar">' + esc(nomeAutore.charAt(0).toUpperCase()) + '</div>';
+        html += '<div class="feed-meta"><div class="feed-meta-name">' + esc(nomeAutore) + '</div>';
+        html += '<div class="feed-meta-sub">' + esc(data) + '</div></div>';
+        if (nomeLocale) html += '<div class="feed-locale-badge">📍 ' + esc(nomeLocale) + '</div>';
+        html += '</div>';
+        if (post.media_url) {
+          html += '<img class="feed-img" src="' + esc(post.media_url) + '" loading="lazy"/>';
+        } else {
+          html += '<div class="feed-img-placeholder">🍝</div>';
+        }
+        html += '<div class="feed-body">';
+        html += '<div class="feed-text">' + esc(post.testo || '') + '</div>';
+        html += '<div class="feed-reactions">';
+        html += '<button class="reaction-btn" onclick="reagisci(this,\'😍\',' + post.id + ')"><span>😍</span><span class="reaction-count">' + (post.reaz_fuoco||0) + '</span></button>';
+        html += '<button class="reaction-btn" onclick="reagisci(this,\'👏\',' + post.id + ')"><span>👏</span><span class="reaction-count">' + (post.reaz_applauso||0) + '</span></button>';
+        html += '<button class="reaction-btn" onclick="reagisci(this,\'🔥\',' + post.id + ')"><span>🔥</span><span class="reaction-count">' + (post.reaz_cuore||0) + '</span></button>';
+        html += '</div>';
+        if (post.punti_assegnati) html += '<div class="feed-points-badge">⭐ +' + post.punti_assegnati + ' punti guadagnati</div>';
+        html += '</div></div>';
+      });
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  // ── STORIE ──────────────────────────────────────────────────────
+  function renderStorie(container) {
+    var html = '<div class="pb-nav">';
+    html += '<div style="padding:16px 16px 8px"><div style="font-size:22px;font-weight:900;letter-spacing:-0.3px">Storie 📸</div>';
+    html += '<div style="font-size:13px;color:var(--text-2);margin-top:4px;">Scompaiono dopo 24 ore</div></div>';
+
+    if (!currentUser) {
+      html += '<div class="empty-state"><div class="empty-icon">🔒</div>';
+      html += '<div class="empty-title">Accedi per pubblicare</div>';
+      html += '<div class="empty-sub">Le storie sono riservate ai clienti verificati.</div>';
+      html += '<button class="empty-btn" onclick="showAuth()">Accedi</button></div>';
+    } else {
+      html += '<div class="section-card">';
+      html += '<div class="section-card-title">📸 Pubblica una storia</div>';
+      html += '<div style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:12px;">Condividi la tua esperienza al ristorante. Guadagni <strong>+50 punti</strong> fidelity per ogni storia pubblicata.</div>';
+      html += '<div style="background:var(--bg);border:2px dashed var(--border);border-radius:14px;padding:32px;text-align:center;cursor:pointer;" onclick="apriUploadStoria()">';
+      html += '<div style="font-size:40px;margin-bottom:8px;">📷</div>';
+      html += '<div style="font-size:14px;font-weight:700;color:var(--brand);">Tocca per aggiungere foto/video</div>';
+      html += '</div>';
+      html += '<textarea id="storia-testo" style="width:100%;margin-top:12px;padding:12px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;resize:none;outline:none;" rows="3" placeholder="Racconta la tua esperienza..."></textarea>';
+      html += '<button onclick="pubblicaStoria()" style="width:100%;margin-top:8px;padding:13px;background:linear-gradient(135deg,var(--brand),var(--brand-mid));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;">Pubblica e guadagna +50pt 🌟</button>';
+      html += '</div>';
+
+      // Storie attive
+      html += '<div class="feed-section-title">Storie attive</div>';
+      html += '<div class="empty-state"><div class="empty-icon">🕐</div>';
+      html += '<div class="empty-title">Nessuna storia attiva</div>';
+      html += '<div class="empty-sub">Le storie degli ultimi 24h appariranno qui.</div></div>';
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  // ── RICETTE ──────────────────────────────────────────────────────
+  async function renderRicette(container) {
+    container.innerHTML = '<div class="page-loader"><div class="spinner"></div></div>';
+
+    var { data: ricette } = await supa
+      .from('ricette')
+      .select('id, nome, descrizione, foto_url, tempo_preparazione, difficolta, categoria')
+      .eq('azienda_id', 'b331365f-17db-4dda-aa2f-77a09427fe42')
+      .eq('pubblica', true)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    var html = '<div class="pb-nav">';
+    html += '<div style="padding:16px 16px 8px"><div style="font-size:22px;font-weight:900;letter-spacing:-0.3px">Ricette 👨‍🍳</div>';
+    html += '<div style="font-size:13px;color:var(--text-2);margin-top:4px;">Dai segreti della cucina</div></div>';
+
+    // Search bar
+    html += '<div style="padding:0 12px 8px">';
+    html += '<input style="width:100%;padding:11px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;background:var(--surface);outline:none;" placeholder="🔍 Cerca ricetta..." oninput="cercaRicette(this.value)"/>';
+    html += '</div>';
+
+    if (!ricette || ricette.length === 0) {
+      html += '<div class="empty-state"><div class="empty-icon">👨‍🍳</div>';
+      html += '<div class="empty-title">Ricette in arrivo</div>';
+      html += '<div class="empty-sub">Stiamo preparando le ricette del locale. Torna presto!</div></div>';
+    } else {
+      html += '<div id="ricette-grid">';
+      ricette.forEach(function(r) {
+        html += '<div class="ricetta-card" onclick="apriRicetta(' + r.id + ')">';
+        if (r.foto_url) {
+          html += '<img class="ricetta-img" src="' + esc(r.foto_url) + '" loading="lazy" style="display:block;"/>';
+        } else {
+          html += '<div class="ricetta-img">🍝</div>';
+        }
+        html += '<div class="ricetta-body">';
+        html += '<div class="ricetta-nome">' + esc(r.nome) + '</div>';
+        html += '<div class="ricetta-meta">';
+        if (r.tempo_preparazione) html += '<span>⏱ ' + r.tempo_preparazione + ' min</span>';
+        if (r.difficolta) html += '<span>📊 ' + esc(r.difficolta) + '</span>';
+        html += '</div>';
+        if (r.categoria) html += '<div class="ricetta-tag">' + esc(r.categoria) + '</div>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+  }
+
+  // ── TESSERA ─────────────────────────────────────────────────────
+  function renderTessera(container) {
+    if (!currentUser) {
+      container.innerHTML = '<div class="pb-nav"><div class="empty-state"><div class="empty-icon">🎫</div><div class="empty-title">Accedi per la tessera</div><div class="empty-sub">Registrati per accumulare punti e ottenere premi.</div><button class="empty-btn" onclick="showAuth()">Accedi</button></div></div>';
+      return;
+    }
+    // Redirige alla fidelity.html passando user
+    var aziendaId = 'b331365f-17db-4dda-aa2f-77a09427fe42';
+    container.innerHTML = '<div style="height:100%;"><iframe src="/fidelity.html?a=' + aziendaId + '" style="width:100%;height:calc(100vh - 120px);border:none;"></iframe></div>';
+  }
+
+  // ── PROFILO ─────────────────────────────────────────────────────
+  async function renderProfilo(container) {
+    if (!currentUser) {
+      container.innerHTML = '<div class="pb-nav"><div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">Non hai effettuato l\'accesso</div><button class="empty-btn" onclick="showAuth()">Accedi</button></div></div>';
+      return;
+    }
+
+    container.innerHTML = '<div class="page-loader"><div class="spinner"></div></div>';
+
+    var meta = currentUser.user_metadata || {};
+    var nome = meta.nome_completo || currentUser.email || 'Cliente';
+    var email = currentUser.email || '';
+    var iniziale = nome.charAt(0).toUpperCase();
+
+    // Carica stats
+    var { data: profilo } = await supa
+      .from('clienti_profilo')
+      .select('punti_totali, visite_totali, storie_pubblicate')
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+
+    var punti = profilo?.punti_totali || 0;
+    var visite = profilo?.visite_totali || 0;
+    var storie = profilo?.storie_pubblicate || 0;
+
+    var html = '<div class="pb-nav">';
+
+    html += '<div class="profilo-header">';
+    html += '<div class="profilo-avatar-wrap">' + esc(iniziale) + '</div>';
+    html += '<div class="profilo-nome">' + esc(nome) + '</div>';
+    html += '<div class="profilo-email">' + esc(email) + '</div>';
+    html += '</div>';
+
+    html += '<div class="profilo-stats">';
+    html += '<div class="profilo-stat"><div class="profilo-stat-val">⭐ ' + punti + '</div><div class="profilo-stat-label">Punti</div></div>';
+    html += '<div class="profilo-stat"><div class="profilo-stat-val">' + visite + '</div><div class="profilo-stat-label">Visite</div></div>';
+    html += '<div class="profilo-stat"><div class="profilo-stat-val">' + storie + '</div><div class="profilo-stat-label">Storie</div></div>';
+    html += '</div>';
+
+    html += '<div style="height:16px;"></div>';
+
+    html += '<div class="profilo-section">';
+    html += '<div class="profilo-section-title">Account</div>';
+    html += '<div class="profilo-row" onclick="navTo(\'tessera\')"><div class="profilo-row-icon">🎫</div><div class="profilo-row-text">La mia tessera fidelity</div><div class="profilo-row-arrow">›</div></div>';
+    html += '<div class="profilo-row"><div class="profilo-row-icon">🔔</div><div class="profilo-row-text">Notifiche</div><div class="profilo-row-arrow">›</div></div>';
+    html += '<div class="profilo-row"><div class="profilo-row-icon">🔒</div><div class="profilo-row-text">Privacy e dati</div><div class="profilo-row-arrow">›</div></div>';
+    html += '</div>';
+
+    html += '<div class="profilo-section">';
+    html += '<div class="profilo-section-title">Supporto</div>';
+    html += '<div class="profilo-row"><div class="profilo-row-icon">💬</div><div class="profilo-row-text">Contattaci su WhatsApp</div><div class="profilo-row-arrow">›</div></div>';
+    html += '</div>';
+
+    html += '<button class="profilo-logout" onclick="doLogout()">Esci dall\'account</button>';
+    html += '</div>';
+
+    container.innerHTML = html;
+  }
+
+  // ── AZIONI ──────────────────────────────────────────────────────
+  window.reagisci = async function(btn, emoji, postId) {
+    if (!currentUser) { navTo('profilo'); return; }
+    btn.classList.toggle('reacted');
+    // TODO: salva reaction su DB
+  };
+
+  window.apriUploadStoria = function() {
+    var input = document.createElement('input');
+    input.type = 'file'; input.accept = 'image/*,video/*';
+    input.onchange = function(e) {
+      var file = e.target.files[0];
+      if (file) { /* TODO: upload su Supabase Storage */ alert('Upload: ' + file.name); }
+    };
+    input.click();
+  };
+
+  window.pubblicaStoria = async function() {
+    if (!currentUser) return;
+    var testo = document.getElementById('storia-testo')?.value || '';
+    if (!testo) { alert('Scrivi qualcosa sulla tua esperienza!'); return; }
+
+    var { error } = await supa.from('social_post').insert({
+      user_id: currentUser.id,
+      testo: testo,
+      tipo: 'storia',
+      visibile: true,
+      punti_assegnati: 50,
+      azienda_id: 'b331365f-17db-4dda-aa2f-77a09427fe42'
+    });
+
+    if (!error) {
+      // Assegna punti
+      await supa.rpc('aggiungi_punti_cliente', {
+        p_user_id: currentUser.id,
+        p_punti: 50,
+        p_motivo: 'storia_pubblicata'
+      }).catch(function(){});
+      alert('✅ Storia pubblicata! +50 punti guadagnati 🌟');
+      navTo('home');
+    }
+  };
+
+  window.apriRicetta = function(id) {
+    alert('Dettaglio ricetta #' + id + ' — prossimo modulo!');
+  };
+
+  window.cercaRicette = function(query) {
+    // TODO: filtro locale
+  };
+
+  window.doLogout = async function() {
+    await supa.auth.signOut();
+  };
+
+  window.showAuth = function() {
+    hide('app-shell');
+    show('auth-screen', 'flex');
+  };
+
+  // ── HELPERS ─────────────────────────────────────────────────────
+  function show(id, display) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = display || 'block';
+  }
+  function hide(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  }
+  function val(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+  function esc(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function formatData(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    return d.toLocaleDateString('it-IT', { day:'2-digit', month:'short' });
+  }
+
+  // ── START ────────────────────────────────────────────────────────
+  init();
+})();
+</script>
+</body>
+</html>
