@@ -559,19 +559,23 @@
     document.querySelectorAll(".stella-sel span").forEach(function(s,i){s.classList.toggle("on",i<v);});
   };
 
+  var uploadFile=null;
+  var uploadFile=null;
   window.apriUpload=function(){
     var i=document.createElement("input");i.type="file";i.accept="image/*,video/*";
     i.onchange=function(e){
       var f=e.target.files[0];if(!f)return;
+      uploadFile=f;
       var pw=document.getElementById("preview-wrap");
       if(pw&&f.type.startsWith("image/")){
         var url=URL.createObjectURL(f);
         pw.innerHTML='<img src="'+url+'" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;display:block;margin-bottom:10px"/>';
+      }else if(pw){
+        pw.innerHTML='<div style="padding:10px;background:var(--bg);border-radius:12px;font-size:13px;font-weight:600;color:var(--brand);margin-bottom:10px">'+esc(f.name)+'</div>';
       }
     };
     i.click();
   };
-
   window.pubblica=async function(tipo){
     if(!ME)return;
     var testo=val("pub-testo"),titolo=val("pub-titolo")||"",luogo=val("pub-luogo")||"";
@@ -581,8 +585,20 @@
     var punti=puntiMap[tipo]||0;
     var testoCompleto=titolo?(titolo+(testo?"\n\n"+testo:"")):(testo);
     if(luogo)testoCompleto+="\n\nZona: "+luogo;
-    if(!testoCompleto){alert("Scrivi qualcosa!");return;}
-    var payload={user_id:ME.id,testo:testoCompleto,tipo:tipo,categoria:cat,visibile:true,punti_assegnati:punti,azienda_id:AZIENDA};
+    if(!testoCompleto&&!uploadFile){alert("Scrivi qualcosa o aggiungi una foto!");return;}
+    // Upload foto
+    var mediaUrl=null;
+    if(uploadFile){
+      var ext=uploadFile.name.split(".").pop().toLowerCase();
+      var path="posts/"+ME.id+"-"+Date.now()+"."+ext;
+      var{data:upData,error:upErr}=await supa.storage.from("social-media").upload(path,uploadFile,{cacheControl:"3600",upsert:false});
+      if(upErr){alert("Errore upload: "+upErr.message);return;}
+      var{data:urlData}=supa.storage.from("social-media").getPublicUrl(path);
+      mediaUrl=urlData.publicUrl;
+      uploadFile=null;
+    }
+    var payload={user_id:ME.id,testo:testoCompleto||" ",tipo:tipo,categoria:cat,visibile:true,punti_assegnati:punti,azienda_id:AZIENDA};
+    if(mediaUrl)payload.media_url=mediaUrl;
     if(tipo==="storia")payload.scade_at=new Date(Date.now()+86400000).toISOString();
     if(tipo==="recensione"&&votoSel)payload.voto=votoSel;
     var{error}=await supa.from("social_post").insert(payload);
