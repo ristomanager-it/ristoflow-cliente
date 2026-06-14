@@ -511,14 +511,14 @@
 
   window.scegliTipo=function(tipo){
     tipoSel=tipo;
-    hide("step-tipo");
-    var form=document.getElementById("step-form");
-    form.innerHTML=buildForm(tipo);
-    show("step-form");
+    var st=document.getElementById("step-tipo");
+    var sf=document.getElementById("step-form");
+    if(st)st.style.display="none";
+    if(sf){sf.classList.remove("hidden");sf.style.display="block";sf.innerHTML=buildForm(tipo);}
   };
 
   function buildForm(tipo){
-    var h='<button class="back-btn" onclick="show(\'step-tipo\');hide(\'step-form\')">&#8592; Cambia tipo</button>';
+    var h='<button class="back-btn" onclick="document.getElementById(\'step-tipo\').style.display=\'block\';document.getElementById(\'step-form\').style.display=\'none\'">&#8592; Cambia tipo</button>';
     if(tipo==="esperienza"||tipo==="storia"){
       var punti=tipo==="storia"?50:30;
       h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:36px;margin-bottom:6px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand)">Aggiungi foto o video</div></div>';
