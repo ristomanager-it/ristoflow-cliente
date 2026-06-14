@@ -331,7 +331,7 @@
     var{data,error}=await supa.auth.signUp({email,password:pwd,options:{data:{nome_completo:nome,telefono:tel}}});
     btn.textContent="Crea account";btn.disabled=false;
     if(error){showErr(error.message);return;}
-    if(data.user)await supa.from("clienti_profilo").upsert({user_id:data.user.id,nome_completo:nome,email,telefono:tel},{onConflict:"user_id"}).catch(function(){});
+    if(data.user)try{await supa.from("clienti_profilo").upsert({user_id:data.user.id,nome_completo:nome,email,telefono:tel},{onConflict:"user_id"});}catch(e){}
     showErr("Account creato! Puoi accedere adesso.");
   };
   function showErr(m){var e=document.getElementById("auth-error");e.textContent=m;e.style.display="block";}
@@ -354,7 +354,7 @@
 
   async function renderHome(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
-    var q=supa.from("social_post").select("*,clienti_profilo(nome_completo,tipo_utente),sedi(nome)").eq("visibile",true).order("created_at",{ascending:false}).limit(20);
+    var q=supa.from("social_post").select("*,clienti_profilo(nome_completo,tipo_utente)").eq("visibile",true).order("created_at",{ascending:false}).limit(20);
     if(filtroAttivo!=="tutti")q=q.eq("categoria",filtroAttivo);
     var[{data:posts},{data:reaz}]=await Promise.all([q,ME?supa.from("social_reactions").select("post_id,emoji").eq("user_id",ME.id):{data:[]}]);
     if(reaz)reaz.forEach(function(r){myReaz[r.post_id]=r.emoji;});
@@ -383,7 +383,7 @@
       posts.forEach(function(p){
         var autore=(p.clienti_profilo&&p.clienti_profilo.nome_completo)||"Anonimo";
         var tipoA=(p.clienti_profilo&&p.clienti_profilo.tipo_utente)||"cliente";
-        var locale=(p.sedi&&p.sedi.nome)||"";
+        var locale=p.nome_locale||"";
         var miaR=myReaz[p.id]||null;
         var totR=(p.reaz_fuoco||0)+(p.reaz_applauso||0)+(p.reaz_cuore||0);
         var emj=[];
@@ -587,7 +587,7 @@
     if(tipo==="recensione"&&votoSel)payload.voto=votoSel;
     var{error}=await supa.from("social_post").insert(payload);
     if(error){alert("Errore: "+error.message);return;}
-    if(punti>0)await supa.rpc("aggiungi_punti_cliente",{p_user_id:ME.id,p_punti:punti,p_motivo:tipo+"_pubblicato"}).catch(function(){});
+    if(punti>0)try{await supa.rpc("aggiungi_punti_cliente",{p_user_id:ME.id,p_punti:punti,p_motivo:tipo+"_pubblicato"});}catch(e){}
     chiudiModale();filtroAttivo="tutti";navTo("home");
     if(punti>0)setTimeout(function(){alert("Pubblicato! +"+punti+" punti guadagnati");},300);
   };
@@ -617,7 +617,47 @@
 
   function renderTessera(c){
     if(!ME){showAuth();return;}
-    c.innerHTML='<iframe src="/fidelity.html?a='+AZIENDA+'" style="width:100%;height:calc(100dvh - 112px);border:none;display:block"></iframe>';
+    c.innerHTML='<div class="pb-nav"><div style="padding:16px"><div class="page-title">&#127915; Tessera Fidelity</div><div class="page-sub">I tuoi punti e premi</div></div><div id="tessera-content"><div class="page-loader"><div class="spinner"></div></div></div></div>';
+    caricaTessera();
+  }
+  async function caricaTessera(){
+    var el=document.getElementById("tessera-content");
+    if(!el)return;
+    var{data:profilo}=await supa.from("clienti_profilo").select("*").eq("user_id",ME.id).maybeSingle();
+    var punti=(profilo&&profilo.punti_totali)||0;
+    var livello="Bronzo";
+    if(punti>=5000)livello="Oro";
+    else if(punti>=2000)livello="Argento";
+    var h='<div style="background:linear-gradient(135deg,#0E5A7A,#1a8fb5);margin:0 16px;border-radius:24px;padding:24px;color:#fff;box-shadow:0 8px 32px rgba(14,90,122,.3)">';
+    h+='<div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:4px">Campo Antico Ricevimenti</div>';
+    h+='<div style="font-size:22px;font-weight:800;margin-bottom:16px">'+esc((ME.user_metadata&&ME.user_metadata.nome_completo)||"Cliente")+'</div>';
+    h+='<div style="font-size:11px;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.06em">Punti</div>';
+    h+='<div style="font-size:48px;font-weight:800;line-height:1">'+punti+'</div>';
+    h+='<div style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,.2);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:800">'+livello+'</div>';
+    h+='</div>';
+    h+='<div style="margin:16px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
+    h+='<div style="font-size:14px;font-weight:800;margin-bottom:12px">Come guadagnare punti</div>';
+    var modi=[{i:"&#128247;",t:"Pubblica una storia",p:"+50 pt"},{i:"&#127859;",t:"Condividi una ricetta",p:"+80 pt"},{i:"&#11088;",t:"Scrivi una recensione",p:"+100 pt"},{i:"&#128101;",t:"Porta un amico",p:"+150 pt"}];
+    modi.forEach(function(m){
+      h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f6fa">';
+      h+='<span style="font-size:24px">'+m.i+'</span>';
+      h+='<span style="flex:1;font-size:14px;font-weight:600">'+m.t+'</span>';
+      h+='<span style="background:#e8f4f8;color:#0E5A7A;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800">'+m.p+'</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+    h+='<div style="margin:12px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
+    h+='<div style="font-size:14px;font-weight:800;margin-bottom:12px">Premi disponibili</div>';
+    var livelli=[{n:"Bronzo",p:0,d:"Sconto 5% sulla prossima visita"},{n:"Argento",p:2000,d:"Cena per 2 in omaggio"},{n:"Oro",p:5000,d:"Weekend gastronomico"}];
+    livelli.forEach(function(l){
+      var att=punti>=l.p;
+      h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f6fa;opacity:'+( att?1:.5)+'">';
+      h+='<div style="width:40px;height:40px;border-radius:50%;background:'+( att?"#0E5A7A":"#e5e7eb")+';display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;font-weight:800;flex-shrink:0">'+( att?"&#10003;":l.p/1000+"k")+'</div>';
+      h+='<div><div style="font-size:14px;font-weight:800">'+l.n+'</div><div style="font-size:12px;color:#64748b">'+l.d+'</div></div>';
+      h+='</div>';
+    });
+    h+='</div>';
+    if(el)el.innerHTML=h;
   }
 
   async function renderProfilo(c){
