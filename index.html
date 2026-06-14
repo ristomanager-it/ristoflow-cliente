@@ -24,7 +24,7 @@
       --safe-top:env(safe-area-inset-top,0px);
       --safe-bottom:env(safe-area-inset-bottom,0px);
     }
-    html,body{height:100%;overflow:hidden;}
+    html,body{height:100%;overflow:hidden;} #auth-screen *{pointer-events:auto;}
     body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
     .spinner{width:36px;height:36px;border:3px solid var(--brand-light);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto;}
     @keyframes spin{to{transform:rotate(360deg);}}
@@ -32,7 +32,7 @@
     .page-loader.full{height:100vh;}
 
     /* AUTH */
-    #auth-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 20px calc(24px + var(--safe-bottom));background:linear-gradient(160deg,#0a3f57 0%,#0E5A7A 45%,#00c896 100%);overflow-y:auto;position:relative;z-index:300;}
+    #auth-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 20px 40px;background:linear-gradient(160deg,#0a3f57 0%,#0E5A7A 45%,#00c896 100%);overflow-y:auto;position:fixed;inset:0;z-index:300;}
     .auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
     .auth-logo-icon{width:56px;height:56px;background:rgba(255,255,255,.15);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1.5px solid rgba(255,255,255,.25);}
     .auth-brand-name{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;}
