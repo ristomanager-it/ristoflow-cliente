@@ -36,7 +36,9 @@
     .auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
     .auth-logo-icon{width:56px;height:56px;background:rgba(255,255,255,.15);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1.5px solid rgba(255,255,255,.25);}
     .auth-brand-name{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;}
-    .auth-brand-name span{color:#f97316;}
+    .auth-brand-name .l-risto{color:#fff;}
+    .auth-brand-name .l-flow{color:#00c896;}
+    .auth-brand-name .l-book{color:#f97316;}
     .auth-tagline{font-size:14px;color:rgba(255,255,255,.7);margin-bottom:28px;text-align:center;line-height:1.5;}
     .auth-card{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.25);}
     .auth-tabs{display:flex;gap:4px;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:20px;}
@@ -53,7 +55,9 @@
     #app-shell{display:none;flex-direction:column;height:100vh;height:100dvh;}
     .top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:calc(var(--top-h) + var(--safe-top));padding-top:var(--safe-top);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:100;}
     .top-bar-logo{font-size:22px;font-weight:900;color:var(--brand);letter-spacing:-.8px;}
-    .top-bar-logo span{color:#f97316;}
+    .top-bar-logo .l-risto{color:#0E5A7A;}
+    .top-bar-logo .l-flow{color:#00c896;}
+    .top-bar-logo .l-book{color:#f97316;}
     .top-bar-right{display:flex;gap:6px;}
     .top-btn{width:38px;height:38px;border:none;background:var(--bg);border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;}
     .notif-dot::after{content:"";position:absolute;top:7px;right:7px;width:9px;height:9px;background:#ef4444;border-radius:50%;border:2px solid var(--surface);}
@@ -215,7 +219,7 @@
 <div id="auth-screen">
   <div class="auth-brand">
     <div class="auth-logo-icon">🍽️</div>
-    <div class="auth-brand-name">Ristoflow<span>Book</span></div>
+    <div class="auth-brand-name"><span class="l-risto">Risto</span><span class="l-flow">flow</span><span class="l-book">Book</span></div>
   </div>
   <div class="auth-tagline">Il social della ristorazione italiana.<br>Condividi, scopri, accumula punti.</div>
   <div class="auth-card">
@@ -242,7 +246,7 @@
 <!-- APP -->
 <div id="app-shell">
   <div class="top-bar">
-    <div class="top-bar-logo">Ristoflow<span>Book</span></div>
+    <div class="top-bar-logo"><span class="l-risto">Risto</span><span class="l-flow">flow</span><span class="l-book">Book</span></div>
     <div class="top-bar-right">
       <button class="top-btn notif-dot">&#128276;</button>
       <button class="top-avatar-circle" id="top-av" onclick="navTo('profilo')">&#128100;</button>
