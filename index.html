@@ -281,6 +281,7 @@
         <button class="tipo-btn" onclick="scegliTipo('recensione')"><span class="tipo-icon">&#11088;</span><span class="tipo-label">Recensione</span></button>
         <button class="tipo-btn" onclick="scegliTipo('lavoro')"><span class="tipo-icon">&#128188;</span><span class="tipo-label">Offerta lavoro</span></button>
         <button class="tipo-btn" onclick="scegliTipo('cerco-lavoro')"><span class="tipo-icon">&#128587;</span><span class="tipo-label">Cerco lavoro</span></button>
+        <button class="tipo-btn" onclick="scegliTipo('offerta')"><span class="tipo-icon">&#127873;</span><span class="tipo-label">Offerta</span></button>
         <button class="tipo-btn" onclick="scegliTipo('storia')"><span class="tipo-icon">&#9200;&#65039;</span><span class="tipo-label">Storia 24h</span></button>
       </div>
     </div>
@@ -370,7 +371,7 @@
     h+='</div></div>';
 
     // Filtri
-    var filtri=[{s:"tutti",i:"&#127869;&#65039;",l:"Tutti"},{s:"esperienze",i:"&#128247;",l:"Esperienze"},{s:"ricette",i:"&#127859;",l:"Ricette"},{s:"recensioni",i:"&#11088;",l:"Recensioni"},{s:"lavoro",i:"&#128188;",l:"Lavoro"},{s:"fornitori",i:"&#129309;",l:"Fornitori"}];
+    var filtri=[{s:"tutti",i:"&#127968;",l:"Feed"},{s:"esperienze",i:"&#128247;",l:"Momenti"},{s:"ricette",i:"&#127859;",l:"Ricette"},{s:"recensioni",i:"&#11088;",l:"Recensioni"},{s:"offerte",i:"&#127873;",l:"Offerte"},{s:"lavoro",i:"&#128188;",l:"Lavoro"}];
     h+='<div class="filtri-wrap"><div class="filtri-strip">';
     filtri.forEach(function(f){
       h+='<button class="filtro-btn'+(filtroAttivo===f.s?" active":"")+'" onclick="setFiltro(\''+f.s+'\')">'+f.i+' '+f.l+'</button>';
@@ -391,7 +392,7 @@
         if(p.reaz_applauso>0)emj.push("&#128079;");
         if(p.reaz_cuore>0)emj.push("&#128293;");
         var cat=p.categoria||"esperienze";
-        var catL={esperienze:"&#128247; Esperienza",ricette:"&#127859; Ricetta",recensioni:"&#11088; Recensione",lavoro:"&#128188; Lavoro",fornitori:"&#129309; Fornitore"}[cat]||cat;
+        var catL={esperienze:"&#128247; Momento",ricette:"&#127859; Ricetta",recensioni:"&#11088; Recensione",offerte:"&#127873; Offerta",lavoro:"&#128188; Lavoro"}[cat]||cat;
 
         h+='<div class="feed-post" id="post-'+p.id+'">';
         h+='<div class="post-header"><div class="post-avatar">'+esc(autore.charAt(0).toUpperCase())+'</div>';
@@ -524,14 +525,14 @@
       h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:36px;margin-bottom:6px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand)">Aggiungi foto o video</div></div>';
       h+='<div id="preview-wrap"></div>';
       h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza..."></textarea>';
-      h+='<button class="pub-btn" onclick="pubblica(\''+tipo+'\')">Pubblica &middot; +'+punti+' pt</button>';
+      h+='<button class="pub-btn" onclick="pubblica(\''+tipo+'\')">Pubblica</button>';
     }else if(tipo==="ricetta"){
       h+='<input class="pub-input" id="pub-titolo" placeholder="Nome della ricetta"/>';
       h+='<textarea class="pub-textarea" id="pub-ingredienti" placeholder="Ingredienti (uno per riga)" style="min-height:80px"></textarea>';
       h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Procedimento..."></textarea>';
       h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:28px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand);margin-top:4px">Foto del piatto</div></div>';
       h+='<div id="preview-wrap"></div>';
-      h+='<button class="pub-btn" onclick="pubblica(\'ricetta\')">Pubblica ricetta &middot; +80 pt</button>';
+      h+='<button class="pub-btn" onclick="pubblica(\'ricetta\')">Pubblica ricetta</button>';
     }else if(tipo==="recensione"){
       h+='<div style="font-size:14px;font-weight:700;margin-bottom:10px">Il tuo voto</div>';
       h+='<div class="stella-sel" id="stella-sel">';
@@ -539,7 +540,7 @@
       h+='</div>';
       h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza in questo locale..."></textarea>';
       h+='<div style="font-size:12px;color:var(--text-3);margin-bottom:12px">&#10003; La recensione viene verificata tramite la tua visita registrata</div>';
-      h+='<button class="pub-btn" onclick="pubblica(\'recensione\')">Pubblica recensione &middot; +100 pt</button>';
+      h+='<button class="pub-btn" onclick="pubblica(\'recensione\')">Pubblica recensione</button>';
     }else if(tipo==="lavoro"){
       h+='<input class="pub-input" id="pub-titolo" placeholder="Posizione (es. Chef de partie, Cameriere...)"/>';
       h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Descrizione, requisiti, orari..."></textarea>';
@@ -550,6 +551,13 @@
       h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Presentati: esperienza, disponibilita, cosa cerchi..."></textarea>';
       h+='<input class="pub-input" id="pub-luogo" placeholder="Citta / Zona"/>';
       h+='<button class="pub-btn" onclick="pubblica(\'cerco-lavoro\')">Pubblica candidatura</button>';
+    }
+    else if(tipo==="offerta"){
+      h+='<input class="pub-input" id="pub-titolo" placeholder="Titolo offerta (es. -20% su tutti i secondi)"/>';
+      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Descrivi l offerta: validita, condizioni..."></textarea>';
+      h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:28px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand);margin-top:4px">Aggiungi foto</div></div>';
+      h+='<div id="preview-wrap"></div>';
+      h+='<button class="pub-btn" onclick="pubblica('offerta')">Pubblica offerta</button>';
     }
     return h;
   }
@@ -579,7 +587,7 @@
   window.pubblica=async function(tipo){
     if(!ME)return;
     var testo=val("pub-testo"),titolo=val("pub-titolo")||"",luogo=val("pub-luogo")||"";
-    var catMap={esperienza:"esperienze",storia:"esperienze",ricetta:"ricette",recensione:"recensioni",lavoro:"lavoro","cerco-lavoro":"lavoro"};
+    var catMap={esperienza:"esperienze",storia:"esperienze",ricetta:"ricette",recensione:"recensioni",offerta:"offerte",lavoro:"lavoro","cerco-lavoro":"lavoro"};
     var puntiMap={esperienza:30,storia:50,ricetta:80,recensione:100,lavoro:0,"cerco-lavoro":0};
     var cat=catMap[tipo]||"esperienze";
     var punti=puntiMap[tipo]||0;
