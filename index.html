@@ -346,7 +346,17 @@
       var data=await res.json();
       if(data.error){showErr(data.error);btn.textContent="Invia codice WhatsApp";btn.disabled=false;return;}
       telCorrente=data.telefono;
-      document.getElementById("otp-hint").textContent="Codice inviato a "+telCorrente;
+      var hint=document.getElementById("otp-hint");
+      if(data.codice_test){
+        hint.innerHTML="&#128272; <strong>TEST:</strong> codice = <span style='font-size:22px;font-weight:900;color:var(--brand);letter-spacing:4px'>"+data.codice_test+"</span>";
+        // Auto-compila il campo
+        setTimeout(function(){
+          var inp=document.getElementById("input-otp");
+          if(inp){inp.value=data.codice_test;}
+        },300);
+      } else {
+        hint.textContent="Codice inviato a "+telCorrente;
+      }
       hide("step-tel");show("step-otp");hide("auth-error");
       document.getElementById("input-otp").focus();
     }catch(e){showErr("Errore connessione");btn.textContent="Invia codice WhatsApp";btn.disabled=false;}
