@@ -453,16 +453,16 @@
     var updBtn=function(id,c,on){var e=document.getElementById("reaz-"+id+"-"+c);if(e)e.classList.toggle("liked",on);};
     if(prev===emoji){
       await supa.from("social_reactions").delete().eq("user_id",ME.id).eq("post_id",postId);
-      await supa.rpc("decrementa_reaction",{p_post_id:postId,p_campo:campo}).catch(function(){});
+      try{await supa.rpc("decrementa_reaction",{p_post_id:postId,p_campo:campo});}catch(e){}
       updBtn(postId,campo,false);delete myReaz[postId];return;
     }
     if(prev){
       var cpMap={"&#128525;":"reaz_fuoco","&#128079;":"reaz_applauso","&#128293;":"reaz_cuore"};
       var cp=cpMap[prev];
-      if(cp){await supa.rpc("decrementa_reaction",{p_post_id:postId,p_campo:cp}).catch(function(){});updBtn(postId,cp,false);}
+      if(cp){try{await supa.rpc("decrementa_reaction",{p_post_id:postId,p_campo:cp});}catch(e){}updBtn(postId,cp,false);}
     }
     await supa.from("social_reactions").upsert({user_id:ME.id,post_id:postId,emoji},{onConflict:"user_id,post_id"});
-    await supa.rpc("incrementa_reaction",{p_post_id:postId,p_campo:campo}).catch(function(){});
+    try{await supa.rpc("incrementa_reaction",{p_post_id:postId,p_campo:campo});}catch(e){}
     updBtn(postId,campo,true);myReaz[postId]=emoji;
   };
 
