@@ -354,7 +354,7 @@
 
   async function renderHome(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
-    var q=supa.from("social_post").select("*,clienti_profilo(nome_completo,tipo_utente)").eq("visibile",true).order("created_at",{ascending:false}).limit(20);
+    var q=supa.from("v_social_feed").select("*").eq("visibile",true).order("created_at",{ascending:false}).limit(20);
     if(filtroAttivo!=="tutti")q=q.eq("categoria",filtroAttivo);
     var[{data:posts},{data:reaz}]=await Promise.all([q,ME?supa.from("social_reactions").select("post_id,emoji").eq("user_id",ME.id):{data:[]}]);
     if(reaz)reaz.forEach(function(r){myReaz[r.post_id]=r.emoji;});
@@ -381,8 +381,8 @@
       h+='<div class="empty-state"><div class="empty-icon">&#127869;&#65039;</div><div class="empty-title">Nessun contenuto</div><div class="empty-sub">Sii il primo a pubblicare!</div><button class="empty-btn" onclick="apriPubblica()">Pubblica ora</button></div>';
     }else{
       posts.forEach(function(p){
-        var autore=(p.clienti_profilo&&p.clienti_profilo.nome_completo)||"Anonimo";
-        var tipoA=(p.clienti_profilo&&p.clienti_profilo.tipo_utente)||"cliente";
+        var autore=p.nome_completo||"Anonimo";
+        var tipoA=p.tipo_utente||"cliente";
         var locale=p.nome_locale||"";
         var miaR=myReaz[p.id]||null;
         var totR=(p.reaz_fuoco||0)+(p.reaz_applauso||0)+(p.reaz_cuore||0);
@@ -594,7 +594,7 @@
 
   async function renderRicette(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
-    var{data:ricette}=await supa.from("social_post").select("*,clienti_profilo(nome_completo)").eq("categoria","ricette").eq("visibile",true).order("created_at",{ascending:false}).limit(40);
+    var{data:ricette}=await supa.from("v_social_feed").select("*").eq("categoria","ricette").eq("visibile",true).order("created_at",{ascending:false}).limit(40);
     var h='<div class="pb-nav"><div style="padding:16px 16px 12px"><div class="page-title">Ricette</div><div class="page-sub">Dai segreti della cucina</div></div>';
     h+='<div style="padding:0 12px 10px"><input style="width:100%;padding:11px 16px;border:1.5px solid var(--border);border-radius:999px;font-size:14px;font-family:inherit;background:var(--surface);outline:none;" placeholder="Cerca ricetta..."/></div>';
     if(!ricette||ricette.length===0){
@@ -602,7 +602,7 @@
     }else{
       h+='<div class="ricette-grid">';
       ricette.forEach(function(r){
-        var autore=(r.clienti_profilo&&r.clienti_profilo.nome_completo)||"Anonimo";
+        var autore=r.nome_completo||"Anonimo";
         var titolo=r.testo?r.testo.split("\n")[0].substring(0,40):"Ricetta";
         h+='<div class="ricetta-card"><div class="ricetta-img">&#127837;</div>';
         h+='<div class="ricetta-body"><div class="ricetta-nome">'+esc(titolo)+'</div>';
