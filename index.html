@@ -748,14 +748,30 @@
     h+='</div>';
 
     // Menu
+    var menuItems=[
+      {icon:"&#127915;",text:"Tessera fidelity",fn:"navTo('tessera')"},
+      {icon:"&#128247;",text:"I miei post",fn:""},
+      {icon:"&#11088;",text:"Le mie recensioni",fn:""}
+    ];
+    var menuItemsSupp=[
+      {icon:"&#128172;",text:"Contattaci su WhatsApp",fn:""},
+      {icon:"&#128274;",text:"Privacy e dati",fn:""}
+    ];
     h+='<div class="profilo-menu">';
     h+='<div class="menu-group-title">Il mio account</div>';
-    h+='<div class="menu-row" onclick="navTo('tessera')"><div class="menu-row-icon">&#127915;</div><div class="menu-row-text">Tessera fidelity</div><div class="menu-row-arrow">&#8250;</div></div>';
-    h+='<div class="menu-row"><div class="menu-row-icon">&#128247;</div><div class="menu-row-text">I miei post</div><div class="menu-row-arrow">&#8250;</div></div>';
-    h+='<div class="menu-row"><div class="menu-row-icon">&#11088;</div><div class="menu-row-text">Le mie recensioni</div><div class="menu-row-arrow">&#8250;</div></div>';
+    menuItems.forEach(function(m){
+      h+='<div class="menu-row"'+(m.fn?' onclick="'+m.fn+'"':'')+'>'+
+         '<div class="menu-row-icon">'+m.icon+'</div>'+
+         '<div class="menu-row-text">'+m.text+'</div>'+
+         '<div class="menu-row-arrow">&#8250;</div></div>';
+    });
     h+='<div class="menu-group-title" style="margin-top:8px">Supporto</div>';
-    h+='<div class="menu-row"><div class="menu-row-icon">&#128172;</div><div class="menu-row-text">Contattaci su WhatsApp</div><div class="menu-row-arrow">&#8250;</div></div>';
-    h+='<div class="menu-row"><div class="menu-row-icon">&#128274;</div><div class="menu-row-text">Privacy e dati</div><div class="menu-row-arrow">&#8250;</div></div>';
+    menuItemsSupp.forEach(function(m){
+      h+='<div class="menu-row"'+(m.fn?' onclick="'+m.fn+'"':'')+'>'+
+         '<div class="menu-row-icon">'+m.icon+'</div>'+
+         '<div class="menu-row-text">'+m.text+'</div>'+
+         '<div class="menu-row-arrow">&#8250;</div></div>';
+    });
     h+='</div>';
     h+='<button class="logout-btn" onclick="doLogout()">Esci dall'account</button>';
     h+='</div>';
