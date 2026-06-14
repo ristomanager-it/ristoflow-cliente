@@ -219,31 +219,32 @@
 <!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-brand">
-    <div class="auth-logo-icon">🍽️</div>
+    <div class="auth-logo-icon">&#127869;&#65039;</div>
     <div class="auth-brand-name"><span class="l-risto">Risto</span><span class="l-flow">flow</span><span class="l-book">Book</span></div>
   </div>
-  <div class="auth-tagline">Il social della ristorazione italiana.<br>Condividi, scopri, accumula punti.</div>
+  <div class="auth-tagline">Il social della ristorazione italiana.<br>Entra con il tuo numero WhatsApp.</div>
   <div class="auth-card">
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchTab('login',this)">Accedi</button>
-      <button class="auth-tab" onclick="switchTab('register',this)">Registrati</button>
-    </div>
     <div id="auth-error" class="auth-error"></div>
-    <div id="form-login" class="auth-form">
-      <input class="auth-input" type="email" id="login-email" placeholder="Email" autocomplete="email"/>
-      <input class="auth-input" type="password" id="login-pwd" placeholder="Password" autocomplete="current-password"/>
-      <button class="auth-btn" onclick="doLogin()">Entra &rarr;</button>
+    <div id="step-tel" class="auth-form">
+      <div style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:8px">Il tuo numero WhatsApp</div>
+      <input class="auth-input" type="tel" id="input-tel" placeholder="+39 333 123 4567" autocomplete="tel"/>
+      <button class="auth-btn" onclick="inviaOtp()">Invia codice WhatsApp &#128172;</button>
     </div>
-    <div id="form-register" class="auth-form hidden">
-      <input class="auth-input" type="text" id="reg-nome" placeholder="Nome e cognome"/>
-      <input class="auth-input" type="email" id="reg-email" placeholder="Email" autocomplete="email"/>
-      <input class="auth-input" type="tel" id="reg-tel" placeholder="Telefono (per WhatsApp)"/>
-      <input class="auth-input" type="password" id="reg-pwd" placeholder="Password (min 6 caratteri)" autocomplete="new-password"/>
-      <button class="auth-btn" onclick="doRegister()">Crea account &rarr;</button>
+    <div id="step-otp" class="auth-form hidden">
+      <div style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:4px">Codice ricevuto su WhatsApp</div>
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:12px" id="otp-hint">Controlla i tuoi messaggi</div>
+      <input class="auth-input" type="tel" id="input-otp" placeholder="123456" maxlength="6" autocomplete="one-time-code" style="font-size:24px;letter-spacing:8px;text-align:center"/>
+      <button class="auth-btn" onclick="verificaOtp()">Entra &#8594;</button>
+      <button onclick="tornaATel()" style="width:100%;background:none;border:none;font-size:13px;font-weight:700;color:var(--text-2);cursor:pointer;margin-top:8px">&#8592; Cambia numero</button>
+    </div>
+    <div id="step-nome" class="auth-form hidden">
+      <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px">Benvenuto!</div>
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:16px">Come ti chiami?</div>
+      <input class="auth-input" type="text" id="input-nome" placeholder="Nome e cognome" autocomplete="name"/>
+      <button class="auth-btn" onclick="completaRegistrazione()">Inizia &#8594;</button>
     </div>
   </div>
 </div>
-
 <!-- APP -->
 <div id="app-shell">
   <div class="top-bar">
@@ -304,41 +305,89 @@
   var ME=null,myReaz={},filtroAttivo="tutti",tipoSel=null,votoSel=0;
 
   async function init(){
-    var{data:{session}}=await supa.auth.getSession();
+    // Precompila telefono da URL ?tel=
+    var urlParams=new URLSearchParams(window.location.search);
+    var telParam=urlParams.get("tel");
+    if(telParam){
+      var inputTel=document.getElementById("input-tel");
+      if(inputTel)inputTel.value=telParam;
+    }
     hide("initial-loader");
-    if(session){ME=session.user;showApp();}else showAuth();
-    supa.auth.onAuthStateChange(function(ev,sess){
-      if(ev==="SIGNED_IN"&&sess){ME=sess.user;showApp();}
-      else if(ev==="SIGNED_OUT"){ME=null;showAuth();}
-    });
+    var token=localStorage.getItem("rfb_token");
+    if(token){
+      // Verifica sessione
+      var{data:sess}=await supa.from("clienti_sessioni").select("*,clienti_profilo(*)").eq("token",token).gte("scade_at",new Date().toISOString()).maybeSingle();
+      if(sess&&sess.clienti_profilo){
+        ME=sess.clienti_profilo;
+        sessionToken=token;
+        showApp();
+        return;
+      } else {
+        localStorage.removeItem("rfb_token");
+      }
+    }
+    showAuth();
   }
 
-  window.switchTab=function(tab,btn){
-    document.querySelectorAll(".auth-tab").forEach(function(t){t.classList.remove("active");});
-    btn.classList.add("active");
-    tab==="login"?(show("form-login"),hide("form-register")):(hide("form-login"),show("form-register"));
-    hide("auth-error");
+  var sessionToken=localStorage.getItem("rfb_token")||null;
+  var telCorrente=null;
+
+  window.inviaOtp=async function(){
+    var tel=val("input-tel");
+    if(!tel||tel.length<8){showErr("Inserisci un numero valido");return;}
+    var btn=document.querySelector("#step-tel .auth-btn");
+    btn.textContent="Invio...";btn.disabled=true;
+    try{
+      var res=await fetch("https://cuhcscpvhypoaplcmtjk.supabase.co/functions/v1/invia-otp-wa",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0"},
+        body:JSON.stringify({telefono:tel,azione:"invia"})
+      });
+      var data=await res.json();
+      if(data.error){showErr(data.error);btn.textContent="Invia codice WhatsApp";btn.disabled=false;return;}
+      telCorrente=data.telefono;
+      document.getElementById("otp-hint").textContent="Codice inviato a "+telCorrente;
+      hide("step-tel");show("step-otp");hide("auth-error");
+      document.getElementById("input-otp").focus();
+    }catch(e){showErr("Errore connessione");btn.textContent="Invia codice WhatsApp";btn.disabled=false;}
   };
-  window.doLogin=async function(){
-    var email=val("login-email"),pwd=val("login-pwd");
-    if(!email||!pwd){showErr("Inserisci email e password");return;}
-    var btn=document.querySelector("#form-login .auth-btn");
-    btn.textContent="...";btn.disabled=true;
-    var{error}=await supa.auth.signInWithPassword({email,password:pwd});
-    btn.textContent="Entra";btn.disabled=false;
-    if(error)showErr(error.message==="Invalid login credentials"?"Email o password errati":error.message);
+
+  window.verificaOtp=async function(){
+    var codice=val("input-otp");
+    if(!codice||codice.length!==6){showErr("Inserisci il codice a 6 cifre");return;}
+    var btn=document.querySelector("#step-otp .auth-btn");
+    btn.textContent="Verifica...";btn.disabled=true;
+    try{
+      var res=await fetch("https://cuhcscpvhypoaplcmtjk.supabase.co/functions/v1/invia-otp-wa",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0"},
+        body:JSON.stringify({telefono:telCorrente,azione:"verifica",codice:codice})
+      });
+      var data=await res.json();
+      btn.textContent="Entra";btn.disabled=false;
+      if(data.error){showErr(data.error);return;}
+      sessionToken=data.token;
+      localStorage.setItem("rfb_token",sessionToken);
+      ME=data.profilo;
+      if(!ME.nome_completo){
+        hide("step-otp");show("step-nome");
+      } else {
+        showApp();
+      }
+    }catch(e){showErr("Errore connessione");btn.textContent="Entra";btn.disabled=false;}
   };
-  window.doRegister=async function(){
-    var nome=val("reg-nome"),email=val("reg-email"),tel=val("reg-tel"),pwd=val("reg-pwd");
-    if(!nome||!email||!pwd){showErr("Compila tutti i campi");return;}
-    if(pwd.length<6){showErr("Password minimo 6 caratteri");return;}
-    var btn=document.querySelector("#form-register .auth-btn");
-    btn.textContent="...";btn.disabled=true;
-    var{data,error}=await supa.auth.signUp({email,password:pwd,options:{data:{nome_completo:nome,telefono:tel}}});
-    btn.textContent="Crea account";btn.disabled=false;
-    if(error){showErr(error.message);return;}
-    if(data.user)try{await supa.from("clienti_profilo").upsert({user_id:data.user.id,nome_completo:nome,email,telefono:tel},{onConflict:"user_id"});}catch(e){}
-    showErr("Account creato! Puoi accedere adesso.");
+
+  window.completaRegistrazione=async function(){
+    var nome=val("input-nome");
+    if(!nome){showErr("Inserisci il tuo nome");return;}
+    await supa.from("clienti_profilo").update({nome_completo:nome}).eq("id",ME.id);
+    ME.nome_completo=nome;
+    showApp();
+  };
+
+  window.tornaATel=function(){
+    hide("step-otp");show("step-tel");hide("auth-error");
+    document.getElementById("input-otp").value="";
   };
   function showErr(m){var e=document.getElementById("auth-error");e.textContent=m;e.style.display="block";}
   function showAuth(){hide("app-shell");show("auth-screen","flex");}
@@ -349,7 +398,12 @@
     if(av&&ME&&ME.user_metadata&&ME.user_metadata.nome_completo)av.textContent=ME.user_metadata.nome_completo.charAt(0).toUpperCase();
     navTo("home");
   }
-  window.doLogout=async function(){await supa.auth.signOut();};
+  window.doLogout=async function(){
+    if(sessionToken) await supa.from("clienti_sessioni").delete().eq("token",sessionToken);
+    localStorage.removeItem("rfb_token");
+    ME=null;sessionToken=null;
+    showAuth();
+  };
 
   window.navTo=function(page){
     document.querySelectorAll(".nav-item").forEach(function(b){b.classList.toggle("active",b.dataset.page===page);});
