@@ -206,6 +206,7 @@
     .empty-btn{background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px;}
 
     .pb-nav{padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);}
+    .profilo-hero{position:relative;}
     .hidden{display:none!important;}
     .page-title{font-size:22px;font-weight:900;letter-spacing:-.3px;}
     .page-sub{font-size:13px;color:var(--text-2);margin-top:4px;}
@@ -701,41 +702,141 @@
     var visite=(profilo&&profilo.visite_totali)||0;
     var storie=(profilo&&profilo.storie_pubblicate)||0;
     var views=(profilo&&profilo.views_totali)||0;
+    var nomeCompleto=(profilo&&profilo.nome_completo)||nome;
+    var bio=(profilo&&profilo.bio)||"";
+    var citta=(profilo&&profilo.citta)||"";
+    var ruolo=(profilo&&profilo.tipo_utente)||"cliente";
+    var avatarUrl=(profilo&&profilo.avatar_url)||"";
     var livello="Bronzo",nextLiv=2000,nextNome="Argento";
     if(tot>=5000){livello="Oro";nextLiv=10000;nextNome="Platinum";}
     else if(tot>=2000){livello="Argento";nextLiv=5000;nextNome="Oro";}
     var pct=Math.min(100,Math.round((tot/nextLiv)*100));
     var livIco={Bronzo:"&#129355;",Argento:"&#129354;",Oro:"&#129353;",Platinum:"&#128142;"}[livello]||"";
+    var ruoloLabel={cliente:"&#127869;&#65039; Cliente",chef:"&#128104;&#8205;&#127859; Chef",titolare:"&#127978; Titolare",fornitore:"&#129309; Fornitore"}[ruolo]||ruolo;
 
     var h='<div class="pb-nav">';
-    h+='<div class="profilo-hero"><div class="profilo-av">'+esc(nome.charAt(0).toUpperCase())+'</div>';
-    h+='<div class="profilo-nome-el">'+esc(nome)+'</div>';
-    h+='<div class="profilo-email-el">'+esc(email)+'</div>';
-    h+='<div class="profilo-livello-badge">'+livIco+' '+livello+'</div></div>';
+    // Hero
+    h+='<div class="profilo-hero" style="position:relative">';
+    h+='<div class="profilo-av" id="av-wrap" style="cursor:pointer;position:relative" onclick="cambiaFotoProfilo()">';
+    if(avatarUrl){
+      h+='<img src="'+esc(avatarUrl)+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>';
+    }else{
+      h+=esc(nomeCompleto.charAt(0).toUpperCase());
+    }
+    h+='<div style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:#f97316;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #fff">&#9998;</div>';
+    h+='</div>';
+    h+='<div class="profilo-nome-el">'+esc(nomeCompleto)+'</div>';
+    if(bio)h+='<div class="profilo-email-el">'+esc(bio)+'</div>';
+    if(citta)h+='<div style="font-size:12px;opacity:.7;margin-top:4px">&#128205; '+esc(citta)+'</div>';
+    h+='<div class="profilo-livello-badge">'+livIco+' '+livello+'</div>';
+    h+='<button onclick="apriModificaProfilo()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.2);border:none;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer">Modifica</button>';
+    h+='</div>';
+
+    // Stats
     h+='<div class="profilo-stats">';
     h+='<div class="p-stat"><div class="p-stat-val">'+tot+'</div><div class="p-stat-label">Punti</div></div>';
     h+='<div class="p-stat"><div class="p-stat-val">'+visite+'</div><div class="p-stat-label">Visite</div></div>';
     h+='<div class="p-stat"><div class="p-stat-val">'+views+'</div><div class="p-stat-label">Views</div></div>';
     h+='<div class="p-stat"><div class="p-stat-val">'+storie+'</div><div class="p-stat-label">Post</div></div>';
     h+='</div>';
+
+    // Barra punti
     h+='<div class="punti-bar-wrap">';
     h+='<div class="punti-bar-labels"><span>'+livIco+' '+livello+'</span><span>'+tot+' / '+nextLiv+' pt</span></div>';
     h+='<div class="punti-bar-track"><div class="punti-bar-fill" style="width:'+pct+'%"></div></div>';
     h+='<div class="punti-next-label">Ancora '+Math.max(0,nextLiv-tot)+' punti per '+nextNome+'</div>';
     h+='</div>';
+
+    // Menu
     h+='<div class="profilo-menu">';
     h+='<div class="menu-group-title">Il mio account</div>';
-    h+='<div class="menu-row" onclick="navTo(\'tessera\')"><div class="menu-row-icon">&#127915;</div><div class="menu-row-text">Tessera fidelity</div><div class="menu-row-arrow">&#8250;</div></div>';
+    h+='<div class="menu-row" onclick="navTo('tessera')"><div class="menu-row-icon">&#127915;</div><div class="menu-row-text">Tessera fidelity</div><div class="menu-row-arrow">&#8250;</div></div>';
     h+='<div class="menu-row"><div class="menu-row-icon">&#128247;</div><div class="menu-row-text">I miei post</div><div class="menu-row-arrow">&#8250;</div></div>';
     h+='<div class="menu-row"><div class="menu-row-icon">&#11088;</div><div class="menu-row-text">Le mie recensioni</div><div class="menu-row-arrow">&#8250;</div></div>';
     h+='<div class="menu-group-title" style="margin-top:8px">Supporto</div>';
     h+='<div class="menu-row"><div class="menu-row-icon">&#128172;</div><div class="menu-row-text">Contattaci su WhatsApp</div><div class="menu-row-arrow">&#8250;</div></div>';
     h+='<div class="menu-row"><div class="menu-row-icon">&#128274;</div><div class="menu-row-text">Privacy e dati</div><div class="menu-row-arrow">&#8250;</div></div>';
     h+='</div>';
-    h+='<button class="logout-btn" onclick="doLogout()">Esci dall\'account</button>';
+    h+='<button class="logout-btn" onclick="doLogout()">Esci dall'account</button>';
     h+='</div>';
     c.innerHTML=h;
   }
+
+  window.apriModificaProfilo=async function(){
+    var{data:profilo}=await supa.from("clienti_profilo").select("*").eq("user_id",ME.id).maybeSingle();
+    var nomeCompleto=(profilo&&profilo.nome_completo)||ME.user_metadata?.nome_completo||"";
+    var bio=(profilo&&profilo.bio)||"";
+    var citta=(profilo&&profilo.citta)||"";
+    var tel=(profilo&&profilo.telefono)||ME.user_metadata?.telefono||"";
+    var ruolo=(profilo&&profilo.tipo_utente)||"cliente";
+
+    var sheet=document.getElementById("modal-sheet");
+    var overlay=document.getElementById("modal-pubblica");
+    sheet.innerHTML='<div class="modal-handle"></div>'+
+      '<div class="modal-title">Modifica profilo</div>'+
+      '<div style="text-align:center;margin-bottom:16px">'+
+      '<div onclick="cambiaFotoProfilo()" style="width:80px;height:80px;border-radius:50%;background:var(--brand-light);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:var(--brand);cursor:pointer;position:relative;border:3px solid var(--brand)">'+
+      '&#9998;'+
+      '<div style="position:absolute;bottom:0;right:0;width:24px;height:24px;background:#f97316;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff">&#9998;</div>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--text-3);margin-top:8px;cursor:pointer" onclick="cambiaFotoProfilo()">Cambia foto</div>'+
+      '</div>'+
+      '<input class="pub-input" id="edit-nome" placeholder="Nome completo" value="'+esc(nomeCompleto)+'"/>'+
+      '<input class="pub-input" id="edit-bio" placeholder="Bio (es. Appassionato di cucina siciliana)" value="'+esc(bio)+'"/>'+
+      '<input class="pub-input" id="edit-citta" placeholder="Citta" value="'+esc(citta)+'"/>'+
+      '<input class="pub-input" id="edit-tel" placeholder="Telefono WhatsApp" value="'+esc(tel)+'" type="tel"/>'+
+      '<select class="pub-input" id="edit-ruolo" style="cursor:pointer">'+
+      '<option value="cliente"'+( ruolo==="cliente"?" selected":"")+'>Cliente / Appassionato</option>'+
+      '<option value="chef"'+( ruolo==="chef"?" selected":"")+'>Chef / Cuoco</option>'+
+      '<option value="titolare"'+( ruolo==="titolare"?" selected":"")+'>Titolare locale</option>'+
+      '<option value="fornitore"'+( ruolo==="fornitore"?" selected":"")+'>Fornitore</option>'+
+      '</select>'+
+      '<button class="pub-btn" onclick="salvaProfilo()">Salva profilo</button>';
+    overlay.classList.add("open");
+  };
+
+  window.salvaProfilo=async function(){
+    var nome=val("edit-nome");
+    var bio=val("edit-bio");
+    var citta=val("edit-citta");
+    var tel=val("edit-tel");
+    var ruolo=document.getElementById("edit-ruolo")?.value||"cliente";
+    if(!nome){alert("Inserisci il tuo nome");return;}
+    var btn=document.querySelector("#modal-sheet .pub-btn");
+    btn.textContent="Salvataggio...";btn.disabled=true;
+    var{error}=await supa.from("clienti_profilo").upsert({
+      user_id:ME.id,
+      nome_completo:nome,
+      bio:bio,
+      citta:citta,
+      telefono:tel,
+      tipo_utente:ruolo,
+      email:ME.email
+    },{onConflict:"user_id"});
+    btn.textContent="Salva profilo";btn.disabled=false;
+    if(error){alert("Errore: "+error.message);return;}
+    // Aggiorna anche user metadata
+    await supa.auth.updateUser({data:{nome_completo:nome,telefono:tel}});
+    document.getElementById("modal-pubblica").classList.remove("open");
+    navTo("profilo");
+  };
+
+  window.cambiaFotoProfilo=function(){
+    var i=document.createElement("input");i.type="file";i.accept="image/*";
+    i.onchange=async function(e){
+      var f=e.target.files[0];if(!f)return;
+      var ext=f.name.split(".").pop().toLowerCase();
+      var path="avatar/"+ME.id+"."+ext;
+      var{error:upErr}=await supa.storage.from("profili").upload(path,f,{cacheControl:"3600",upsert:true});
+      if(upErr){alert("Errore upload foto: "+upErr.message);return;}
+      var{data:urlData}=supa.storage.from("profili").getPublicUrl(path);
+      var avatarUrl=urlData.publicUrl;
+      await supa.from("clienti_profilo").upsert({user_id:ME.id,avatar_url:avatarUrl},{onConflict:"user_id"});
+      navTo("profilo");
+    };
+    i.click();
+  };
+
 
   function stelleHTML(v){var s="";for(var i=0;i<5;i++)s+=i<v?"&#11088;":"&#9734;";return s;}
   function show(id,d){var e=document.getElementById(id);if(e)e.style.display=d||"block";}
