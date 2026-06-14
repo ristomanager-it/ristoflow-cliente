@@ -17,8 +17,7 @@
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
     :root{
       --brand:#0E5A7A;--brand-light:#e8f4f8;--brand-mid:#1a8fb5;
-      --accent:#00c896;--accent-dark:#00a87e;
-      --bg:#f0f6fa;--surface:#fff;
+      --accent:#00c896;--bg:#f0f6fa;--surface:#fff;
       --text:#111827;--text-2:#64748b;--text-3:#94a3b8;
       --border:#e5e7eb;--radius:16px;--radius-sm:10px;
       --nav-h:60px;--top-h:52px;
@@ -26,14 +25,13 @@
       --safe-bottom:env(safe-area-inset-bottom,0px);
     }
     html,body{height:100%;overflow:hidden;}
-    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
-
-    /* ── SPINNER ── */
+    body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
     .spinner{width:36px;height:36px;border:3px solid var(--brand-light);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto;}
     @keyframes spin{to{transform:rotate(360deg);}}
-    .page-loader{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--text-2);font-size:13px;font-weight:600;}
+    .page-loader{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--text-2);font-size:13px;font-weight:600;}
+    .page-loader.full{height:100vh;}
 
-    /* ── AUTH ── */
+    /* AUTH */
     #auth-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 20px calc(24px + var(--safe-bottom));background:linear-gradient(160deg,#0a3f57 0%,#0E5A7A 45%,#00c896 100%);overflow-y:auto;}
     .auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
     .auth-logo-icon{width:56px;height:56px;background:rgba(255,255,255,.15);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1.5px solid rgba(255,255,255,.25);}
@@ -47,125 +45,121 @@
     .auth-form{display:flex;flex-direction:column;gap:11px;}
     .auth-input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;background:var(--bg);color:var(--text);}
     .auth-input:focus{border-color:var(--brand);background:#fff;}
-    .auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--brand),var(--brand-mid));color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;letter-spacing:.01em;}
+    .auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--brand),var(--brand-mid));color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;}
     .auth-btn:active{opacity:.88;}
     .auth-error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;display:none;margin-bottom:4px;line-height:1.4;}
 
-    /* ── APP SHELL ── */
+    /* APP */
     #app-shell{display:none;flex-direction:column;height:100vh;height:100dvh;}
-
-    /* TOP BAR */
-    .top-bar{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 16px;
-      height:calc(var(--top-h) + var(--safe-top));
-      padding-top:var(--safe-top);
-      background:var(--surface);
-      border-bottom:1px solid var(--border);
-      flex-shrink:0;position:relative;z-index:100;
-    }
-    .top-bar-logo{font-size:22px;font-weight:900;color:var(--brand);letter-spacing:-0.8px;}
+    .top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:calc(var(--top-h) + var(--safe-top));padding-top:var(--safe-top);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:100;}
+    .top-bar-logo{font-size:22px;font-weight:900;color:var(--brand);letter-spacing:-.8px;}
     .top-bar-logo span{color:var(--accent);}
     .top-bar-right{display:flex;gap:6px;}
-    .top-btn{width:38px;height:38px;border:none;background:var(--bg);border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:background .15s;}
-    .top-btn:active{background:var(--brand-light);}
+    .top-btn{width:38px;height:38px;border:none;background:var(--bg);border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;}
     .notif-dot::after{content:"";position:absolute;top:7px;right:7px;width:9px;height:9px;background:#ef4444;border-radius:50%;border:2px solid var(--surface);}
     .top-avatar-circle{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--accent));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;}
-
-    /* PAGE CONTENT */
     #page-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--bg);}
 
-    /* BOTTOM NAV */
-    .bottom-nav{
-      display:flex;background:var(--surface);
-      border-top:1px solid var(--border);
-      padding-bottom:var(--safe-bottom);
-      flex-shrink:0;height:calc(var(--nav-h) + var(--safe-bottom));
-    }
-    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 0;border:none;background:none;cursor:pointer;color:var(--text-3);transition:color .15s;position:relative;}
+    /* NAV */
+    .bottom-nav{display:flex;background:var(--surface);border-top:1px solid var(--border);padding-bottom:var(--safe-bottom);flex-shrink:0;height:calc(var(--nav-h) + var(--safe-bottom));}
+    .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 0;border:none;background:none;cursor:pointer;color:var(--text-3);transition:color .15s;overflow:visible;}
     .nav-item.active{color:var(--brand);}
     .nav-icon{font-size:24px;line-height:1;}
     .nav-label{font-size:10px;font-weight:700;letter-spacing:.02em;}
     .nav-center-wrap{width:52px;height:52px;background:linear-gradient(135deg,var(--brand),var(--accent));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 18px rgba(14,90,122,.4);margin-top:-14px;}
 
-    /* ── STORIE STRIP ── */
+    /* FILTRI */
+    .filtri-wrap{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 0;}
+    .filtri-strip{display:flex;gap:8px;padding:0 12px;overflow-x:auto;scrollbar-width:none;}
+    .filtri-strip::-webkit-scrollbar{display:none;}
+    .filtro-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface);font-size:13px;font-weight:700;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+    .filtro-btn.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+
+    /* STORIE */
     .storie-wrap{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 0;}
     .storie-strip{display:flex;gap:10px;padding:0 12px;overflow-x:auto;scrollbar-width:none;}
     .storie-strip::-webkit-scrollbar{display:none;}
     .storia-item{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;cursor:pointer;width:68px;}
     .storia-ring{width:60px;height:60px;border-radius:50%;padding:2.5px;background:linear-gradient(135deg,var(--brand),var(--accent));}
-    .storia-ring.grigio{background:var(--border);}
     .storia-ring.add-ring{background:none;border:2px dashed var(--brand);display:flex;align-items:center;justify-content:center;}
-    .storia-inner{width:100%;height:100%;border-radius:50%;border:2.5px solid #fff;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;}
+    .storia-inner{width:100%;height:100%;border-radius:50%;border:2.5px solid #fff;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:22px;}
     .storia-add-inner{width:52px;height:52px;border-radius:50%;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--brand);font-weight:900;}
     .storia-label{font-size:10px;font-weight:600;color:var(--text-2);text-align:center;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-    /* ── FEED POST (stile Facebook) ── */
+    /* FEED */
     .feed-post{background:var(--surface);margin-bottom:8px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
     .post-header{display:flex;align-items:center;gap:10px;padding:12px 14px 10px;}
-    .post-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--brand-light),var(--brand-mid));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:var(--brand);border:2px solid var(--brand-light);}
+    .post-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--brand-light),var(--brand-mid));flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:var(--brand);}
     .post-meta{flex:1;min-width:0;}
-    .post-nome{font-size:15px;font-weight:800;color:var(--text);}
-    .post-sub{font-size:12px;color:var(--text-3);margin-top:1px;display:flex;align-items:center;gap:4px;}
-    .post-locale-pill{background:var(--brand-light);color:var(--brand);border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;}
-    .post-more{font-size:22px;color:var(--text-3);cursor:pointer;padding:4px;}
+    .post-nome{font-size:15px;font-weight:800;}
+    .post-sub{font-size:12px;color:var(--text-3);margin-top:2px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+    .badge{border-radius:999px;padding:2px 8px;font-size:11px;font-weight:700;}
+    .badge-locale{background:var(--brand-light);color:var(--brand);}
+    .badge-cat{background:var(--bg);color:var(--text-2);border:1px solid var(--border);}
+    .badge-titolare{background:#fef3c7;color:#d97706;}
+    .badge-verificato{background:#dcfce7;color:#16a34a;}
+    .post-more{font-size:20px;color:var(--text-3);cursor:pointer;padding:4px;}
     .post-testo{font-size:15px;line-height:1.55;color:var(--text);padding:0 14px 10px;}
-    .post-testo.no-img{padding-bottom:12px;}
-    .post-img{width:100%;display:block;background:var(--bg);max-height:500px;object-fit:cover;}
+    .post-img{width:100%;display:block;max-height:500px;object-fit:cover;}
     .post-img-placeholder{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,var(--brand-light),#dbeafe);display:flex;align-items:center;justify-content:center;font-size:64px;}
 
-    /* CONTATORI REACTIONS */
+    /* STELLE */
+    .stelle-wrap{padding:4px 14px 8px;display:flex;align-items:center;gap:8px;}
+    .stelle{font-size:18px;letter-spacing:1px;}
+
+    /* CONTATORI */
     .post-counts{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);}
-    .post-counts-left{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-2);}
-    .counts-emojis{display:flex;margin-right:2px;}
+    .counts-left{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--text-2);}
+    .counts-emojis{display:flex;margin-right:3px;}
     .counts-emojis span{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--surface);border:1.5px solid var(--bg);margin-left:-4px;}
     .counts-emojis span:first-child{margin-left:0;}
-    .post-counts-right{font-size:13px;color:var(--text-2);}
+    .counts-right{font-size:13px;color:var(--text-2);cursor:pointer;}
 
-    /* REACTION BUTTONS */
+    /* ACTIONS */
     .post-actions{display:flex;border-bottom:1px solid var(--border);}
-    .action-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 4px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:700;color:var(--text-2);transition:all .15s;border-radius:0;}
+    .action-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 2px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:700;color:var(--text-2);transition:all .15s;}
     .action-btn:active{background:var(--bg);}
     .action-btn.liked{color:var(--brand);}
-    .action-btn .act-icon{font-size:20px;line-height:1;}
-    .action-btn .act-label{font-size:13px;font-weight:700;}
+    .act-icon{font-size:18px;line-height:1;}
 
     /* COMMENTI */
-    .commenti-wrap{padding:0;}
-    .commenti-list{padding:8px 14px 4px;display:none;}
+    .commenti-list{display:none;}
     .commenti-list.open{display:block;}
-    .commento-row{display:flex;gap:8px;margin-bottom:8px;}
-    .commento-av{width:32px;height:32px;border-radius:50%;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--brand);flex-shrink:0;}
+    .commento-row{display:flex;gap:8px;margin-bottom:8px;padding:0 14px;}
+    .commento-av{width:30px;height:30px;border-radius:50%;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--brand);flex-shrink:0;}
     .commento-bubble{background:var(--bg);border-radius:14px;padding:8px 12px;flex:1;}
     .commento-nome{font-size:12px;font-weight:800;color:var(--brand);margin-bottom:2px;}
-    .commento-testo{font-size:14px;line-height:1.4;color:var(--text);}
-    .commento-data{font-size:11px;color:var(--text-3);margin-top:3px;}
+    .commento-testo{font-size:13px;line-height:1.4;}
+    .commento-data{font-size:10px;color:var(--text-3);margin-top:3px;}
     .commento-input-row{display:flex;gap:8px;padding:8px 14px 12px;align-items:center;}
-    .commento-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:999px;font-size:14px;font-family:inherit;outline:none;background:var(--bg);}
+    .commento-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:999px;font-size:13px;font-family:inherit;outline:none;background:var(--bg);}
     .commento-input:focus{border-color:var(--brand);background:#fff;}
-    .commento-send-btn{width:38px;height:38px;border-radius:50%;background:var(--brand);color:#fff;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .commento-send-btn{width:36px;height:36px;border-radius:50%;background:var(--brand);color:#fff;border:none;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
-    /* PUNTI BADGE */
     .points-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:800;margin:4px 14px 8px;}
 
-    /* WA BANNER */
-    .wa-banner{background:linear-gradient(135deg,#25D366,#128C7E);margin:8px 12px;border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;}
-    .wa-icon{font-size:28px;flex-shrink:0;}
-    .wa-text{flex:1;}
-    .wa-title{font-size:14px;font-weight:800;color:#fff;}
-    .wa-sub{font-size:12px;color:rgba(255,255,255,.85);margin-top:2px;}
-    .wa-pts{background:rgba(255,255,255,.2);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:800;color:#fff;white-space:nowrap;}
-
-    /* EMPTY */
-    .empty-state{display:flex;flex-direction:column;align-items:center;padding:48px 24px;gap:12px;text-align:center;}
-    .empty-icon{font-size:52px;}
-    .empty-title{font-size:18px;font-weight:800;}
-    .empty-sub{font-size:14px;color:var(--text-2);line-height:1.5;max-width:260px;}
-    .empty-btn{background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px;}
-
-    /* SECTION CARD */
-    .section-card{background:var(--surface);margin:8px 12px;border-radius:var(--radius);padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
-    .section-title{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:flex-end;}
+    .modal-overlay.open{display:flex;}
+    .modal-sheet{background:var(--surface);border-radius:24px 24px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px 20px calc(20px + var(--safe-bottom));}
+    .modal-handle{width:40px;height:4px;background:var(--border);border-radius:999px;margin:0 auto 16px;}
+    .modal-title{font-size:18px;font-weight:900;margin-bottom:16px;}
+    .tipo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px;}
+    .tipo-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--surface);cursor:pointer;transition:all .15s;}
+    .tipo-btn.selected{border-color:var(--brand);background:var(--brand-light);}
+    .tipo-icon{font-size:28px;}
+    .tipo-label{font-size:11px;font-weight:700;color:var(--text-2);}
+    .tipo-btn.selected .tipo-label{color:var(--brand);}
+    .pub-input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;outline:none;background:var(--bg);margin-bottom:10px;color:var(--text);}
+    .pub-input:focus{border-color:var(--brand);background:#fff;}
+    .pub-textarea{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;outline:none;background:var(--bg);resize:none;margin-bottom:10px;min-height:100px;color:var(--text);}
+    .pub-textarea:focus{border-color:var(--brand);background:#fff;}
+    .upload-zone{background:var(--bg);border:2px dashed var(--border);border-radius:14px;padding:24px;text-align:center;cursor:pointer;margin-bottom:12px;}
+    .pub-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--brand),var(--accent));color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:800;cursor:pointer;}
+    .stella-sel{display:flex;gap:10px;margin-bottom:14px;}
+    .stella-sel span{font-size:32px;cursor:pointer;opacity:.3;transition:opacity .15s;}
+    .stella-sel span.on{opacity:1;}
+    .back-btn{background:none;border:none;font-size:13px;font-weight:700;color:var(--text-2);cursor:pointer;margin-bottom:14px;display:flex;align-items:center;gap:4px;}
 
     /* RICETTE */
     .ricette-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:8px 12px;}
@@ -177,26 +171,35 @@
     .ricetta-tag{display:inline-block;background:var(--brand-light);color:var(--brand);border-radius:999px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:6px;}
 
     /* PROFILO */
-    .profilo-hero{background:linear-gradient(135deg,var(--brand),var(--brand-mid));padding:28px 20px 40px;text-align:center;color:#fff;}
+    .profilo-hero{background:linear-gradient(135deg,var(--brand),var(--brand-mid));padding:28px 20px 44px;text-align:center;color:#fff;}
     .profilo-av{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 12px;}
-    .profilo-nome{font-size:22px;font-weight:900;}
-    .profilo-email{font-size:13px;opacity:.75;margin-top:3px;}
+    .profilo-nome-el{font-size:22px;font-weight:900;}
+    .profilo-email-el{font-size:13px;opacity:.75;margin-top:3px;}
+    .profilo-livello-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border-radius:999px;padding:5px 14px;font-size:13px;font-weight:700;margin-top:10px;}
     .profilo-stats{display:flex;background:var(--surface);margin:-24px 16px 0;border-radius:var(--radius);box-shadow:0 4px 24px rgba(0,0,0,.1);overflow:hidden;position:relative;z-index:1;}
-    .p-stat{flex:1;padding:16px 8px;text-align:center;border-right:1px solid var(--border);}
+    .p-stat{flex:1;padding:14px 6px;text-align:center;border-right:1px solid var(--border);}
     .p-stat:last-child{border-right:none;}
-    .p-stat-val{font-size:22px;font-weight:900;color:var(--brand);}
-    .p-stat-label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+    .p-stat-val{font-size:18px;font-weight:900;color:var(--brand);}
+    .p-stat-label{font-size:9px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+    .punti-bar-wrap{margin:16px 16px 0;background:var(--surface);border-radius:var(--radius);padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+    .punti-bar-labels{display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px;}
+    .punti-bar-track{background:var(--bg);border-radius:999px;height:10px;overflow:hidden;}
+    .punti-bar-fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--accent));border-radius:999px;}
+    .punti-next-label{font-size:12px;color:var(--text-3);margin-top:6px;text-align:center;}
     .profilo-menu{margin:12px 12px 0;}
-    .profilo-group-title{font-size:11px;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;padding:8px 4px 6px;}
-    .profilo-row{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:2px;cursor:pointer;}
-    .profilo-row-icon{font-size:20px;width:32px;text-align:center;}
-    .profilo-row-text{flex:1;font-size:15px;font-weight:600;}
-    .profilo-row-arrow{color:var(--text-3);font-size:18px;}
+    .menu-group-title{font-size:11px;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;padding:8px 4px 6px;}
+    .menu-row{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:2px;cursor:pointer;}
+    .menu-row-icon{font-size:20px;width:32px;text-align:center;}
+    .menu-row-text{flex:1;font-size:15px;font-weight:600;}
+    .menu-row-arrow{color:var(--text-3);font-size:18px;}
     .logout-btn{margin:16px 12px 32px;width:calc(100% - 24px);padding:14px;border:1.5px solid #fecaca;background:#fff;color:#dc2626;border-radius:var(--radius-sm);font-size:15px;font-weight:800;cursor:pointer;}
 
-    /* STORIE PAGE */
-    .upload-zone{background:var(--bg);border:2px dashed var(--brand);border-radius:14px;padding:36px;text-align:center;cursor:pointer;transition:background .15s;}
-    .upload-zone:active{background:var(--brand-light);}
+    /* EMPTY */
+    .empty-state{display:flex;flex-direction:column;align-items:center;padding:48px 24px;gap:12px;text-align:center;}
+    .empty-icon{font-size:52px;}
+    .empty-title{font-size:18px;font-weight:800;}
+    .empty-sub{font-size:14px;color:var(--text-2);line-height:1.5;max-width:260px;}
+    .empty-btn{background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px;}
 
     .pb-nav{padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);}
     .hidden{display:none!important;}
@@ -206,9 +209,7 @@
 </head>
 <body>
 
-<div id="initial-loader" class="page-loader" style="height:100vh;">
-  <div class="spinner"></div>Caricamento...
-</div>
+<div id="initial-loader" class="page-loader full"><div class="spinner"></div>Caricamento...</div>
 
 <!-- AUTH -->
 <div id="auth-screen">
@@ -216,7 +217,7 @@
     <div class="auth-logo-icon">🍽️</div>
     <div class="auth-brand-name">Risto<span>flow</span></div>
   </div>
-  <div class="auth-tagline">Il social della ristorazione.<br>Accumula punti, scopri ricette, condividi esperienze.</div>
+  <div class="auth-tagline">Il social della ristorazione italiana.<br>Accumula punti, scopri locali, condividi esperienze.</div>
   <div class="auth-card">
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchTab('login',this)">Accedi</button>
@@ -226,14 +227,14 @@
     <div id="form-login" class="auth-form">
       <input class="auth-input" type="email" id="login-email" placeholder="Email" autocomplete="email"/>
       <input class="auth-input" type="password" id="login-pwd" placeholder="Password" autocomplete="current-password"/>
-      <button class="auth-btn" onclick="doLogin()">Entra →</button>
+      <button class="auth-btn" onclick="doLogin()">Entra &rarr;</button>
     </div>
     <div id="form-register" class="auth-form hidden">
       <input class="auth-input" type="text" id="reg-nome" placeholder="Nome e cognome"/>
       <input class="auth-input" type="email" id="reg-email" placeholder="Email" autocomplete="email"/>
       <input class="auth-input" type="tel" id="reg-tel" placeholder="Telefono (per WhatsApp)"/>
       <input class="auth-input" type="password" id="reg-pwd" placeholder="Password (min 6 caratteri)" autocomplete="new-password"/>
-      <button class="auth-btn" onclick="doRegister()">Crea account →</button>
+      <button class="auth-btn" onclick="doRegister()">Crea account &rarr;</button>
     </div>
   </div>
 </div>
@@ -243,71 +244,84 @@
   <div class="top-bar">
     <div class="top-bar-logo">Risto<span>flow</span></div>
     <div class="top-bar-right">
-      <button class="top-btn notif-dot" title="Notifiche">🔔</button>
-      <button class="top-avatar-circle" id="top-av" onclick="navTo('profilo')">👤</button>
+      <button class="top-btn notif-dot">&#128276;</button>
+      <button class="top-avatar-circle" id="top-av" onclick="navTo('profilo')">&#128100;</button>
     </div>
   </div>
   <div id="page-content"></div>
   <nav class="bottom-nav">
     <button class="nav-item active" data-page="home" onclick="navTo('home')">
-      <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
+      <span class="nav-icon">&#127968;</span><span class="nav-label">Home</span>
     </button>
     <button class="nav-item" data-page="ricette" onclick="navTo('ricette')">
-      <span class="nav-icon">👨‍🍳</span><span class="nav-label">Ricette</span>
+      <span class="nav-icon">&#128104;&#8205;&#127859;</span><span class="nav-label">Ricette</span>
     </button>
-    <button class="nav-item" data-page="storie" onclick="navTo('storie')" style="overflow:visible;">
-      <div class="nav-center-wrap">📸</div>
-      <span class="nav-label" style="margin-top:2px;">Storie</span>
+    <button class="nav-item" data-page="pubblica" onclick="apriPubblica()" style="overflow:visible;">
+      <div class="nav-center-wrap">&#43;</div>
+      <span class="nav-label" style="margin-top:2px;">Pubblica</span>
     </button>
     <button class="nav-item" data-page="tessera" onclick="navTo('tessera')">
-      <span class="nav-icon">🎫</span><span class="nav-label">Tessera</span>
+      <span class="nav-icon">&#127915;</span><span class="nav-label">Tessera</span>
     </button>
     <button class="nav-item" data-page="profilo" onclick="navTo('profilo')">
-      <span class="nav-icon">👤</span><span class="nav-label">Profilo</span>
+      <span class="nav-icon">&#128100;</span><span class="nav-label">Profilo</span>
     </button>
   </nav>
+</div>
+
+<!-- MODAL PUBBLICA -->
+<div class="modal-overlay" id="modal-pubblica" onclick="chiudiSeFuori(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Cosa vuoi pubblicare?</div>
+    <div id="step-tipo">
+      <div class="tipo-grid">
+        <button class="tipo-btn" onclick="scegliTipo('esperienza')"><span class="tipo-icon">&#128247;</span><span class="tipo-label">Esperienza</span></button>
+        <button class="tipo-btn" onclick="scegliTipo('ricetta')"><span class="tipo-icon">&#128104;&#8205;&#127859;</span><span class="tipo-label">Ricetta</span></button>
+        <button class="tipo-btn" onclick="scegliTipo('recensione')"><span class="tipo-icon">&#11088;</span><span class="tipo-label">Recensione</span></button>
+        <button class="tipo-btn" onclick="scegliTipo('lavoro')"><span class="tipo-icon">&#128188;</span><span class="tipo-label">Offerta lavoro</span></button>
+        <button class="tipo-btn" onclick="scegliTipo('cerco-lavoro')"><span class="tipo-icon">&#128587;</span><span class="tipo-label">Cerco lavoro</span></button>
+        <button class="tipo-btn" onclick="scegliTipo('storia')"><span class="tipo-icon">&#9200;&#65039;</span><span class="tipo-label">Storia 24h</span></button>
+      </div>
+    </div>
+    <div id="step-form" class="hidden"></div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
-  var SUPA_URL  = "https://cuhcscpvhypoaplcmtjk.supabase.co";
-  var SUPA_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0";
-  var AZIENDA = "b331365f-17db-4dda-aa2f-77a09427fe42";
-  var supa = window.supabase.createClient(SUPA_URL, SUPA_ANON);
-  var ME = null;
-  var myReaz = {};
+  var SUPA_URL="https://cuhcscpvhypoaplcmtjk.supabase.co";
+  var SUPA_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0";
+  var AZIENDA="b331365f-17db-4dda-aa2f-77a09427fe42";
+  var supa=window.supabase.createClient(SUPA_URL,SUPA_ANON);
+  var ME=null,myReaz={},filtroAttivo="tutti",tipoSel=null,votoSel=0;
 
-  // ── INIT ──────────────────────────────────────────────────────
   async function init(){
-    var {data:{session}} = await supa.auth.getSession();
+    var{data:{session}}=await supa.auth.getSession();
     hide("initial-loader");
-    if(session){ ME=session.user; showApp(); }
-    else showAuth();
+    if(session){ME=session.user;showApp();}else showAuth();
     supa.auth.onAuthStateChange(function(ev,sess){
-      if(ev==="SIGNED_IN"&&sess){ ME=sess.user; showApp(); }
-      else if(ev==="SIGNED_OUT"){ ME=null; showAuth(); }
+      if(ev==="SIGNED_IN"&&sess){ME=sess.user;showApp();}
+      else if(ev==="SIGNED_OUT"){ME=null;showAuth();}
     });
   }
 
-  // ── AUTH ──────────────────────────────────────────────────────
   window.switchTab=function(tab,btn){
     document.querySelectorAll(".auth-tab").forEach(function(t){t.classList.remove("active");});
     btn.classList.add("active");
     tab==="login"?(show("form-login"),hide("form-register")):(hide("form-login"),show("form-register"));
     hide("auth-error");
   };
-
   window.doLogin=async function(){
     var email=val("login-email"),pwd=val("login-pwd");
     if(!email||!pwd){showErr("Inserisci email e password");return;}
     var btn=document.querySelector("#form-login .auth-btn");
     btn.textContent="...";btn.disabled=true;
     var{error}=await supa.auth.signInWithPassword({email,password:pwd});
-    btn.textContent="Entra →";btn.disabled=false;
+    btn.textContent="Entra";btn.disabled=false;
     if(error)showErr(error.message==="Invalid login credentials"?"Email o password errati":error.message);
   };
-
   window.doRegister=async function(){
     var nome=val("reg-nome"),email=val("reg-email"),tel=val("reg-tel"),pwd=val("reg-pwd");
     if(!nome||!email||!pwd){showErr("Compila tutti i campi");return;}
@@ -315,176 +329,158 @@
     var btn=document.querySelector("#form-register .auth-btn");
     btn.textContent="...";btn.disabled=true;
     var{data,error}=await supa.auth.signUp({email,password:pwd,options:{data:{nome_completo:nome,telefono:tel}}});
-    btn.textContent="Crea account →";btn.disabled=false;
+    btn.textContent="Crea account";btn.disabled=false;
     if(error){showErr(error.message);return;}
-    if(data.user) await supa.from("clienti_profilo").upsert({user_id:data.user.id,nome_completo:nome,email,telefono:tel},{onConflict:"user_id"}).catch(function(){});
-    showErr("✅ Account creato! Puoi accedere adesso.");
+    if(data.user)await supa.from("clienti_profilo").upsert({user_id:data.user.id,nome_completo:nome,email,telefono:tel},{onConflict:"user_id"}).catch(function(){});
+    showErr("Account creato! Puoi accedere adesso.");
   };
-
   function showErr(m){var e=document.getElementById("auth-error");e.textContent=m;e.style.display="block";}
   function showAuth(){hide("app-shell");show("auth-screen","flex");}
   window.showAuth=showAuth;
-
   function showApp(){
     hide("auth-screen");show("app-shell","flex");
     var av=document.getElementById("top-av");
-    if(av&&ME?.user_metadata?.nome_completo) av.textContent=ME.user_metadata.nome_completo.charAt(0).toUpperCase();
+    if(av&&ME&&ME.user_metadata&&ME.user_metadata.nome_completo)av.textContent=ME.user_metadata.nome_completo.charAt(0).toUpperCase();
     navTo("home");
   }
   window.doLogout=async function(){await supa.auth.signOut();};
 
-  // ── ROUTER ──────────────────────────────────────────────────────
   window.navTo=function(page){
     document.querySelectorAll(".nav-item").forEach(function(b){b.classList.toggle("active",b.dataset.page===page);});
-    var c=document.getElementById("page-content"); c.scrollTop=0;
-    ({home:renderHome,storie:renderStorie,ricette:renderRicette,tessera:renderTessera,profilo:renderProfilo}[page]||renderHome)(c);
+    var c=document.getElementById("page-content");c.scrollTop=0;
+    var pages={home:renderHome,ricette:renderRicette,tessera:renderTessera,profilo:renderProfilo};
+    (pages[page]||renderHome)(c);
   };
 
-  // ── HOME ──────────────────────────────────────────────────────
   async function renderHome(c){
-    var nome=ME?(ME.user_metadata?.nome_completo||"").split(" ")[0]:"";
-    c.innerHTML='<div class="page-loader" style="height:200px"><div class="spinner"></div></div>';
-
-    var[{data:posts},{data:reaz}]=await Promise.all([
-      supa.from("social_post").select("*,clienti_profilo(nome_completo),sedi(nome)").eq("visibile",true).order("created_at",{ascending:false}).limit(20),
-      ME?supa.from("social_reactions").select("post_id,emoji").eq("user_id",ME.id):{data:[]}
-    ]);
-    if(reaz) reaz.forEach(function(r){myReaz[r.post_id]=r.emoji;});
+    c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
+    var q=supa.from("social_post").select("*,clienti_profilo(nome_completo,tipo_utente),sedi(nome)").eq("visibile",true).order("created_at",{ascending:false}).limit(20);
+    if(filtroAttivo!=="tutti")q=q.eq("categoria",filtroAttivo);
+    var[{data:posts},{data:reaz}]=await Promise.all([q,ME?supa.from("social_reactions").select("post_id,emoji").eq("user_id",ME.id):{data:[]}]);
+    if(reaz)reaz.forEach(function(r){myReaz[r.post_id]=r.emoji;});
 
     var h='<div class="pb-nav">';
 
-    // Storie strip
+    // Storie
     h+='<div class="storie-wrap"><div class="storie-strip">';
-    h+='<div class="storia-item" onclick="navTo(\'storie\')">';
-    h+='<div class="storia-ring add-ring"><div class="storia-add-inner">＋</div></div>';
-    h+='<div class="storia-label">La tua</div></div>';
+    h+='<div class="storia-item" onclick="apriPubblica(\'storia\')"><div class="storia-ring add-ring"><div class="storia-add-inner">+</div></div><div class="storia-label">La tua</div></div>';
     ["Campo Antico","Trattoria","Catering"].forEach(function(n){
-      h+='<div class="storia-item" onclick="navTo(\'storie\')"><div class="storia-ring"><div class="storia-inner">🍽️</div></div><div class="storia-label">'+esc(n)+'</div></div>';
+      h+='<div class="storia-item"><div class="storia-ring"><div class="storia-inner">&#127869;&#65039;</div></div><div class="storia-label">'+esc(n)+'</div></div>';
     });
     h+='</div></div>';
 
-    // WA Banner
-    h+='<div class="wa-banner" onclick="navTo(\'storie\')">';
-    h+='<div class="wa-icon">📸</div><div class="wa-text"><div class="wa-title">Pubblica una storia</div><div class="wa-sub">Guadagna punti fidelity condividendo la tua esperienza</div></div>';
-    h+='<div class="wa-pts">+50 pt</div></div>';
+    // Filtri
+    var filtri=[{s:"tutti",i:"&#127869;&#65039;",l:"Tutti"},{s:"esperienze",i:"&#128247;",l:"Esperienze"},{s:"ricette",i:"&#127859;",l:"Ricette"},{s:"recensioni",i:"&#11088;",l:"Recensioni"},{s:"lavoro",i:"&#128188;",l:"Lavoro"},{s:"fornitori",i:"&#129309;",l:"Fornitori"}];
+    h+='<div class="filtri-wrap"><div class="filtri-strip">';
+    filtri.forEach(function(f){
+      h+='<button class="filtro-btn'+(filtroAttivo===f.s?" active":"")+'" onclick="setFiltro(\''+f.s+'\')">'+f.i+' '+f.l+'</button>';
+    });
+    h+='</div></div>';
 
-    // Feed
     if(!posts||posts.length===0){
-      h+='<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-title">Il feed è ancora vuoto</div><div class="empty-sub">Sii il primo a condividere la tua esperienza!</div><button class="empty-btn" onclick="navTo(\'storie\')">Pubblica ora</button></div>';
-    } else {
+      h+='<div class="empty-state"><div class="empty-icon">&#127869;&#65039;</div><div class="empty-title">Nessun contenuto</div><div class="empty-sub">Sii il primo a pubblicare!</div><button class="empty-btn" onclick="apriPubblica()">Pubblica ora</button></div>';
+    }else{
       posts.forEach(function(p){
-        var autore=p.clienti_profilo?.nome_completo||"Anonimo";
-        var locale=p.sedi?.nome||"";
+        var autore=(p.clienti_profilo&&p.clienti_profilo.nome_completo)||"Anonimo";
+        var tipoA=(p.clienti_profilo&&p.clienti_profilo.tipo_utente)||"cliente";
+        var locale=(p.sedi&&p.sedi.nome)||"";
         var miaR=myReaz[p.id]||null;
-        var totReaz=(p.reaz_fuoco||0)+(p.reaz_applauso||0)+(p.reaz_cuore||0);
-        var emojiUsate=[];
-        if(p.reaz_fuoco>0) emojiUsate.push("😍");
-        if(p.reaz_applauso>0) emojiUsate.push("👏");
-        if(p.reaz_cuore>0) emojiUsate.push("🔥");
+        var totR=(p.reaz_fuoco||0)+(p.reaz_applauso||0)+(p.reaz_cuore||0);
+        var emj=[];
+        if(p.reaz_fuoco>0)emj.push("&#128525;");
+        if(p.reaz_applauso>0)emj.push("&#128079;");
+        if(p.reaz_cuore>0)emj.push("&#128293;");
+        var cat=p.categoria||"esperienze";
+        var catL={esperienze:"&#128247; Esperienza",ricette:"&#127859; Ricetta",recensioni:"&#11088; Recensione",lavoro:"&#128188; Lavoro",fornitori:"&#129309; Fornitore"}[cat]||cat;
 
         h+='<div class="feed-post" id="post-'+p.id+'">';
-        // Header
-        h+='<div class="post-header">';
-        h+='<div class="post-avatar">'+esc(autore.charAt(0).toUpperCase())+'</div>';
+        h+='<div class="post-header"><div class="post-avatar">'+esc(autore.charAt(0).toUpperCase())+'</div>';
         h+='<div class="post-meta"><div class="post-nome">'+esc(autore)+'</div>';
         h+='<div class="post-sub">'+formatData(p.created_at);
-        if(locale) h+=' · <span class="post-locale-pill">📍 '+esc(locale)+'</span>';
-        h+='</div></div>';
-        h+='<div class="post-more">···</div></div>';
+        if(locale)h+=' &#183; <span class="badge badge-locale">&#128205; '+esc(locale)+'</span>';
+        h+=' <span class="badge badge-cat">'+catL+'</span>';
+        if(tipoA==="titolare")h+=' <span class="badge badge-titolare">&#127978; Titolare</span>';
+        h+='</div></div><div class="post-more">&#183;&#183;&#183;</div></div>';
 
-        // Testo
-        if(p.testo) h+='<div class="post-testo'+(p.media_url?'':' no-img')+'">'+esc(p.testo)+'</div>';
+        if(p.testo)h+='<div class="post-testo">'+esc(p.testo)+'</div>';
+        if(p.media_url)h+='<img class="post-img" src="'+esc(p.media_url)+'" loading="lazy"/>';
+        else if(cat==="esperienze"||cat==="storia")h+='<div class="post-img-placeholder">&#127837;</div>';
 
-        // Immagine
-        if(p.media_url) h+='<img class="post-img" src="'+esc(p.media_url)+'" loading="lazy"/>';
-        else if(!p.testo) h+='<div class="post-img-placeholder">🍝</div>';
-
-        // Punti
-        if(p.punti_assegnati) h+='<div class="points-badge">⭐ +'+p.punti_assegnati+' punti guadagnati</div>';
-
-        // Contatori
-        h+='<div class="post-counts"><div class="post-counts-left">';
-        if(emojiUsate.length>0){
-          h+='<div class="counts-emojis">';
-          emojiUsate.forEach(function(e){h+='<span>'+e+'</span>';});
-          h+='</div>';
-          h+=totReaz;
+        if(cat==="recensioni"&&p.voto){
+          h+='<div class="stelle-wrap"><div class="stelle">'+stelleHTML(p.voto)+'</div><span class="badge badge-verificato">&#10003; Visita verificata</span></div>';
         }
-        h+='</div><div class="post-counts-right" id="cmtcount-'+p.id+'"></div></div>';
+        if(p.punti_assegnati)h+='<div class="points-badge">&#11088; +'+p.punti_assegnati+' punti</div>';
 
-        // Action buttons (stile Facebook)
+        h+='<div class="post-counts"><div class="counts-left">';
+        if(emj.length>0){h+='<div class="counts-emojis">';emj.forEach(function(e){h+='<span>'+e+'</span>';});h+='</div>'+totR;}
+        h+='</div><div class="counts-right" id="cmtcount-'+p.id+'" onclick="toggleCommenti('+p.id+')"></div></div>';
+
         h+='<div class="post-actions">';
-        h+='<button class="action-btn'+(miaR==="😍"?" liked":"")+'" id="reaz-'+p.id+'-reaz_fuoco" onclick="reagisci('+p.id+',\'😍\',\'reaz_fuoco\')">';
-        h+='<span class="act-icon">😍</span><span class="act-label">Mi piace</span></button>';
-        h+='<button class="action-btn'+(miaR==="👏"?" liked":"")+'" id="reaz-'+p.id+'-reaz_applauso" onclick="reagisci('+p.id+',\'👏\',\'reaz_applauso\')">';
-        h+='<span class="act-icon">👏</span><span class="act-label">Bravo!</span></button>';
-        h+='<button class="action-btn'+(miaR==="🔥"?" liked":"")+'" id="reaz-'+p.id+'-reaz_cuore" onclick="reagisci('+p.id+',\'🔥\',\'reaz_cuore\')">';
-        h+='<span class="act-icon">🔥</span><span class="act-label">Top!</span></button>';
-        h+='<button class="action-btn" onclick="toggleCommenti('+p.id+')">';
-        h+='<span class="act-icon">💬</span><span class="act-label">Commenta</span></button>';
+        h+='<button class="action-btn'+(miaR==="&#128525;"?" liked":"")+'" id="reaz-'+p.id+'-reaz_fuoco" onclick="reagisci('+p.id+',\'fuoco\',\'reaz_fuoco\')"><span class="act-icon">&#128525;</span> Mi piace</button>';
+        h+='<button class="action-btn'+(miaR==="&#128079;"?" liked":"")+'" id="reaz-'+p.id+'-reaz_applauso" onclick="reagisci('+p.id+',\'applauso\',\'reaz_applauso\')"><span class="act-icon">&#128079;</span> Bravo!</button>';
+        h+='<button class="action-btn'+(miaR==="&#128293;"?" liked":"")+'" id="reaz-'+p.id+'-reaz_cuore" onclick="reagisci('+p.id+',\'cuore\',\'reaz_cuore\')"><span class="act-icon">&#128293;</span> Top!</button>';
+        h+='<button class="action-btn" onclick="toggleCommenti('+p.id+')"><span class="act-icon">&#128172;</span> Commenta</button>';
         h+='</div>';
 
-        // Commenti
-        h+='<div class="commenti-wrap">';
         h+='<div class="commenti-list" id="cmtlist-'+p.id+'">';
-        h+='<div id="cmtitems-'+p.id+'"><div style="padding:8px 14px;font-size:13px;color:var(--text-3)">Caricamento...</div></div>';
+        h+='<div id="cmtitems-'+p.id+'" style="padding-top:8px"><div style="padding:0 14px 8px;font-size:13px;color:var(--text-3)">Caricamento...</div></div>';
         h+='<div class="commento-input-row">';
-        h+='<div class="commento-av" style="flex-shrink:0">'+(ME?.user_metadata?.nome_completo?ME.user_metadata.nome_completo.charAt(0).toUpperCase():"👤")+'</div>';
-        h+='<input class="commento-input" id="cmtinput-'+p.id+'" type="text" placeholder="Scrivi un commento..." onkeydown="if(event.key===\'Enter\')inviaCommento('+p.id+')"/>';
-        h+='<button class="commento-send-btn" onclick="inviaCommento('+p.id+')">➤</button>';
+        h+='<div class="commento-av">'+(ME&&ME.user_metadata&&ME.user_metadata.nome_completo?ME.user_metadata.nome_completo.charAt(0).toUpperCase():"?")+'</div>';
+        h+='<input class="commento-input" id="cmtinput-'+p.id+'" type="text" placeholder="Commenta..." onkeydown="if(event.key===\'Enter\')inviaCommento('+p.id+')"/>';
+        h+='<button class="commento-send-btn" onclick="inviaCommento('+p.id+')">&#9658;</button>';
         h+='</div></div></div>';
-        h+='</div>';
       });
     }
     h+='</div>';
     c.innerHTML=h;
 
-    // Carica contatori commenti
     if(posts&&posts.length>0){
       posts.forEach(async function(p){
         var{count}=await supa.from("social_commenti").select("*",{count:"exact",head:true}).eq("post_id",p.id);
         var el=document.getElementById("cmtcount-"+p.id);
-        if(el&&count>0) el.textContent=count+" comment"+(count===1?"o":"i");
+        if(el&&count>0)el.textContent=count+" commenti";
       });
     }
   }
 
-  // ── REACTIONS ──────────────────────────────────────────────────
-  window.reagisci=async function(postId,emoji,campo){
+  window.setFiltro=function(s){filtroAttivo=s;navTo("home");};
+
+  window.reagisci=async function(postId,emojiKey,campo){
     if(!ME){showAuth();return;}
+    var emojiMap={fuoco:"&#128525;",applauso:"&#128079;",cuore:"&#128293;"};
+    var emoji=emojiMap[emojiKey];
     var prev=myReaz[postId]||null;
     var updBtn=function(id,c,on){var e=document.getElementById("reaz-"+id+"-"+c);if(e)e.classList.toggle("liked",on);};
     if(prev===emoji){
       await supa.from("social_reactions").delete().eq("user_id",ME.id).eq("post_id",postId);
       await supa.rpc("decrementa_reaction",{p_post_id:postId,p_campo:campo}).catch(function(){});
-      updBtn(postId,campo,false); delete myReaz[postId]; return;
+      updBtn(postId,campo,false);delete myReaz[postId];return;
     }
     if(prev){
-      var cp=prev==="😍"?"reaz_fuoco":prev==="👏"?"reaz_applauso":"reaz_cuore";
-      await supa.rpc("decrementa_reaction",{p_post_id:postId,p_campo:cp}).catch(function(){});
-      updBtn(postId,cp,false);
+      var cpMap={"&#128525;":"reaz_fuoco","&#128079;":"reaz_applauso","&#128293;":"reaz_cuore"};
+      var cp=cpMap[prev];
+      if(cp){await supa.rpc("decrementa_reaction",{p_post_id:postId,p_campo:cp}).catch(function(){});updBtn(postId,cp,false);}
     }
     await supa.from("social_reactions").upsert({user_id:ME.id,post_id:postId,emoji},{onConflict:"user_id,post_id"});
     await supa.rpc("incrementa_reaction",{p_post_id:postId,p_campo:campo}).catch(function(){});
-    updBtn(postId,campo,true); myReaz[postId]=emoji;
+    updBtn(postId,campo,true);myReaz[postId]=emoji;
   };
 
-  // ── COMMENTI ──────────────────────────────────────────────────
   window.toggleCommenti=async function(postId){
     var list=document.getElementById("cmtlist-"+postId);
-    if(!list) return;
-    if(list.classList.toggle("open")) await caricaCommenti(postId);
+    if(!list)return;
+    if(list.classList.toggle("open"))await caricaCommenti(postId);
   };
   async function caricaCommenti(postId){
     var items=document.getElementById("cmtitems-"+postId);
-    if(!items) return;
+    if(!items)return;
     var{data:cc}=await supa.from("social_commenti").select("*,clienti_profilo(nome_completo)").eq("post_id",postId).order("created_at",{ascending:true}).limit(30);
     var cnt=document.getElementById("cmtcount-"+postId);
-    if(cnt&&cc) cnt.textContent=cc.length>0?cc.length+" comment"+(cc.length===1?"o":"i"):"";
-    if(!cc||cc.length===0){items.innerHTML='<div style="padding:8px 14px;font-size:13px;color:var(--text-3)">Nessun commento ancora.</div>';return;}
+    if(cnt&&cc)cnt.textContent=cc.length>0?cc.length+" commenti":"";
+    if(!cc||cc.length===0){items.innerHTML='<div style="padding:0 14px 8px;font-size:13px;color:var(--text-3)">Nessun commento.</div>';return;}
     var h="";
     cc.forEach(function(c){
-      var nome=c.clienti_profilo?.nome_completo||"Anonimo";
+      var nome=(c.clienti_profilo&&c.clienti_profilo.nome_completo)||"Anonimo";
       h+='<div class="commento-row"><div class="commento-av">'+esc(nome.charAt(0).toUpperCase())+'</div>';
       h+='<div class="commento-bubble"><div class="commento-nome">'+esc(nome)+'</div>';
       h+='<div class="commento-testo">'+esc(c.testo)+'</div>';
@@ -496,55 +492,122 @@
     if(!ME){showAuth();return;}
     var input=document.getElementById("cmtinput-"+postId);
     var testo=input?input.value.trim():"";
-    if(!testo) return;
-    input.value="";input.focus();
+    if(!testo)return;
+    input.value="";
     var{error}=await supa.from("social_commenti").insert({post_id:postId,user_id:ME.id,testo});
-    if(!error) await caricaCommenti(postId);
+    if(!error)await caricaCommenti(postId);
   };
 
-  // ── STORIE ──────────────────────────────────────────────────────
-  function renderStorie(c){
+  window.apriPubblica=function(tipoDefault){
     if(!ME){showAuth();return;}
-    var h='<div class="pb-nav">';
-    h+='<div style="padding:16px 16px 12px"><div class="page-title">Storie 📸</div><div class="page-sub">Scompaiono dopo 24 ore · Guadagni +50 pt</div></div>';
-    h+='<div class="section-card">';
-    h+='<div class="section-title">📷 Nuova storia</div>';
-    h+='<div class="upload-zone" onclick="apriUploadStoria()" id="upload-zone">';
-    h+='<div style="font-size:44px;margin-bottom:8px">📷</div>';
-    h+='<div style="font-size:14px;font-weight:700;color:var(--brand)">Tocca per aggiungere foto o video</div>';
-    h+='<div style="font-size:12px;color:var(--text-3);margin-top:4px">JPG, PNG, MP4 · Max 50MB</div></div>';
-    h+='<div id="preview-wrap" style="display:none;margin-top:12px;border-radius:12px;overflow:hidden"></div>';
-    h+='<textarea id="storia-testo" style="width:100%;margin-top:12px;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:inherit;resize:none;outline:none;background:var(--bg)" rows="3" placeholder="Racconta la tua esperienza..."></textarea>';
-    h+='<button onclick="pubblicaStoria()" style="width:100%;margin-top:10px;padding:14px;background:linear-gradient(135deg,var(--brand),var(--accent));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;letter-spacing:.01em">Pubblica · Guadagna +50 pt 🌟</button>';
-    h+='</div>';
-    h+='<div style="padding:4px 16px 8px"><div class="page-title" style="font-size:16px">Storie attive</div></div>';
-    h+='<div class="empty-state"><div class="empty-icon">🕐</div><div class="empty-title">Nessuna storia attiva</div><div class="empty-sub">Le storie degli ultimi 24h appariranno qui.</div></div>';
-    h+='</div>';
-    c.innerHTML=h;
+    tipoSel=null;votoSel=0;
+    show("step-tipo");hide("step-form");
+    document.querySelectorAll(".tipo-btn").forEach(function(b){b.classList.remove("selected");});
+    document.getElementById("modal-pubblica").classList.add("open");
+    if(tipoDefault)scegliTipo(tipoDefault);
+  };
+  window.chiudiSeFuori=function(e){if(e.target===document.getElementById("modal-pubblica"))chiudiModale();};
+  function chiudiModale(){document.getElementById("modal-pubblica").classList.remove("open");}
+
+  window.scegliTipo=function(tipo){
+    tipoSel=tipo;
+    hide("step-tipo");
+    var form=document.getElementById("step-form");
+    form.innerHTML=buildForm(tipo);
+    show("step-form");
+  };
+
+  function buildForm(tipo){
+    var h='<button class="back-btn" onclick="show(\'step-tipo\');hide(\'step-form\')">&#8592; Cambia tipo</button>';
+    if(tipo==="esperienza"||tipo==="storia"){
+      var punti=tipo==="storia"?50:30;
+      h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:36px;margin-bottom:6px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand)">Aggiungi foto o video</div></div>';
+      h+='<div id="preview-wrap"></div>';
+      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza..."></textarea>';
+      h+='<button class="pub-btn" onclick="pubblica(\''+tipo+'\')">Pubblica &middot; +'+punti+' pt</button>';
+    }else if(tipo==="ricetta"){
+      h+='<input class="pub-input" id="pub-titolo" placeholder="Nome della ricetta"/>';
+      h+='<textarea class="pub-textarea" id="pub-ingredienti" placeholder="Ingredienti (uno per riga)" style="min-height:80px"></textarea>';
+      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Procedimento..."></textarea>';
+      h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:28px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand);margin-top:4px">Foto del piatto</div></div>';
+      h+='<div id="preview-wrap"></div>';
+      h+='<button class="pub-btn" onclick="pubblica(\'ricetta\')">Pubblica ricetta &middot; +80 pt</button>';
+    }else if(tipo==="recensione"){
+      h+='<div style="font-size:14px;font-weight:700;margin-bottom:10px">Il tuo voto</div>';
+      h+='<div class="stella-sel" id="stella-sel">';
+      for(var i=1;i<=5;i++)h+='<span data-v="'+i+'" onclick="setVoto('+i+')">&#11088;</span>';
+      h+='</div>';
+      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza in questo locale..."></textarea>';
+      h+='<div style="font-size:12px;color:var(--text-3);margin-bottom:12px">&#10003; La recensione viene verificata tramite la tua visita registrata</div>';
+      h+='<button class="pub-btn" onclick="pubblica(\'recensione\')">Pubblica recensione &middot; +100 pt</button>';
+    }else if(tipo==="lavoro"){
+      h+='<input class="pub-input" id="pub-titolo" placeholder="Posizione (es. Chef de partie, Cameriere...)"/>';
+      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Descrizione, requisiti, orari..."></textarea>';
+      h+='<input class="pub-input" id="pub-luogo" placeholder="Citta / Zona"/>';
+      h+='<button class="pub-btn" onclick="pubblica(\'lavoro\')">Pubblica offerta</button>';
+    }else if(tipo==="cerco-lavoro"){
+      h+='<input class="pub-input" id="pub-titolo" placeholder="Il tuo ruolo (es. Pizzaiolo, Barista...)"/>';
+      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Presentati: esperienza, disponibilita, cosa cerchi..."></textarea>';
+      h+='<input class="pub-input" id="pub-luogo" placeholder="Citta / Zona"/>';
+      h+='<button class="pub-btn" onclick="pubblica(\'cerco-lavoro\')">Pubblica candidatura</button>';
+    }
+    return h;
   }
 
-  // ── RICETTE ──────────────────────────────────────────────────────
+  window.setVoto=function(v){
+    votoSel=v;
+    document.querySelectorAll(".stella-sel span").forEach(function(s,i){s.classList.toggle("on",i<v);});
+  };
+
+  window.apriUpload=function(){
+    var i=document.createElement("input");i.type="file";i.accept="image/*,video/*";
+    i.onchange=function(e){
+      var f=e.target.files[0];if(!f)return;
+      var pw=document.getElementById("preview-wrap");
+      if(pw&&f.type.startsWith("image/")){
+        var url=URL.createObjectURL(f);
+        pw.innerHTML='<img src="'+url+'" style="width:100%;max-height:220px;object-fit:cover;border-radius:12px;display:block;margin-bottom:10px"/>';
+      }
+    };
+    i.click();
+  };
+
+  window.pubblica=async function(tipo){
+    if(!ME)return;
+    var testo=val("pub-testo"),titolo=val("pub-titolo")||"",luogo=val("pub-luogo")||"";
+    var catMap={esperienza:"esperienze",storia:"esperienze",ricetta:"ricette",recensione:"recensioni",lavoro:"lavoro","cerco-lavoro":"lavoro"};
+    var puntiMap={esperienza:30,storia:50,ricetta:80,recensione:100,lavoro:0,"cerco-lavoro":0};
+    var cat=catMap[tipo]||"esperienze";
+    var punti=puntiMap[tipo]||0;
+    var testoCompleto=titolo?(titolo+(testo?"\n\n"+testo:"")):(testo);
+    if(luogo)testoCompleto+="\n\nZona: "+luogo;
+    if(!testoCompleto){alert("Scrivi qualcosa!");return;}
+    var payload={user_id:ME.id,testo:testoCompleto,tipo:tipo,categoria:cat,visibile:true,punti_assegnati:punti,azienda_id:AZIENDA};
+    if(tipo==="storia")payload.scade_at=new Date(Date.now()+86400000).toISOString();
+    if(tipo==="recensione"&&votoSel)payload.voto=votoSel;
+    var{error}=await supa.from("social_post").insert(payload);
+    if(error){alert("Errore: "+error.message);return;}
+    if(punti>0)await supa.rpc("aggiungi_punti_cliente",{p_user_id:ME.id,p_punti:punti,p_motivo:tipo+"_pubblicato"}).catch(function(){});
+    chiudiModale();filtroAttivo="tutti";navTo("home");
+    if(punti>0)setTimeout(function(){alert("Pubblicato! +"+punti+" punti guadagnati");},300);
+  };
+
   async function renderRicette(c){
-    c.innerHTML='<div class="page-loader" style="height:200px"><div class="spinner"></div></div>';
-    var{data:ricette}=await supa.from("ricette").select("id,nome,descrizione,foto_url,tempo_preparazione,difficolta,categoria").eq("azienda_id",AZIENDA).eq("pubblica",true).order("created_at",{ascending:false}).limit(40);
-    var h='<div class="pb-nav">';
-    h+='<div style="padding:16px 16px 12px"><div class="page-title">Ricette 👨‍🍳</div><div class="page-sub">Dai segreti della nostra cucina</div></div>';
-    h+='<div style="padding:0 12px 10px"><input style="width:100%;padding:11px 16px;border:1.5px solid var(--border);border-radius:999px;font-size:14px;font-family:inherit;background:var(--surface);outline:none;" placeholder="🔍 Cerca ricetta..."/></div>';
+    c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
+    var{data:ricette}=await supa.from("social_post").select("*,clienti_profilo(nome_completo)").eq("categoria","ricette").eq("visibile",true).order("created_at",{ascending:false}).limit(40);
+    var h='<div class="pb-nav"><div style="padding:16px 16px 12px"><div class="page-title">Ricette</div><div class="page-sub">Dai segreti della cucina</div></div>';
+    h+='<div style="padding:0 12px 10px"><input style="width:100%;padding:11px 16px;border:1.5px solid var(--border);border-radius:999px;font-size:14px;font-family:inherit;background:var(--surface);outline:none;" placeholder="Cerca ricetta..."/></div>';
     if(!ricette||ricette.length===0){
-      h+='<div class="empty-state"><div class="empty-icon">👨‍🍳</div><div class="empty-title">Ricette in arrivo</div><div class="empty-sub">Stiamo preparando le nostre ricette.</div></div>';
-    } else {
+      h+='<div class="empty-state"><div class="empty-icon">&#127859;</div><div class="empty-title">Nessuna ricetta ancora</div><div class="empty-sub">Pubblica la prima ricetta e guadagna +80 punti!</div><button class="empty-btn" onclick="apriPubblica(\'ricetta\')">Pubblica ricetta</button></div>';
+    }else{
       h+='<div class="ricette-grid">';
       ricette.forEach(function(r){
-        h+='<div class="ricetta-card" onclick="apriRicetta('+r.id+')">';
-        if(r.foto_url) h+='<img class="ricetta-img" src="'+esc(r.foto_url)+'" loading="lazy" style="display:block"/>';
-        else h+='<div class="ricetta-img">🍝</div>';
-        h+='<div class="ricetta-body"><div class="ricetta-nome">'+esc(r.nome)+'</div>';
-        h+='<div class="ricetta-meta">';
-        if(r.tempo_preparazione) h+='⏱ '+r.tempo_preparazione+'min';
-        if(r.difficolta) h+=' · '+esc(r.difficolta);
-        h+='</div>';
-        if(r.categoria) h+='<div class="ricetta-tag">'+esc(r.categoria)+'</div>';
-        h+='</div></div>';
+        var autore=(r.clienti_profilo&&r.clienti_profilo.nome_completo)||"Anonimo";
+        var titolo=r.testo?r.testo.split("\n")[0].substring(0,40):"Ricetta";
+        h+='<div class="ricetta-card"><div class="ricetta-img">&#127837;</div>';
+        h+='<div class="ricetta-body"><div class="ricetta-nome">'+esc(titolo)+'</div>';
+        h+='<div class="ricetta-meta">di '+esc(autore)+'</div>';
+        h+='<div class="ricetta-tag">Ricetta</div></div></div>';
       });
       h+='</div>';
     }
@@ -552,81 +615,61 @@
     c.innerHTML=h;
   }
 
-  // ── TESSERA ──────────────────────────────────────────────────────
   function renderTessera(c){
     if(!ME){showAuth();return;}
     c.innerHTML='<iframe src="/fidelity.html?a='+AZIENDA+'" style="width:100%;height:calc(100dvh - 112px);border:none;display:block"></iframe>';
   }
 
-  // ── PROFILO ──────────────────────────────────────────────────────
   async function renderProfilo(c){
     if(!ME){showAuth();return;}
-    c.innerHTML='<div class="page-loader" style="height:200px"><div class="spinner"></div></div>';
+    c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
     var meta=ME.user_metadata||{};
     var nome=meta.nome_completo||ME.email||"Cliente";
     var email=ME.email||"";
-    var{data:profilo}=await supa.from("clienti_profilo").select("punti_totali,visite_totali,storie_pubblicate").eq("user_id",ME.id).maybeSingle();
+    var{data:profilo}=await supa.from("clienti_profilo").select("*").eq("user_id",ME.id).maybeSingle();
+    var punti=(profilo&&profilo.punti_totali)||0;
+    var puntiS=(profilo&&profilo.punti_social)||0;
+    var tot=punti+puntiS;
+    var visite=(profilo&&profilo.visite_totali)||0;
+    var storie=(profilo&&profilo.storie_pubblicate)||0;
+    var views=(profilo&&profilo.views_totali)||0;
+    var livello="Bronzo",nextLiv=2000,nextNome="Argento";
+    if(tot>=5000){livello="Oro";nextLiv=10000;nextNome="Platinum";}
+    else if(tot>=2000){livello="Argento";nextLiv=5000;nextNome="Oro";}
+    var pct=Math.min(100,Math.round((tot/nextLiv)*100));
+    var livIco={Bronzo:"&#129355;",Argento:"&#129354;",Oro:"&#129353;",Platinum:"&#128142;"}[livello]||"";
+
     var h='<div class="pb-nav">';
     h+='<div class="profilo-hero"><div class="profilo-av">'+esc(nome.charAt(0).toUpperCase())+'</div>';
-    h+='<div class="profilo-nome">'+esc(nome)+'</div><div class="profilo-email">'+esc(email)+'</div></div>';
+    h+='<div class="profilo-nome-el">'+esc(nome)+'</div>';
+    h+='<div class="profilo-email-el">'+esc(email)+'</div>';
+    h+='<div class="profilo-livello-badge">'+livIco+' '+livello+'</div></div>';
     h+='<div class="profilo-stats">';
-    h+='<div class="p-stat"><div class="p-stat-val">⭐ '+(profilo?.punti_totali||0)+'</div><div class="p-stat-label">Punti</div></div>';
-    h+='<div class="p-stat"><div class="p-stat-val">'+(profilo?.visite_totali||0)+'</div><div class="p-stat-label">Visite</div></div>';
-    h+='<div class="p-stat"><div class="p-stat-val">'+(profilo?.storie_pubblicate||0)+'</div><div class="p-stat-label">Storie</div></div>';
+    h+='<div class="p-stat"><div class="p-stat-val">'+tot+'</div><div class="p-stat-label">Punti</div></div>';
+    h+='<div class="p-stat"><div class="p-stat-val">'+visite+'</div><div class="p-stat-label">Visite</div></div>';
+    h+='<div class="p-stat"><div class="p-stat-val">'+views+'</div><div class="p-stat-label">Views</div></div>';
+    h+='<div class="p-stat"><div class="p-stat-val">'+storie+'</div><div class="p-stat-label">Post</div></div>';
+    h+='</div>';
+    h+='<div class="punti-bar-wrap">';
+    h+='<div class="punti-bar-labels"><span>'+livIco+' '+livello+'</span><span>'+tot+' / '+nextLiv+' pt</span></div>';
+    h+='<div class="punti-bar-track"><div class="punti-bar-fill" style="width:'+pct+'%"></div></div>';
+    h+='<div class="punti-next-label">Ancora '+Math.max(0,nextLiv-tot)+' punti per '+nextNome+'</div>';
     h+='</div>';
     h+='<div class="profilo-menu">';
-    h+='<div class="profilo-group-title">Il mio account</div>';
-    h+='<div class="profilo-row" onclick="navTo(\'tessera\')"><div class="profilo-row-icon">🎫</div><div class="profilo-row-text">Tessera fidelity</div><div class="profilo-row-arrow">›</div></div>';
-    h+='<div class="profilo-row"><div class="profilo-row-icon">📸</div><div class="profilo-row-text">Le mie storie</div><div class="profilo-row-arrow">›</div></div>';
-    h+='<div class="profilo-row"><div class="profilo-row-icon">🔔</div><div class="profilo-row-text">Notifiche</div><div class="profilo-row-arrow">›</div></div>';
-    h+='<div class="profilo-group-title" style="margin-top:8px">Supporto</div>';
-    h+='<div class="profilo-row"><div class="profilo-row-icon">💬</div><div class="profilo-row-text">Contattaci su WhatsApp</div><div class="profilo-row-arrow">›</div></div>';
-    h+='<div class="profilo-row"><div class="profilo-row-icon">🔒</div><div class="profilo-row-text">Privacy e dati</div><div class="profilo-row-arrow">›</div></div>';
+    h+='<div class="menu-group-title">Il mio account</div>';
+    h+='<div class="menu-row" onclick="navTo(\'tessera\')"><div class="menu-row-icon">&#127915;</div><div class="menu-row-text">Tessera fidelity</div><div class="menu-row-arrow">&#8250;</div></div>';
+    h+='<div class="menu-row"><div class="menu-row-icon">&#128247;</div><div class="menu-row-text">I miei post</div><div class="menu-row-arrow">&#8250;</div></div>';
+    h+='<div class="menu-row"><div class="menu-row-icon">&#11088;</div><div class="menu-row-text">Le mie recensioni</div><div class="menu-row-arrow">&#8250;</div></div>';
+    h+='<div class="menu-group-title" style="margin-top:8px">Supporto</div>';
+    h+='<div class="menu-row"><div class="menu-row-icon">&#128172;</div><div class="menu-row-text">Contattaci su WhatsApp</div><div class="menu-row-arrow">&#8250;</div></div>';
+    h+='<div class="menu-row"><div class="menu-row-icon">&#128274;</div><div class="menu-row-text">Privacy e dati</div><div class="menu-row-arrow">&#8250;</div></div>';
     h+='</div>';
     h+='<button class="logout-btn" onclick="doLogout()">Esci dall\'account</button>';
     h+='</div>';
     c.innerHTML=h;
   }
 
-  // ── AZIONI ──────────────────────────────────────────────────────
-  window.apriUploadStoria=function(){
-    var i=document.createElement("input");
-    i.type="file";i.accept="image/*,video/*";
-    i.onchange=function(e){
-      var f=e.target.files[0];
-      if(!f) return;
-      var preview=document.getElementById("preview-wrap");
-      if(preview){
-        preview.style.display="block";
-        if(f.type.startsWith("image/")){
-          var url=URL.createObjectURL(f);
-          preview.innerHTML='<img src="'+url+'" style="width:100%;max-height:300px;object-fit:cover;border-radius:12px;display:block"/>';
-        } else {
-          preview.innerHTML='<div style="padding:12px;background:var(--bg);border-radius:12px;font-size:13px;font-weight:600;color:var(--brand)">📹 '+esc(f.name)+'</div>';
-        }
-      }
-    };
-    i.click();
-  };
-
-  window.pubblicaStoria=async function(){
-    var testo=document.getElementById("storia-testo")?.value||"";
-    if(!testo){alert("Scrivi qualcosa sulla tua esperienza!");return;}
-    var{error}=await supa.from("social_post").insert({
-      user_id:ME.id,testo,tipo:"storia",visibile:true,
-      punti_assegnati:50,azienda_id:AZIENDA,
-      scade_at:new Date(Date.now()+86400000).toISOString()
-    });
-    if(!error){
-      await supa.rpc("aggiungi_punti_cliente",{p_user_id:ME.id,p_punti:50,p_motivo:"storia_pubblicata"}).catch(function(){});
-      alert("✅ Storia pubblicata! +50 punti guadagnati 🌟");
-      navTo("home");
-    }
-  };
-
-  window.apriRicetta=function(){alert("Dettaglio ricetta — prossimo modulo!");};
-
-  // ── HELPERS ──────────────────────────────────────────────────────
+  function stelleHTML(v){var s="";for(var i=0;i<5;i++)s+=i<v?"&#11088;":"&#9734;";return s;}
   function show(id,d){var e=document.getElementById(id);if(e)e.style.display=d||"block";}
   function hide(id){var e=document.getElementById(id);if(e)e.style.display="none";}
   function val(id){var e=document.getElementById(id);return e?e.value.trim():"";}
