@@ -6,6 +6,7 @@
   <title>RistoflowBook</title>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#0E5A7A"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <link rel="apple-touch-icon" href="/favicon-192.png"/>
@@ -293,9 +294,24 @@
     <button class="nav-item active" data-page="home" onclick="navTo('home')"><span class="nav-icon">&#127968;</span><span class="nav-label">Home</span></button>
     <button class="nav-item" data-page="ricette" onclick="navTo('ricette')"><span class="nav-icon">&#127859;</span><span class="nav-label">Ricette</span></button>
     <button class="nav-item" data-page="pubblica" onclick="apriPubblica()" style="overflow:visible;"><div class="nav-center-wrap">&#43;</div><span class="nav-label" style="margin-top:2px;">Pubblica</span></button>
+    <button class="nav-item" data-page="locali" onclick="navTo('locali')"><span class="nav-icon">&#128205;</span><span class="nav-label">Locali</span></button>
     <button class="nav-item" data-page="tessera" onclick="navTo('tessera')"><span class="nav-icon">&#127915;</span><span class="nav-label">Tessera</span></button>
     <button class="nav-item" data-page="profilo" onclick="navTo('profilo')"><span class="nav-icon">&#128100;</span><span class="nav-label">Profilo</span></button>
   </nav>
+</div>
+
+
+<!-- STORIA VIEWER -->
+<div id="storia-viewer">
+  <div class="storia-progress" id="storia-progress"></div>
+  <div class="storia-header">
+    <div class="storia-av" id="storia-av-el">?</div>
+    <div class="storia-nome" id="storia-nome-el">Storia</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.6);margin-right:8px" id="storia-ora-el"></div>
+    <button class="storia-chiudi" onclick="chiudiStoriaViewer()">&#10005;</button>
+  </div>
+  <div class="storia-media" id="storia-media-el"></div>
+  <div class="storia-testo-overlay" id="storia-testo-el"></div>
 </div>
 
 <!-- MODAL PUBBLICA -->
@@ -413,6 +429,7 @@
     var{data,error}=await supa.auth.signUp({
       email,password:pwd,
       options:{
+        emailRedirectTo:"https://social.ristoflow-ai.com",
         data:{nome_completo:nome,telefono:tel}
       }
     });
@@ -422,18 +439,10 @@
     if(data.user){
       try{await supa.from("clienti_profilo").upsert({user_id:data.user.id,nome_completo:nome,email,telefono:tel},{onConflict:"user_id"});}catch(e){}
     }
-    // Invia email di conferma via Edge Function (bypassa limite Supabase free)
-    try{
-      await fetch("https://cuhcscpvhypoaplcmtjk.supabase.co/functions/v1/invia-conferma-email",{
-        method:"POST",
-        headers:{"Content-Type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0"},
-        body:JSON.stringify({email,nome})
-      });
-    }catch(e){console.warn("Edge Function conferma:",e);}
     showConferma(email);
   };
 
-  window.doLogout=async function(){await supa.auth.signOut();};
+  window.doLogout=async function(){await supa.auth.signOut();ME=null;showAuth();};
 
   // COMPLETA PROFILO
   window.cambiaFotoCompleta=function(){
@@ -486,7 +495,7 @@
   window.navTo=function(page){
     document.querySelectorAll(".nav-item").forEach(function(b){b.classList.toggle("active",b.dataset.page===page);});
     var c=document.getElementById("page-content");c.scrollTop=0;
-    var pages={home:renderHome,ricette:renderRicette,tessera:renderTessera,profilo:renderProfilo};
+    var pages={home:renderHome,ricette:renderRicette,tessera:renderTessera,profilo:renderProfilo,locali:renderLocali};
     (pages[page]||renderHome)(c);
   };
 
@@ -509,7 +518,8 @@
       h+='<div class="empty-state"><div class="empty-icon">&#127869;&#65039;</div><div class="empty-title">Nessun contenuto</div><div class="empty-sub">Sii il primo a pubblicare!</div><button class="empty-btn" onclick="apriPubblica()">Pubblica ora</button></div>';
     }else{
       posts.forEach(function(p){
-        var autore=p.nome_completo||"Anonimo";
+        if(!p.nome_completo)return; // nascondi post anonimi
+        var autore=p.nome_completo;
         var tipoA=p.tipo_utente||"cliente";
         var locale=p.nome_locale||"";
         var miaR=myReaz[p.id]||null;
@@ -529,7 +539,11 @@
         if(tipoA==="titolare")h+=' <span class="badge badge-titolare">&#127978; Titolare</span>';
         h+='</div></div><div style="font-size:20px;color:var(--text-3);cursor:pointer;padding:4px;">&#183;&#183;&#183;</div></div>';
         if(p.testo)h+='<div class="post-testo">'+esc(p.testo)+'</div>';
-        if(p.media_url)h+='<img class="post-img" src="'+esc(p.media_url)+'" loading="lazy"/>';
+        if(p.media_url){
+          var isVideo=p.media_url.match(/\.(mp4|mov|webm|ogg)(\?|$)/i);
+          if(isVideo)h+='<video class="post-img" src="'+esc(p.media_url)+'" controls playsinline preload="metadata" style="max-height:400px;width:100%;background:#000"></video>';
+          else h+='<img class="post-img" src="'+esc(p.media_url)+'" loading="lazy"/>';
+        }
         else if(cat==="esperienze"||cat==="storia")h+='<div class="post-img-placeholder">&#127837;</div>';
         if(cat==="recensioni"&&p.voto)h+='<div class="stelle-wrap"><div>'+stelleHTML(p.voto)+'</div><span class="badge badge-verificato">&#10003; Verificata</span></div>';
         if(p.punti_assegnati)h+='<div class="points-badge">&#11088; +'+p.punti_assegnati+' punti</div>';
@@ -597,7 +611,7 @@
     if(!cc||cc.length===0){items.innerHTML='<div style="padding:0 14px 8px;font-size:13px;color:var(--text-3)">Nessun commento.</div>';return;}
     var h="";
     cc.forEach(function(c){
-      var nome=(c.clienti_profilo&&c.clienti_profilo.nome_completo)||"Anonimo";
+      var nome=(c.clienti_profilo&&c.clienti_profilo.nome_completo)||""; if(!nome)return;
       h+='<div class="commento-row"><div class="commento-av">'+esc(nome.charAt(0).toUpperCase())+'</div>';
       h+='<div class="commento-bubble"><div class="commento-nome">'+esc(nome)+'</div><div class="commento-testo">'+esc(c.testo)+'</div><div class="commento-data">'+formatData(c.created_at)+'</div></div></div>';
     });
@@ -752,20 +766,50 @@
     var el=document.getElementById("tessera-content");if(!el)return;
     var{data:profilo}=await supa.from("clienti_profilo").select("*").eq("user_id",ME.id).maybeSingle();
     var punti=(profilo&&profilo.punti_totali)||0;
-    var livello="Bronzo";if(punti>=5000)livello="Oro";else if(punti>=2000)livello="Argento";
+    var puntiS=(profilo&&profilo.punti_social)||0;
+    var tot=punti+puntiS;
+    var livello="Bronzo",nextLiv=2000,nextNome="Argento";
+    if(tot>=5000){livello="Oro";nextLiv=10000;nextNome="Platinum";}
+    else if(tot>=2000){livello="Argento";nextLiv=5000;nextNome="Oro";}
+    var livIco={"Bronzo":"&#129355;","Argento":"&#129354;","Oro":"&#129353;","Platinum":"&#128142;"}[livello]||"";
     var nome=(ME&&ME.user_metadata&&ME.user_metadata.nome_completo)||"Cliente";
+    var pct=Math.min(100,Math.round((tot/nextLiv)*100));
     var h='<div style="background:linear-gradient(135deg,#0E5A7A,#1a8fb5);margin:0 16px;border-radius:24px;padding:24px;color:#fff;box-shadow:0 8px 32px rgba(14,90,122,.3);position:relative">';
     h+='<div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:4px">Rete Ristoflow</div>';
     h+='<div style="font-size:22px;font-weight:800;margin-bottom:16px">'+esc(nome)+'</div>';
-    h+='<div style="font-size:11px;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.06em">Punti</div>';
-    h+='<div style="font-size:48px;font-weight:800;line-height:1">'+punti+'</div>';
+    h+='<div style="font-size:11px;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.06em">Livello</div>';
+    h+='<div style="font-size:36px;font-weight:800;line-height:1">'+livIco+' '+livello+'</div>';
+    h+='<div style="font-size:13px;opacity:.7;margin-top:6px">'+tot+' punti accumulati</div>';
     h+='<div style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,.2);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:800">'+livello+'</div></div>';
+    h+='<div style="margin:12px 16px 0;background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
+    h+='<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px"><span>'+livIco+' '+livello+'</span><span>'+tot+'/'+nextLiv+'</span></div>';
+    h+='<div style="background:#f0f6fa;border-radius:999px;height:10px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,#0E5A7A,#00c896);border-radius:999px;width:'+pct+'%"></div></div>';
+    h+='<div style="font-size:12px;color:#94a3b8;margin-top:6px;text-align:center">Ancora '+Math.max(0,nextLiv-tot)+' punti per '+nextNome+'</div></div>';
     h+='<div style="margin:16px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
-    h+='<div style="font-size:14px;font-weight:800;margin-bottom:12px">Come guadagnare punti</div>';
-    [{i:"&#128247;",t:"Pubblica una storia",p:"+50 pt"},{i:"&#127859;",t:"Condividi una ricetta",p:"+80 pt"},{i:"&#11088;",t:"Scrivi una recensione",p:"+100 pt"},{i:"&#128101;",t:"Porta un amico",p:"+150 pt"}].forEach(function(m){
+    h+='<div style="font-size:14px;font-weight:800;margin-bottom:12px">&#11088; Come guadagnare punti</div>';
+    [{i:"&#128247;",t:"Pubblica un momento",p:"+30 pt"},{i:"&#127757;",t:"Pubblica una storia",p:"+50 pt"},{i:"&#127859;",t:"Condividi una ricetta",p:"+80 pt"},{i:"&#11088;",t:"Scrivi una recensione",p:"+100 pt"},{i:"&#128101;",t:"Porta un amico",p:"+150 pt"},{i:"&#128205;",t:"Visita un locale partner",p:"+200 pt"}].forEach(function(m){
       h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f6fa"><span style="font-size:24px">'+m.i+'</span><span style="flex:1;font-size:14px;font-weight:600">'+m.t+'</span><span style="background:#e8f4f8;color:#0E5A7A;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800">'+m.p+'</span></div>';
     });
-    h+='</div></div>';el.innerHTML=h;
+    h+='</div>';
+    h+='<div style="margin:12px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
+    h+='<div style="font-size:14px;font-weight:800;margin-bottom:14px">&#127873; Premi disponibili</div>';
+    var premi=[{i:"&#9749;",n:"Caffè gratis",s:500,d:"Un caffè offerto dai locali partner"},{i:"&#127829;",n:"Pizza gratis",s:1500,d:"Una pizza offerta dal locale partner"},{i:"&#127869;",n:"Degustazione",s:3000,d:"Menù degustazione per 2 persone"},{i:"&#128142;",n:"Cena VIP",s:8000,d:"Cena esclusiva per 4 persone"}];
+    premi.forEach(function(p){
+      var ok=tot>=p.s;
+      h+='<div class="premio-card"><div class="premio-icon">'+p.i+'</div><div class="premio-body"><div class="premio-nome">'+p.n+'</div><div class="premio-soglia">'+p.s+' punti richiesti</div><div style="font-size:12px;color:#92400e;margin-top:2px">'+p.d+'</div><div class="premio-stato '+(ok?"ok":"nok")+'">'+( ok?"&#10003; Riscattabile":"Ancora "+(p.s-tot)+" pt")+'</div></div></div>';
+    });
+    h+='</div>';
+    h+='<div style="margin:12px 16px 32px;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
+    h+='<div style="font-size:14px;font-weight:800;margin-bottom:10px">&#128196; Regolamento</div>';
+    h+='<div style="font-size:13px;color:#64748b;line-height:1.7">';
+    h+='&#8226; I punti si accumulano con ogni interazione social su RistoflowBook.<br>';
+    h+='&#8226; I premi sono riscattabili nei locali partner Ristoflow.<br>';
+    h+='&#8226; Un premio per utente ogni 30 giorni.<br>';
+    h+='&#8226; I punti scadono dopo 12 mesi di inattivit&#224;.<br>';
+    h+='&#8226; Ristoflow si riserva di modificare il programma con preavviso di 30 giorni.<br>';
+    h+='&#8226; Per assistenza: <a href="mailto:info@ristoflow-ai.com" style="color:#0E5A7A;font-weight:700">info@ristoflow-ai.com</a>';
+    h+='</div></div>';
+    h+='</div>';el.innerHTML=h;
   }
 
   async function renderProfilo(c){
@@ -877,6 +921,141 @@
   function val(id){var e=document.getElementById(id);return e?e.value.trim():"";}
   function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
   function formatData(ts){if(!ts)return"";return new Date(ts).toLocaleDateString("it-IT",{day:"2-digit",month:"short"});}
+
+
+  // ── LOCALI PAGE ─────────────────────────────────────────────────────────────
+  async function renderLocali(c){
+    c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
+    var{data:sedi}=await supa.from("sedi").select("id,nome,indirizzo,tipo,lat,lng,foto_url").order("nome");
+    var h='<div class="pb-nav">';
+    h+='<div style="padding:16px 16px 12px"><div style="font-size:22px;font-weight:900">&#128205; Locali Partner</div>';
+    h+='<div style="font-size:13px;color:var(--text-2);margin-top:4px">Ristoranti e locali su Ristoflow</div></div>';
+    if(!sedi||sedi.length===0){
+      h+='<div class="empty-state"><div class="empty-icon">&#128205;</div><div class="empty-title">Nessun locale ancora</div></div>';
+    }else{
+      sedi.forEach(function(s){
+        var mapUrl="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent((s.indirizzo||s.nome||"")+"+"+(s.lat&&s.lng?s.lat+","+s.lng:""));
+        h+='<div class="locale-card">';
+        if(s.foto_url)h+='<img src="'+esc(s.foto_url)+'" style="width:100%;height:140px;object-fit:cover"/>';
+        else h+='<div class="locale-card-img">&#127869;&#65039;</div>';
+        h+='<div class="locale-card-body">';
+        h+='<div class="locale-card-nome">'+esc(s.nome||"Locale")+'</div>';
+        h+='<div class="locale-card-tipo">'+esc(s.indirizzo||"")+'</div>';
+        h+='<div class="locale-card-actions">';
+        h+='<a href="'+mapUrl+'" target="_blank" class="locale-action-btn primary">&#128205; Indicazioni</a>';
+        h+='<button class="locale-action-btn" onclick="prenotaLocale(''+s.id+'')">&#128197; Prenota</button>';
+        h+='</div></div></div>';
+      });
+    }
+    h+='</div>';c.innerHTML=h;
+  }
+
+  window.prenotaLocale=function(id){
+    window.open("https://ristoflow-ai.com/prenotazione.html?sede="+id,"_blank");
+  };
+
+  // ── PULSANTE SEGUI ───────────────────────────────────────────────────────────
+  window.toggleSegui=async function(targetUserId,btn){
+    if(!ME){showAuth();return;}
+    var{data:exists}=await supa.from("social_follower").select("id").eq("follower_id",ME.id).eq("following_id",targetUserId).maybeSingle();
+    if(exists){
+      await supa.from("social_follower").delete().eq("follower_id",ME.id).eq("following_id",targetUserId);
+      if(btn){btn.textContent="Segui";btn.classList.remove("following");}
+    }else{
+      await supa.from("social_follower").insert({follower_id:ME.id,following_id:targetUserId});
+      if(btn){btn.textContent="Stai seguendo";btn.classList.add("following");}
+    }
+  };
+
+  // ── MENU REAZIONI TENDINA ─────────────────────────────────────────────────────
+  var reazMenuOpen=null;
+  window.toggleReazMenu=function(postId,evt){
+    evt.stopPropagation();
+    if(reazMenuOpen===postId){chiudiReazMenu();return;}
+    chiudiReazMenu();
+    reazMenuOpen=postId;
+    var wrap=document.getElementById("act-wrap-"+postId);
+    if(!wrap)return;
+    var m=document.createElement("div");
+    m.className="reaz-menu";m.id="reaz-menu-"+postId;
+    m.innerHTML=[
+      {k:"fuoco",c:"reaz_fuoco",e:"&#128525;",l:"Mi piace"},
+      {k:"applauso",c:"reaz_applauso",e:"&#128079;",l:"Bravo!"},
+      {k:"cuore",c:"reaz_cuore",e:"&#128293;",l:"Top!"},
+      {k:"wow",c:"reaz_fuoco",e:"&#129327;",l:"Wow"},
+      {k:"yum",c:"reaz_fuoco",e:"&#128523;",l:"Yum"}
+    ].map(function(r){
+      return '<button class="reaz-menu-btn" onclick="reagisci('+postId+',''+r.k+'',''+r.c+'');chiudiReazMenu()">'+r.e+'<span>'+r.l+'</span></button>';
+    }).join("");
+    wrap.style.position="relative";
+    wrap.appendChild(m);
+    setTimeout(function(){document.addEventListener("click",chiudiReazMenu,{once:true});},50);
+  };
+  window.chiudiReazMenu=function(){
+    if(reazMenuOpen){var m=document.getElementById("reaz-menu-"+reazMenuOpen);if(m)m.remove();reazMenuOpen=null;}
+  };
+
+  // ── CONDIVIDI POST ────────────────────────────────────────────────────────────
+  window.condividiPost=function(postId){
+    var url=window.location.origin+"?post="+postId;
+    if(navigator.share){navigator.share({title:"RistoflowBook",url:url});}
+    else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){alert("Link copiato!");});}
+  };
+
+  // ── STICKER STORIA ────────────────────────────────────────────────────────────
+  var storiaStickersList=[];
+  window.aggiungiStickerStoria=function(tipo){
+    var val="",emoji="";
+    if(tipo==="ora"){val=new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});emoji="&#128336; ";}
+    else if(tipo==="timer"){val=prompt("Countdown (es. 3 giorni, 2 ore):");if(!val)return;emoji="&#9203; ";}
+    else if(tipo==="posizione"){val=prompt("Luogo o posizione:");if(!val)return;emoji="&#128205; ";}
+    else if(tipo==="link"){val=prompt("URL da inserire:");if(!val)return;emoji="&#128279; ";}
+    else if(tipo==="tag"){val=prompt("Tagga un utente o locale (@nome):");if(!val)return;emoji="";}
+    else if(tipo==="musica"){val=prompt("Canzone (artista - titolo):");if(!val)return;emoji="&#127925; ";}
+    else if(tipo==="gif"){val=prompt("URL GIF:");if(!val)return;emoji="&#127827; ";}
+    if(!val)return;
+    storiaStickersList.push({tipo,val,emoji});
+    var sp=document.getElementById("stickers-preview");
+    if(sp){
+      var badge=document.createElement("div");
+      badge.style.cssText="background:#0E5A7A;color:#fff;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px;";
+      badge.innerHTML=emoji+esc(val.substring(0,30))+'<span onclick="this.parentNode.remove()" style="cursor:pointer;margin-left:4px;opacity:.7">&#10005;</span>';
+      sp.appendChild(badge);
+    }
+  };
+
+  // ── STORIA VIEWER ─────────────────────────────────────────────────────────────
+  var storieList=[],storiaIdx=0,storiaTimer=null;
+  window.apriStoria=function(items,idx){
+    storieList=items;storiaIdx=idx||0;
+    document.getElementById("storia-viewer").classList.add("open");
+    mostraStoria(storiaIdx);
+  };
+  function mostraStoria(idx){
+    if(storiaTimer)clearTimeout(storiaTimer);
+    var s=storieList[idx];if(!s)return chiudiStoriaViewer();
+    document.getElementById("storia-av-el").textContent=(s.nome||"?").charAt(0).toUpperCase();
+    document.getElementById("storia-nome-el").textContent=s.nome||"Storia";
+    document.getElementById("storia-ora-el").textContent=formatData(s.created_at);
+    var media=document.getElementById("storia-media-el");
+    var testo=document.getElementById("storia-testo-el");
+    if(s.media_url){
+      var isVid=s.media_url.match(/\.(mp4|mov|webm)(\?|$)/i);
+      media.innerHTML=isVid?'<video src="'+esc(s.media_url)+'" autoplay playsinline muted style="max-width:100%;max-height:100%"></video>':'<img src="'+esc(s.media_url)+'" style="max-width:100%;max-height:100%;object-fit:contain"/>';
+    }else{media.innerHTML='<div style="font-size:80px">&#127837;</div>';}
+    testo.innerHTML=s.testo&&s.testo.trim()&&s.testo.trim()!=" "?'<p>'+esc(s.testo)+'</p>':"";
+    var prog=document.getElementById("storia-progress");
+    prog.innerHTML=storieList.map(function(_,i){return'<div class="storia-bar"><div class="storia-bar-fill" id="sp-'+i+'" style="width:'+(i<idx?"100%":"0%")+'"></div></div>';}).join("");
+    var fill=document.getElementById("sp-"+idx);
+    if(fill){fill.style.transition="width 5s linear";setTimeout(function(){fill.style.width="100%";},50);}
+    storiaTimer=setTimeout(function(){storiaIdx++;mostraStoria(storiaIdx);},5000);
+    media.onclick=function(){storiaIdx++;mostraStoria(storiaIdx);};
+  }
+  window.chiudiStoriaViewer=function(){
+    if(storiaTimer)clearTimeout(storiaTimer);
+    document.getElementById("storia-viewer").classList.remove("open");
+    storieList=[];storiaIdx=0;
+  };
 
   init();
 })();
