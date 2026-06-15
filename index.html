@@ -32,15 +32,15 @@
     .page-loader.full{height:100vh;}
 
     /* AUTH */
-    #auth-screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 20px 40px;background:linear-gradient(160deg,#0a3f57 0%,#0E5A7A 45%,#00c896 100%);overflow-y:auto;position:fixed;inset:0;z-index:300;}
-    .auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+    #auth-screen{display:none;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh;padding:40px 20px 40px;background:linear-gradient(160deg,#0a3f57 0%,#0E5A7A 45%,#00c896 100%);overflow-y:auto;position:fixed;inset:0;z-index:300;}
+    .auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
     .auth-logo-icon{width:56px;height:56px;background:rgba(255,255,255,.15);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1.5px solid rgba(255,255,255,.25);}
     .auth-brand-name{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px;}
     .auth-brand-name .l-risto{color:#fff;}
     .auth-brand-name .l-flow{color:#00c896;}
     .auth-brand-name .l-book{color:#f97316;}
-    .auth-tagline{font-size:14px;color:rgba(255,255,255,.7);margin-bottom:28px;text-align:center;line-height:1.5;}
-    .auth-card{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.25);position:relative;z-index:301;}
+    .auth-tagline{font-size:14px;color:rgba(255,255,255,.7);margin-bottom:16px;text-align:center;line-height:1.5;}
+    .auth-card{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.25);position:relative;z-index:301;margin-top:20px;}
     .auth-tabs{display:flex;gap:4px;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:20px;}
     .auth-tab{flex:1;padding:9px;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;background:transparent;color:var(--text-2);transition:all .2s;}
     .auth-tab.active{background:#fff;color:var(--brand);box-shadow:0 2px 8px rgba(0,0,0,.08);}
@@ -218,30 +218,52 @@
 
 <!-- AUTH -->
 <div id="auth-screen">
-  <div class="auth-brand">
-    <div class="auth-logo-icon">&#127869;&#65039;</div>
-    <div class="auth-brand-name"><span class="l-risto">Risto</span><span class="l-flow">flow</span><span class="l-book">Book</span></div>
+  <div style="text-align:center;margin-bottom:24px;margin-top:20px;">
+    <div style="display:inline-flex;align-items:center;gap:12px;margin-bottom:8px;">
+      <div style="width:56px;height:56px;background:rgba(255,255,255,.15);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;border:1.5px solid rgba(255,255,255,.25);">&#127869;&#65039;</div>
+      <div style="font-size:32px;font-weight:900;letter-spacing:-1px;"><span style="color:#fff">Risto</span><span style="color:#00c896">flow</span><span style="color:#f97316">Book</span></div>
+    </div>
+    <div style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.5;">Il social della ristorazione italiana.<br>Entra con il tuo numero WhatsApp.</div>
   </div>
-  <div class="auth-tagline">Il social della ristorazione italiana.<br>Entra con il tuo numero WhatsApp.</div>
-  <div class="auth-card">
-    <div id="auth-error" class="auth-error"></div>
-    <div id="step-tel" class="auth-form">
-      <div style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:8px">Il tuo numero WhatsApp</div>
-      <input class="auth-input" type="tel" id="input-tel" placeholder="+39 333 123 4567" autocomplete="tel"/>
-      <button class="auth-btn" onclick="inviaOtp()">Invia codice WhatsApp &#128172;</button>
+  <div style="background:#fff;border-radius:24px;padding:28px;width:calc(100% - 40px);max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.25);">
+    <div id="auth-error" style="background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;display:none;margin-bottom:12px;line-height:1.4;"></div>
+    <!-- STEP TEL -->
+    <div id="step-tel">
+      <div style="font-size:14px;font-weight:700;color:#64748b;margin-bottom:10px;">&#128222; Il tuo numero WhatsApp</div>
+      <input id="input-tel" type="tel" placeholder="+39 333 123 4567" autocomplete="tel"
+        style="width:100%;padding:14px 16px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;font-family:inherit;outline:none;background:#f0f6fa;color:#111827;margin-bottom:12px;"/>
+      <button onclick="inviaOtp()"
+        style="width:100%;padding:15px;background:linear-gradient(135deg,#0E5A7A,#1a8fb5);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;">
+        Invia codice WhatsApp &#128172;
+      </button>
     </div>
-    <div id="step-otp" class="auth-form hidden">
-      <div style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:4px">Codice ricevuto su WhatsApp</div>
-      <div style="font-size:12px;color:var(--text-3);margin-bottom:12px" id="otp-hint">Controlla i tuoi messaggi</div>
-      <input class="auth-input" type="tel" id="input-otp" placeholder="123456" maxlength="6" autocomplete="one-time-code" style="font-size:24px;letter-spacing:8px;text-align:center"/>
-      <button class="auth-btn" onclick="verificaOtp()">Entra &#8594;</button>
-      <button onclick="tornaATel()" style="width:100%;background:none;border:none;font-size:13px;font-weight:700;color:var(--text-2);cursor:pointer;margin-top:8px">&#8592; Cambia numero</button>
+    <!-- STEP OTP -->
+    <div id="step-otp" style="display:none;">
+      <div style="font-size:14px;font-weight:700;color:#64748b;margin-bottom:6px;">&#128272; Codice ricevuto</div>
+      <div id="otp-hint" style="font-size:13px;color:#94a3b8;margin-bottom:14px;">Controlla i tuoi messaggi</div>
+      <input id="input-otp" type="tel" placeholder="123456" maxlength="6" autocomplete="one-time-code"
+        style="width:100%;padding:14px 16px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:28px;font-family:inherit;outline:none;background:#f0f6fa;color:#111827;margin-bottom:12px;letter-spacing:8px;text-align:center;"
+        onkeydown="if(event.key==='Enter')verificaOtp()"/>
+      <button onclick="verificaOtp()"
+        style="width:100%;padding:15px;background:linear-gradient(135deg,#0E5A7A,#1a8fb5);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:10px;">
+        Entra &#8594;
+      </button>
+      <button onclick="tornaATel()"
+        style="width:100%;background:none;border:none;font-size:13px;font-weight:700;color:#64748b;cursor:pointer;padding:6px;">
+        &#8592; Cambia numero
+      </button>
     </div>
-    <div id="step-nome" class="auth-form hidden">
-      <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:4px">Benvenuto!</div>
-      <div style="font-size:13px;color:var(--text-2);margin-bottom:16px">Come ti chiami?</div>
-      <input class="auth-input" type="text" id="input-nome" placeholder="Nome e cognome" autocomplete="name"/>
-      <button class="auth-btn" onclick="completaRegistrazione()">Inizia &#8594;</button>
+    <!-- STEP NOME -->
+    <div id="step-nome" style="display:none;">
+      <div style="font-size:16px;font-weight:800;color:#111827;margin-bottom:6px;">Benvenuto! &#127881;</div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:16px;">Come ti chiami?</div>
+      <input id="input-nome" type="text" placeholder="Nome e cognome" autocomplete="name"
+        style="width:100%;padding:14px 16px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:16px;font-family:inherit;outline:none;background:#f0f6fa;color:#111827;margin-bottom:12px;"
+        onkeydown="if(event.key==='Enter')completaRegistrazione()"/>
+      <button onclick="completaRegistrazione()"
+        style="width:100%;padding:15px;background:linear-gradient(135deg,#0E5A7A,#00c896);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;">
+        Inizia &#8594;
+      </button>
     </div>
   </div>
 </div>
@@ -319,6 +341,7 @@
       var{data:sess}=await supa.from("clienti_sessioni").select("*,clienti_profilo(*)").eq("token",token).gte("scade_at",new Date().toISOString()).maybeSingle();
       if(sess&&sess.clienti_profilo){
         ME=sess.clienti_profilo;
+        ME.nome_completo=ME.nome_completo||ME.telefono||"Cliente";
         sessionToken=token;
         showApp();
         return;
@@ -357,7 +380,7 @@
       } else {
         hint.textContent="Codice inviato a "+telCorrente;
       }
-      hide("step-tel");show("step-otp");hide("auth-error");
+      document.getElementById("step-tel").style.display="none";document.getElementById("step-otp").style.display="block";hide("auth-error");
       document.getElementById("input-otp").focus();
     }catch(e){showErr("Errore connessione");btn.textContent="Invia codice WhatsApp";btn.disabled=false;}
   };
@@ -380,7 +403,7 @@
       localStorage.setItem("rfb_token",sessionToken);
       ME=data.profilo;
       if(!ME.nome_completo){
-        hide("step-otp");show("step-nome");
+        document.getElementById("step-otp").style.display="none";document.getElementById("step-nome").style.display="block";
       } else {
         showApp();
       }
@@ -396,10 +419,10 @@
   };
 
   window.tornaATel=function(){
-    hide("step-otp");show("step-tel");hide("auth-error");
+    document.getElementById("step-otp").style.display="none";document.getElementById("step-tel").style.display="block";hide("auth-error");
     document.getElementById("input-otp").value="";
   };
-  function showErr(m){var e=document.getElementById("auth-error");e.textContent=m;e.style.display="block";}
+  function showErr(m){var e=document.getElementById("auth-error");if(e){e.textContent=m;e.style.display="block";}}
   function showAuth(){hide("app-shell");show("auth-screen","flex");}
   window.showAuth=showAuth;
   function showApp(){
