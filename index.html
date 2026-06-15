@@ -423,6 +423,14 @@
     if(data.user){
       try{await supa.from("clienti_profilo").upsert({user_id:data.user.id,nome_completo:nome,email,telefono:tel},{onConflict:"user_id"});}catch(e){}
     }
+    // Invia email di conferma via Edge Function (bypassa limite Supabase free)
+    try{
+      await fetch("https://cuhcscpvhypoaplcmtjk.supabase.co/functions/v1/invia-conferma-email",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0"},
+        body:JSON.stringify({email,nome})
+      });
+    }catch(e){console.warn("Edge Function conferma:",e);}
     showConferma(email);
   };
 
