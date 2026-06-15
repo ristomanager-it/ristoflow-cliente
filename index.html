@@ -201,6 +201,26 @@
     .pb-nav{padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);}
     .hidden{display:none!important;}
 
+    /* STICKER MODAL */
+    #sticker-modal{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.7);display:none;align-items:flex-end;}
+    #sticker-modal.open{display:flex;}
+    .sticker-sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;padding:20px 16px calc(20px + var(--safe-bottom));max-height:80vh;overflow-y:auto;}
+    .sticker-handle{width:40px;height:4px;background:var(--border);border-radius:999px;margin:0 auto 16px;}
+    .sticker-title{font-size:16px;font-weight:800;margin-bottom:16px;}
+    .sticker-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;outline:none;background:var(--bg);margin-bottom:12px;display:block;}
+    .sticker-input:focus{border-color:var(--brand);background:#fff;}
+    .sticker-confirm-btn{width:100%;padding:13px;background:var(--brand);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;}
+    .sticker-cancel-btn{width:100%;padding:11px;background:none;border:none;font-size:14px;font-weight:700;color:var(--text-3);cursor:pointer;margin-top:8px;}
+    .sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+    .sc-tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border:1.5px solid var(--border);border-radius:14px;background:var(--surface);cursor:pointer;transition:border-color .15s;}
+    .sc-tile:active{background:var(--brand-light);border-color:var(--brand);}
+    .sc-tile-icon{font-size:26px;line-height:1;}
+    .sc-tile-label{font-size:11px;font-weight:700;color:var(--text-2);}
+    .stickers-preview{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 10px;min-height:0;}
+    .sticker-badge{background:var(--brand);color:#fff;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px;}
+    .sticker-badge-x{cursor:pointer;opacity:.7;font-size:14px;line-height:1;}
+
+
     /* STORIA VIEWER */
     #storia-viewer{position:fixed;inset:0;z-index:500;background:#000;display:none;flex-direction:column;}
     #storia-viewer.open{display:flex;}
@@ -357,6 +377,17 @@
   </div>
   <div class="storia-media" id="storia-media-el" onclick="storiaIdx++;mostraStoria(storiaIdx)"></div>
   <div class="storia-testo-overlay" id="storia-testo-el"></div>
+</div>
+
+<!-- STICKER MODAL -->
+<div id="sticker-modal">
+  <div class="sticker-sheet">
+    <div class="sticker-handle"></div>
+    <div class="sticker-title" id="sticker-title">Aggiungi sticker</div>
+    <input class="sticker-input" id="sticker-input" placeholder="Scrivi qui..."/>
+    <button class="sticker-confirm-btn" onclick="confermaStickerInput()">Aggiungi &#10003;</button>
+    <button class="sticker-cancel-btn" onclick="chiudiStickerModal()">Annulla</button>
+  </div>
 </div>
 
 <!-- MODAL PUBBLICA -->
@@ -705,10 +736,29 @@
 
   function buildForm(tipo){
     var h='<button class="back-btn" onclick="document.getElementById(\'step-tipo\').style.display=\'block\';document.getElementById(\'step-form\').style.display=\'none\'">&#8592; Cambia tipo</button>';
-    if(tipo==="esperienza"||tipo==="storia"){
+    if(tipo==="esperienza"){
       h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:36px;margin-bottom:6px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand)">Aggiungi foto o video</div></div>';
-      h+='<div id="preview-wrap"></div><textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza..."></textarea>';
-      h+='<button class="pub-btn" onclick="pubblica(\''+tipo+'\')">Pubblica</button>';
+      h+='<div id="preview-wrap"></div>';
+      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza..."></textarea>';
+      h+='<input class="pub-input" id="pub-luogo" placeholder="&#128205; Posizione (opzionale)"/>';
+      h+='<button class="pub-btn" onclick="pubblica(\'esperienza\')">Pubblica</button>';
+    }else if(tipo==="storia"){
+      h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:40px;margin-bottom:6px">&#127909;</div><div style="font-size:13px;font-weight:700;color:var(--brand)">Foto o video</div><div style="font-size:11px;color:var(--text-3);margin-top:4px">Scompare dopo 24 ore</div></div>';
+      h+='<div id="preview-wrap"></div>';
+      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Testo (opzionale)..." style="min-height:70px"></textarea>';
+      h+='<div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:8px">Aggiungi sticker</div>';
+      h+='<div class="sc-grid">';
+      h+='<div class="sc-tile" onclick="apriStickerModal(\'ora\')"><div class="sc-tile-icon">&#128336;</div><div class="sc-tile-label">Ora</div></div>';
+      h+='<div class="sc-tile" onclick="apriStickerModal(\'posizione\')"><div class="sc-tile-icon">&#128205;</div><div class="sc-tile-label">Posizione</div></div>';
+      h+='<div class="sc-tile" onclick="apriStickerModal(\'musica\')"><div class="sc-tile-icon">&#127925;</div><div class="sc-tile-label">Musica</div></div>';
+      h+='<div class="sc-tile" onclick="apriStickerModal(\'link\')"><div class="sc-tile-icon">&#128279;</div><div class="sc-tile-label">Link</div></div>';
+      h+='<div class="sc-tile" onclick="apriStickerModal(\'tag\')"><div class="sc-tile-icon">&#64;</div><div class="sc-tile-label">Tag</div></div>';
+      h+='<div class="sc-tile" onclick="apriStickerModal(\'gif\')"><div class="sc-tile-icon">&#127916;</div><div class="sc-tile-label">GIF</div></div>';
+      h+='<div class="sc-tile" onclick="apriStickerModal(\'timer\')"><div class="sc-tile-icon">&#9203;</div><div class="sc-tile-label">Timer</div></div>';
+      h+='<div class="sc-tile" onclick="apriStickerModal(\'meteo\')"><div class="sc-tile-icon">&#127780;</div><div class="sc-tile-label">Meteo</div></div>';
+      h+='</div>';
+      h+='<div class="stickers-preview" id="stickers-preview"></div>';
+      h+='<button class="pub-btn" onclick="pubblica(\'storia\')">&#9200; Pubblica storia 24h</button>';
     }else if(tipo==="ricetta"){
       h+='<input class="pub-input" id="pub-titolo" placeholder="Nome della ricetta"/>';
       h+='<textarea class="pub-textarea" id="pub-ingredienti" placeholder="Ingredienti (uno per riga)" style="min-height:80px"></textarea>';
@@ -768,6 +818,7 @@
     var cat=catMap[tipo]||"esperienze";
     var punti=puntiMap[tipo]||0;
     var testoCompleto=titolo?(titolo+(testo?"\n\n"+testo:"")):(testo);
+    if(tipo==="storia"){var stickers=raccogliStickers();if(stickers)testoCompleto=(testoCompleto||"")+stickers;}
     if(luogo)testoCompleto+="\n\nZona: "+luogo;
     if(!testoCompleto&&!uploadFile){alert("Scrivi qualcosa o aggiungi una foto!");return;}
     var mediaUrl=null;
@@ -786,8 +837,13 @@
     var{error}=await supa.from("social_post").insert(payload);
     if(error){alert("Errore: "+error.message);return;}
     if(punti>0)try{await supa.rpc("aggiungi_punti_cliente",{p_user_id:ME.id,p_punti:punti,p_motivo:tipo+"_pubblicato"});}catch(e){}
-    chiudiModale();filtroAttivo="tutti";navTo("home");
-    if(punti>0)setTimeout(function(){alert("Pubblicato! +"+punti+" punti guadagnati");},300);
+    chiudiModale();
+    if(tipo==="storia"){
+      setTimeout(function(){alert("Storia pubblicata! Visibile per 24 ore &#9203;");},300);
+    }else{
+      filtroAttivo="tutti";navTo("home");
+      if(punti>0)setTimeout(function(){alert("Pubblicato! +"+punti+" punti guadagnati");},300);
+    }
   };
 
   async function renderRicette(c){
@@ -1050,13 +1106,13 @@
         var mapUrl="https://www.google.com/maps/dir/?api=1&destination="+dest;
         var card=document.createElement("div");card.className="locale-card";
         if(s.foto_url){var img=document.createElement("img");img.src=s.foto_url;img.style.cssText="width:100%;height:140px;object-fit:cover";card.appendChild(img);}
-        else{var ph=document.createElement("div");ph.className="locale-card-img";ph.textContent="🍽️";card.appendChild(ph);}
+        else{var ph=document.createElement("div");ph.className="locale-card-img";ph.textContent="&#127869;&#65039;";card.appendChild(ph);}
         var body=document.createElement("div");body.className="locale-card-body";
         var nome=document.createElement("div");nome.className="locale-card-nome";nome.textContent=s.nome||"Locale";
         var ind=document.createElement("div");ind.className="locale-card-tipo";ind.textContent=s.indirizzo||"";
         var acts=document.createElement("div");acts.className="locale-card-actions";
-        var aBtn=document.createElement("a");aBtn.href=mapUrl;aBtn.target="_blank";aBtn.className="locale-action-btn primary";aBtn.textContent="📍 Indicazioni";
-        var pBtn=document.createElement("button");pBtn.className="locale-action-btn";pBtn.textContent="📅 Prenota";
+        var aBtn=document.createElement("a");aBtn.href=mapUrl;aBtn.target="_blank";aBtn.className="locale-action-btn primary";aBtn.textContent="&#128205; Indicazioni";
+        var pBtn=document.createElement("button");pBtn.className="locale-action-btn";pBtn.textContent="&#128197; Prenota";
         pBtn.onclick=(function(id){return function(){window.open("https://ristoflow-ai.com/prenotazione.html?sede="+encodeURIComponent(id),"_blank");};})(s.id);
         acts.appendChild(aBtn);acts.appendChild(pBtn);
         body.appendChild(nome);body.appendChild(ind);body.appendChild(acts);
@@ -1090,7 +1146,7 @@
     if(!wrap)return;
     var m=document.createElement("div");
     m.className="reaz-menu";m.id="reaz-menu-"+postId;
-    [["fuoco","reaz_fuoco","😍","Mi piace"],["applauso","reaz_applauso","👏","Bravo!"],["cuore","reaz_cuore","🔥","Top!"],["wow","reaz_fuoco","🤯","Wow"],["yum","reaz_fuoco","😋","Yum"]].forEach(function(r){
+    [["fuoco","reaz_fuoco","&#128525;","Mi piace"],["applauso","reaz_applauso","&#128079;","Bravo!"],["cuore","reaz_cuore","&#128293;","Top!"],["wow","reaz_fuoco","&#129327;","Wow"],["yum","reaz_fuoco","&#128523;","Yum"]].forEach(function(r){
       var b=document.createElement("button");b.className="reaz-menu-btn";
       var e=document.createElement("div");e.className="reaz-e";e.textContent=r[2];
       var l=document.createElement("div");l.className="reaz-l";l.textContent=r[3];
@@ -1154,6 +1210,68 @@
   window.apriStoriaEncoded=function(el){
     try{var g=JSON.parse(decodeURIComponent(el.dataset.g));apriStoria(g,0);}catch(e){console.warn(e);}
   };
+
+
+  // ── STICKER MODAL MOBILE-FRIENDLY ────────────────────────────────────────────
+  var stickerTipoAttivo=null;
+  var stickerTitoliConfig={
+    ora:{title:"Aggiungi l'ora",placeholder:"",auto:true},
+    posizione:{title:"Dove sei?",placeholder:"Es. Milano, Ristorante da Mario..."},
+    musica:{title:"Che musica stai ascoltando?",placeholder:"Es. Vasco Rossi - Albachiara"},
+    link:{title:"Aggiungi un link",placeholder:"https://..."},
+    tag:{title:"Tagga qualcuno",placeholder:"@nomeutente o @locale"},
+    gif:{title:"URL della GIF",placeholder:"https://media.giphy.com/..."},
+    timer:{title:"Countdown",placeholder:"Es. 3 giorni, stasera ore 20..."},
+    meteo:{title:"Com'è il tempo?",placeholder:"Es. ☀️ Sole e 28°C a Roma"}
+  };
+
+  window.apriStickerModal=function(tipo){
+    stickerTipoAttivo=tipo;
+    var cfg=stickerTitoliConfig[tipo]||{title:"Aggiungi sticker",placeholder:"Scrivi..."};
+    document.getElementById("sticker-title").textContent=cfg.title;
+    var inp=document.getElementById("sticker-input");
+    inp.placeholder=cfg.placeholder||"Scrivi...";
+    inp.value="";
+    if(tipo==="ora"){
+      inp.value=new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
+    }
+    document.getElementById("sticker-modal").classList.add("open");
+    if(tipo!=="ora")setTimeout(function(){inp.focus();},100);
+  };
+
+  window.chiudiStickerModal=function(){
+    document.getElementById("sticker-modal").classList.remove("open");
+    stickerTipoAttivo=null;
+  };
+
+  window.confermaStickerInput=function(){
+    var val=document.getElementById("sticker-input").value.trim();
+    if(!val){chiudiStickerModal();return;}
+    var emojiMap={ora:"&#128336;",posizione:"&#128205;",musica:"&#127925;",link:"&#128279;",tag:"@",gif:"&#127916;",timer:"&#9203;",meteo:"&#127780;"};
+    var emoji=emojiMap[stickerTipoAttivo]||"&#10024;";
+    var preview=document.getElementById("stickers-preview");
+    if(preview){
+      var badge=document.createElement("div");
+      badge.className="sticker-badge";
+      badge.innerHTML=emoji+" "+escHtml(val)+'<span class="sticker-badge-x" onclick="this.parentNode.remove()">&#10005;</span>';
+      preview.appendChild(badge);
+    }
+    chiudiStickerModal();
+  };
+
+  function escHtml(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+  // Raccoglie sticker dal preview e li aggiunge al testo della storia
+  function raccogliStickers(){
+    var badges=document.querySelectorAll("#stickers-preview .sticker-badge");
+    if(!badges.length)return"";
+    var parts=[];
+    badges.forEach(function(b){
+      var txt=b.textContent.replace("✕","").replace("×","").trim();
+      if(txt)parts.push(txt);
+    });
+    return parts.length?"\n\n"+parts.join(" \u00b7 "):"";
+  }
 
   init();
 })();
