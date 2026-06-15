@@ -943,7 +943,7 @@
         h+='<div class="locale-card-tipo">'+esc(s.indirizzo||"")+'</div>';
         h+='<div class="locale-card-actions">';
         h+='<a href="'+mapUrl+'" target="_blank" class="locale-action-btn primary">&#128205; Indicazioni</a>';
-        h+='<button class="locale-action-btn" onclick="prenotaLocale(''+s.id+'')">&#128197; Prenota</button>';
+        h+='<button class="locale-action-btn" onclick="prenotaLocale(this.dataset.id)" data-id="'+s.id+'">&#128197; Prenota</button>';
         h+='</div></div></div>';
       });
     }
