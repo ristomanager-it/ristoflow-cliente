@@ -6,7 +6,6 @@
   <title>RistoflowBook</title>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#0E5A7A"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <link rel="apple-touch-icon" href="/favicon-192.png"/>
@@ -201,6 +200,54 @@
     .empty-btn{background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px;}
     .pb-nav{padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);}
     .hidden{display:none!important;}
+
+    /* STORIA VIEWER */
+    #storia-viewer{position:fixed;inset:0;z-index:500;background:#000;display:none;flex-direction:column;}
+    #storia-viewer.open{display:flex;}
+    .storia-progress{display:flex;gap:4px;padding:calc(12px + var(--safe-top)) 12px 0;}
+    .storia-bar{flex:1;height:3px;background:rgba(255,255,255,.3);border-radius:999px;overflow:hidden;}
+    .storia-bar-fill{height:100%;background:#fff;width:0%;}
+    .storia-header{display:flex;align-items:center;gap:10px;padding:10px 12px;}
+    .storia-av{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;}
+    .storia-nome{font-size:14px;font-weight:700;color:#fff;flex:1;}
+    .storia-chiudi{background:none;border:none;color:#fff;font-size:28px;cursor:pointer;padding:0 4px;line-height:1;}
+    .storia-media{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+    .storia-media img,.storia-media video{width:100%;height:100%;object-fit:contain;}
+    .storia-testo-overlay{padding:0 20px 20px;text-align:center;}
+    .storia-testo-overlay p{background:rgba(0,0,0,.6);color:#fff;border-radius:12px;padding:10px 16px;font-size:16px;font-weight:600;display:inline-block;}
+    /* REAZIONI TENDINA */
+    .post-actions-wrap{position:relative;}
+    .reaz-menu{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#fff;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:12px 16px;display:flex;gap:14px;z-index:50;white-space:nowrap;border:1px solid var(--border);}
+    .reaz-menu::after{content:"";position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:12px;height:12px;background:#fff;border-right:1px solid var(--border);border-bottom:1px solid var(--border);transform:translateX(-50%) rotate(45deg);}
+    .reaz-menu-btn{display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px;}
+    .reaz-menu-btn .reaz-e{font-size:26px;line-height:1;transition:transform .15s;}
+    .reaz-menu-btn:active .reaz-e{transform:scale(1.3);}
+    .reaz-menu-btn .reaz-l{font-size:10px;font-weight:700;color:var(--text-2);}
+    /* LOCALI */
+    .locale-card{background:#fff;border-radius:16px;margin:0 12px 12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);}
+    .locale-card-img{width:100%;height:140px;background:linear-gradient(135deg,var(--brand-light),#dbeafe);display:flex;align-items:center;justify-content:center;font-size:48px;}
+    .locale-card-body{padding:14px 16px;}
+    .locale-card-nome{font-size:16px;font-weight:800;}
+    .locale-card-tipo{font-size:12px;color:var(--text-3);margin-top:2px;}
+    .locale-card-actions{display:flex;gap:8px;margin-top:12px;}
+    .locale-action-btn{flex:1;padding:10px;border:1.5px solid var(--brand);border-radius:10px;background:#fff;color:var(--brand);font-size:13px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px;}
+    .locale-action-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand);}
+    /* PREMI */
+    .premio-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+    .premio-icon{font-size:36px;flex-shrink:0;width:48px;text-align:center;}
+    .premio-body{flex:1;}
+    .premio-nome{font-size:15px;font-weight:800;color:var(--text);}
+    .premio-desc{font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4;}
+    .premio-soglia{font-size:12px;font-weight:700;color:var(--brand);margin-top:6px;}
+    .premio-stato{font-size:11px;font-weight:800;border-radius:999px;padding:4px 12px;margin-top:8px;display:inline-block;}
+    .premio-stato.ok{background:#dcfce7;color:#16a34a;}
+    .premio-stato.nok{background:#f3f4f6;color:#6b7280;}
+    /* STORIA CREATOR */
+    .storia-creator-bar{display:flex;gap:8px;overflow-x:auto;padding:8px 0 4px;scrollbar-width:none;}
+    .storia-creator-bar::-webkit-scrollbar{display:none;}
+    .sc-btn{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;border:1.5px solid var(--border);background:var(--surface);border-radius:12px;padding:8px 12px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-2);}
+    .sc-btn-icon{font-size:20px;}
+
   </style>
 </head>
 <body>
@@ -294,12 +341,10 @@
     <button class="nav-item active" data-page="home" onclick="navTo('home')"><span class="nav-icon">&#127968;</span><span class="nav-label">Home</span></button>
     <button class="nav-item" data-page="ricette" onclick="navTo('ricette')"><span class="nav-icon">&#127859;</span><span class="nav-label">Ricette</span></button>
     <button class="nav-item" data-page="pubblica" onclick="apriPubblica()" style="overflow:visible;"><div class="nav-center-wrap">&#43;</div><span class="nav-label" style="margin-top:2px;">Pubblica</span></button>
-    <button class="nav-item" data-page="locali" onclick="navTo('locali')"><span class="nav-icon">&#128205;</span><span class="nav-label">Locali</span></button>
     <button class="nav-item" data-page="tessera" onclick="navTo('tessera')"><span class="nav-icon">&#127915;</span><span class="nav-label">Tessera</span></button>
     <button class="nav-item" data-page="profilo" onclick="navTo('profilo')"><span class="nav-icon">&#128100;</span><span class="nav-label">Profilo</span></button>
   </nav>
 </div>
-
 
 <!-- STORIA VIEWER -->
 <div id="storia-viewer">
@@ -310,7 +355,7 @@
     <div style="font-size:12px;color:rgba(255,255,255,.6);margin-right:8px" id="storia-ora-el"></div>
     <button class="storia-chiudi" onclick="chiudiStoriaViewer()">&#10005;</button>
   </div>
-  <div class="storia-media" id="storia-media-el"></div>
+  <div class="storia-media" id="storia-media-el" onclick="storiaIdx++;mostraStoria(storiaIdx)"></div>
   <div class="storia-testo-overlay" id="storia-testo-el"></div>
 </div>
 
@@ -442,7 +487,7 @@
     showConferma(email);
   };
 
-  window.doLogout=async function(){await supa.auth.signOut();ME=null;showAuth();};
+  window.doLogout=async function(){await supa.auth.signOut();};
 
   // COMPLETA PROFILO
   window.cambiaFotoCompleta=function(){
@@ -508,7 +553,21 @@
     var h='<div class="pb-nav">';
     h+='<div class="storie-wrap"><div class="storie-strip">';
     h+='<div class="storia-item" onclick="apriPubblica(\'storia\')"><div class="storia-add-ring"><div class="storia-add-inner">+</div></div><div class="storia-label">La tua</div></div>';
-    ["Campo Antico","Trattoria","Catering"].forEach(function(n){h+='<div class="storia-item"><div class="storia-ring"><div class="storia-inner">&#127869;&#65039;</div></div><div class="storia-label">'+esc(n)+'</div></div>';});
+    // Storie reali dal DB
+    var{data:storieDB}=await supa.from("v_social_feed").select("id,user_id,nome_completo,avatar_url,media_url,testo,created_at").eq("tipo","storia").eq("visibile",true).gt("scade_at",new Date().toISOString()).order("created_at",{ascending:false}).limit(20);
+    if(storieDB&&storieDB.length>0){
+      var gruppi={};
+      storieDB.forEach(function(s){if(!gruppi[s.user_id])gruppi[s.user_id]=[];gruppi[s.user_id].push(s);});
+      Object.keys(gruppi).forEach(function(uid){
+        var grup=gruppi[uid];var s=grup[0];
+        var nome=(s.nome_completo||"?");
+        var av=s.avatar_url?'<img src="'+esc(s.avatar_url)+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>':esc(nome.charAt(0).toUpperCase());
+        var encoded=encodeURIComponent(JSON.stringify(grup));
+        h+='<div class="storia-item" onclick="apriStoriaEncoded(this)"  data-g="'+encoded+'">';
+        h+='<div class="storia-ring"><div class="storia-inner" style="overflow:hidden;font-size:18px;font-weight:800;color:var(--brand)">'+av+'</div></div>';
+        h+='<div class="storia-label">'+esc(nome.split(" ")[0])+'</div></div>';
+      });
+    }
     h+='</div></div>';
     var filtri=[{s:"tutti",i:"&#127968;",l:"Feed"},{s:"esperienze",i:"&#128247;",l:"Momenti"},{s:"ricette",i:"&#127859;",l:"Ricette"},{s:"recensioni",i:"&#11088;",l:"Recensioni"},{s:"offerte",i:"&#127873;",l:"Offerte"},{s:"lavoro",i:"&#128188;",l:"Lavoro"}];
     h+='<div class="filtri-wrap"><div class="filtri-strip">';
@@ -518,8 +577,7 @@
       h+='<div class="empty-state"><div class="empty-icon">&#127869;&#65039;</div><div class="empty-title">Nessun contenuto</div><div class="empty-sub">Sii il primo a pubblicare!</div><button class="empty-btn" onclick="apriPubblica()">Pubblica ora</button></div>';
     }else{
       posts.forEach(function(p){
-        if(!p.nome_completo)return; // nascondi post anonimi
-        var autore=p.nome_completo;
+        var autore=p.nome_completo||"Anonimo";
         var tipoA=p.tipo_utente||"cliente";
         var locale=p.nome_locale||"";
         var miaR=myReaz[p.id]||null;
@@ -539,14 +597,10 @@
         if(tipoA==="titolare")h+=' <span class="badge badge-titolare">&#127978; Titolare</span>';
         h+='</div></div><div style="font-size:20px;color:var(--text-3);cursor:pointer;padding:4px;">&#183;&#183;&#183;</div></div>';
         if(p.testo)h+='<div class="post-testo">'+esc(p.testo)+'</div>';
-        if(p.media_url){
-          var isVideo=p.media_url.match(/\.(mp4|mov|webm|ogg)(\?|$)/i);
-          if(isVideo)h+='<video class="post-img" src="'+esc(p.media_url)+'" controls playsinline preload="metadata" style="max-height:400px;width:100%;background:#000"></video>';
-          else h+='<img class="post-img" src="'+esc(p.media_url)+'" loading="lazy"/>';
-        }
+        if(p.media_url)h+='<img class="post-img" src="'+esc(p.media_url)+'" loading="lazy"/>';
         else if(cat==="esperienze"||cat==="storia")h+='<div class="post-img-placeholder">&#127837;</div>';
         if(cat==="recensioni"&&p.voto)h+='<div class="stelle-wrap"><div>'+stelleHTML(p.voto)+'</div><span class="badge badge-verificato">&#10003; Verificata</span></div>';
-        if(p.punti_assegnati)h+='<div class="points-badge">&#11088; +'+p.punti_assegnati+' punti</div>';
+        // punti non mostrati nel feed
         h+='<div class="post-counts"><div class="counts-left">';
         if(emj.length>0){h+='<div class="counts-emojis">';emj.forEach(function(e){h+='<span>'+e+'</span>';});h+='</div>'+totR;}
         h+='</div><div class="counts-right" id="cmtcount-'+p.id+'" onclick="toggleCommenti('+p.id+')"></div></div>';
@@ -611,7 +665,7 @@
     if(!cc||cc.length===0){items.innerHTML='<div style="padding:0 14px 8px;font-size:13px;color:var(--text-3)">Nessun commento.</div>';return;}
     var h="";
     cc.forEach(function(c){
-      var nome=(c.clienti_profilo&&c.clienti_profilo.nome_completo)||""; if(!nome)return;
+      var nome=(c.clienti_profilo&&c.clienti_profilo.nome_completo)||"Anonimo";
       h+='<div class="commento-row"><div class="commento-av">'+esc(nome.charAt(0).toUpperCase())+'</div>';
       h+='<div class="commento-bubble"><div class="commento-nome">'+esc(nome)+'</div><div class="commento-testo">'+esc(c.testo)+'</div><div class="commento-data">'+formatData(c.created_at)+'</div></div></div>';
     });
@@ -759,60 +813,112 @@
 
   function renderTessera(c){
     if(!ME){showAuth();return;}
-    c.innerHTML='<div class="pb-nav"><div style="padding:16px"><div style="font-size:22px;font-weight:900">&#127915; Tessera Fidelity</div></div><div id="tessera-content"><div class="page-loader"><div class="spinner"></div></div></div></div>';
+    c.innerHTML='<div class="pb-nav"><div style="padding:16px 16px 8px"><div style="font-size:22px;font-weight:900">&#127915; Tessera Fidelity</div></div><div id="tessera-content"><div class="page-loader"><div class="spinner"></div></div></div></div>';
     caricaTessera();
   }
+
   async function caricaTessera(){
     var el=document.getElementById("tessera-content");if(!el)return;
     var{data:profilo}=await supa.from("clienti_profilo").select("*").eq("user_id",ME.id).maybeSingle();
-    var punti=(profilo&&profilo.punti_totali)||0;
-    var puntiS=(profilo&&profilo.punti_social)||0;
-    var tot=punti+puntiS;
-    var livello="Bronzo",nextLiv=2000,nextNome="Argento";
-    if(tot>=5000){livello="Oro";nextLiv=10000;nextNome="Platinum";}
-    else if(tot>=2000){livello="Argento";nextLiv=5000;nextNome="Oro";}
-    var livIco={"Bronzo":"&#129355;","Argento":"&#129354;","Oro":"&#129353;","Platinum":"&#128142;"}[livello]||"";
+    var ptSocial=(profilo&&profilo.punti_social)||0;
+    var ptVisite=(profilo&&profilo.punti_totali)||0;
+    var ptGlobali=ptSocial+ptVisite;
     var nome=(ME&&ME.user_metadata&&ME.user_metadata.nome_completo)||"Cliente";
-    var pct=Math.min(100,Math.round((tot/nextLiv)*100));
-    var h='<div style="background:linear-gradient(135deg,#0E5A7A,#1a8fb5);margin:0 16px;border-radius:24px;padding:24px;color:#fff;box-shadow:0 8px 32px rgba(14,90,122,.3);position:relative">';
-    h+='<div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:4px">Rete Ristoflow</div>';
-    h+='<div style="font-size:22px;font-weight:800;margin-bottom:16px">'+esc(nome)+'</div>';
-    h+='<div style="font-size:11px;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.06em">Livello</div>';
-    h+='<div style="font-size:36px;font-weight:800;line-height:1">'+livIco+' '+livello+'</div>';
-    h+='<div style="font-size:13px;opacity:.7;margin-top:6px">'+tot+' punti accumulati</div>';
-    h+='<div style="position:absolute;top:20px;right:20px;background:rgba(255,255,255,.2);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:800">'+livello+'</div></div>';
-    h+='<div style="margin:12px 16px 0;background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
-    h+='<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px"><span>'+livIco+' '+livello+'</span><span>'+tot+'/'+nextLiv+'</span></div>';
-    h+='<div style="background:#f0f6fa;border-radius:999px;height:10px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,#0E5A7A,#00c896);border-radius:999px;width:'+pct+'%"></div></div>';
-    h+='<div style="font-size:12px;color:#94a3b8;margin-top:6px;text-align:center">Ancora '+Math.max(0,nextLiv-tot)+' punti per '+nextNome+'</div></div>';
-    h+='<div style="margin:16px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
-    h+='<div style="font-size:14px;font-weight:800;margin-bottom:12px">&#11088; Come guadagnare punti</div>';
-    [{i:"&#128247;",t:"Pubblica un momento",p:"+30 pt"},{i:"&#127757;",t:"Pubblica una storia",p:"+50 pt"},{i:"&#127859;",t:"Condividi una ricetta",p:"+80 pt"},{i:"&#11088;",t:"Scrivi una recensione",p:"+100 pt"},{i:"&#128101;",t:"Porta un amico",p:"+150 pt"},{i:"&#128205;",t:"Visita un locale partner",p:"+200 pt"}].forEach(function(m){
-      h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f6fa"><span style="font-size:24px">'+m.i+'</span><span style="flex:1;font-size:14px;font-weight:600">'+m.t+'</span><span style="background:#e8f4f8;color:#0E5A7A;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800">'+m.p+'</span></div>';
-    });
-    h+='</div>';
-    h+='<div style="margin:12px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
-    h+='<div style="font-size:14px;font-weight:800;margin-bottom:14px">&#127873; Premi disponibili</div>';
-    var premi=[{i:"&#9749;",n:"Caffè gratis",s:500,d:"Un caffè offerto dai locali partner"},{i:"&#127829;",n:"Pizza gratis",s:1500,d:"Una pizza offerta dal locale partner"},{i:"&#127869;",n:"Degustazione",s:3000,d:"Menù degustazione per 2 persone"},{i:"&#128142;",n:"Cena VIP",s:8000,d:"Cena esclusiva per 4 persone"}];
-    premi.forEach(function(p){
-      var ok=tot>=p.s;
-      h+='<div class="premio-card"><div class="premio-icon">'+p.i+'</div><div class="premio-body"><div class="premio-nome">'+p.n+'</div><div class="premio-soglia">'+p.s+' punti richiesti</div><div style="font-size:12px;color:#92400e;margin-top:2px">'+p.d+'</div><div class="premio-stato '+(ok?"ok":"nok")+'">'+( ok?"&#10003; Riscattabile":"Ancora "+(p.s-tot)+" pt")+'</div></div></div>';
-    });
-    h+='</div>';
-    h+='<div style="margin:12px 16px 32px;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.05)">';
-    h+='<div style="font-size:14px;font-weight:800;margin-bottom:10px">&#128196; Regolamento</div>';
-    h+='<div style="font-size:13px;color:#64748b;line-height:1.7">';
-    h+='&#8226; I punti si accumulano con ogni interazione social su RistoflowBook.<br>';
-    h+='&#8226; I premi sono riscattabili nei locali partner Ristoflow.<br>';
-    h+='&#8226; Un premio per utente ogni 30 giorni.<br>';
-    h+='&#8226; I punti scadono dopo 12 mesi di inattivit&#224;.<br>';
-    h+='&#8226; Ristoflow si riserva di modificare il programma con preavviso di 30 giorni.<br>';
-    h+='&#8226; Per assistenza: <a href="mailto:info@ristoflow-ai.com" style="color:#0E5A7A;font-weight:700">info@ristoflow-ai.com</a>';
+    var livello="Bronzo",nextLiv=2000,nextNome="Argento";
+    if(ptGlobali>=10000){livello="Platinum";nextLiv=20000;nextNome="Diamond";}
+    else if(ptGlobali>=5000){livello="Oro";nextLiv=10000;nextNome="Platinum";}
+    else if(ptGlobali>=2000){livello="Argento";nextLiv=5000;nextNome="Oro";}
+    var livIco={"Bronzo":"&#129355;","Argento":"&#129354;","Oro":"&#129353;","Platinum":"&#128142;","Diamond":"&#128142;"}[livello]||"";
+    var pct=Math.min(100,Math.round((ptGlobali/nextLiv)*100));
+
+    var h='';
+
+    // CARD TESSERA
+    h+='<div style="background:linear-gradient(135deg,#0a3f57,#0E5A7A,#1a8fb5);margin:0 16px;border-radius:24px;padding:28px 24px;color:#fff;box-shadow:0 8px 32px rgba(14,90,122,.4);position:relative;overflow:hidden">';
+    h+='<div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.05)"></div>';
+    h+='<div style="font-size:11px;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Rete Ristoflow</div>';
+    h+='<div style="font-size:20px;font-weight:900;margin-bottom:20px">'+esc(nome)+'</div>';
+    h+='<div style="display:flex;align-items:flex-end;justify-content:space-between">';
+    h+='<div><div style="font-size:11px;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.06em">Livello</div>';
+    h+='<div style="font-size:28px;font-weight:900;line-height:1.1">'+livIco+' '+livello+'</div></div>';
+    h+='<div style="text-align:right"><div style="font-size:11px;opacity:.7">Punti globali</div>';
+    h+='<div style="font-size:32px;font-weight:900">'+ptGlobali.toLocaleString("it-IT")+'</div></div>';
     h+='</div></div>';
-    h+='</div>';el.innerHTML=h;
+
+    // BARRA PROGRESSO
+    h+='<div style="margin:12px 16px 0;background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.05)">';
+    h+='<div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:8px"><span>'+livIco+' '+livello+'</span><span>'+ptGlobali.toLocaleString("it-IT")+' / '+nextLiv.toLocaleString("it-IT")+'</span></div>';
+    h+='<div style="background:#f0f6fa;border-radius:999px;height:10px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,#0E5A7A,#00c896);border-radius:999px;width:'+pct+'%;transition:width .6s ease"></div></div>';
+    h+='<div style="font-size:12px;color:#94a3b8;margin-top:6px;text-align:center">Ancora '+Math.max(0,nextLiv-ptGlobali).toLocaleString("it-IT")+' punti per '+nextNome+'</div></div>';
+
+    // SPIEGAZIONE LOGICA PUNTI
+    h+='<div style="margin:12px 16px 0;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:16px;padding:16px;border:1px solid #bbf7d0">';
+    h+='<div style="font-size:14px;font-weight:800;color:#15803d;margin-bottom:8px">&#128204; Come funzionano i tuoi punti</div>';
+    h+='<div style="font-size:13px;color:#166534;line-height:1.7">';
+    h+='&#8226; <strong>Punti locale:</strong> accumulati visitando e interagendo con un locale specifico. Spendibili solo in quel locale per sconti e vantaggi.<br>';
+    h+='&#8226; <strong>Punti globali Ristoflow:</strong> somma di tutti i punti di tutti i locali + punti social. Sblocca i premi esclusivi Ristoflow qui sotto.';
+    h+='</div></div>';
+
+    // COME GUADAGNARE
+    h+='<div style="margin:12px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)">';
+    h+='<div style="font-size:14px;font-weight:800;margin-bottom:12px">&#11088; Come guadagnare punti</div>';
+    [{i:"&#128247;",t:"Pubblica un momento",p:"+30"},{i:"&#127757;",t:"Pubblica una storia",p:"+50"},{i:"&#127859;",t:"Condividi una ricetta",p:"+80"},{i:"&#11088;",t:"Scrivi una recensione",p:"+100"},{i:"&#128101;",t:"Porta un amico",p:"+150"},{i:"&#128205;",t:"Visita un locale partner",p:"+200"}].forEach(function(m){
+      h+='<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #f0f6fa">';
+      h+='<span style="font-size:22px;width:32px;text-align:center">'+m.i+'</span>';
+      h+='<span style="flex:1;font-size:13px;font-weight:600">'+m.t+'</span>';
+      h+='<span style="background:#e8f4f8;color:#0E5A7A;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800">'+m.p+' pt</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+
+    // PREMI ESCLUSIVI RISTOFLOW
+    h+='<div style="margin:12px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)">';
+    h+='<div style="font-size:14px;font-weight:800;margin-bottom:4px">&#127775; Premi Esclusivi Ristoflow</div>';
+    h+='<div style="font-size:12px;color:var(--text-3);margin-bottom:16px">Riscattabili con i tuoi punti globali. Ristoflow copre i costi, proporzionalmente ai locali visitati.</div>';
+    var premi=[
+      {i:"&#9749;",n:"Aperitivo per 2",d:"Aperitivo completo in un locale Ristoflow partner a scelta",s:800,cat:"Gastronomia"},
+      {i:"&#127869;",n:"Cena degustazione",d:"Menù degustazione per 2 persone in un ristorante Ristoflow",s:2500,cat:"Gastronomia"},
+      {i:"&#127863;",n:"Corso Sommelier AIS Livello 1",d:"Corso ufficiale AIS di avvicinamento al vino — 5 serate",s:5000,cat:"Formazione"},
+      {i:"&#127863;",n:"Corso Sommelier AIS Livello 2",d:"Corso AIS avanzato di analisi sensoriale del vino",s:9000,cat:"Formazione"},
+      {i:"&#127859;",n:"Corso professionale di cucina",d:"Corso intensivo presso una scuola di cucina partner",s:8000,cat:"Formazione"},
+      {i:"&#9992;",n:"Weekend gastronomico",d:"2 notti in hotel + cena stellata per 2 persone in Italia",s:15000,cat:"Esperienze"},
+      {i:"&#127963;",n:"Volo + soggiorno",d:"Volo A/R + 3 notti in una destinazione gastronomica europea",s:25000,cat:"Esperienze"}
+    ];
+    var catAttuale="";
+    premi.forEach(function(p){
+      var ok=ptGlobali>=p.s;
+      if(p.cat!==catAttuale){
+        catAttuale=p.cat;
+        h+='<div style="font-size:11px;font-weight:800;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 8px">'+p.cat+'</div>';
+      }
+      h+='<div class="premio-card" style="'+(ok?"border-left:3px solid #16a34a":"border-left:3px solid #e5e7eb")+'">';
+      h+='<div class="premio-icon">'+p.i+'</div>';
+      h+='<div class="premio-body">';
+      h+='<div class="premio-nome">'+p.n+'</div>';
+      h+='<div class="premio-desc">'+p.d+'</div>';
+      h+='<div class="premio-soglia">'+p.s.toLocaleString("it-IT")+' punti globali</div>';
+      h+='<div class="premio-stato '+(ok?"ok":"nok")+'">'+(ok?"&#10003; Riscattabile ora":"Mancano "+(p.s-ptGlobali).toLocaleString("it-IT")+" pt")+'</div>';
+      h+='</div></div>';
+    });
+    h+='</div>';
+
+    // REGOLAMENTO
+    h+='<div style="margin:12px 16px 32px;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05)">';
+    h+='<div style="font-size:14px;font-weight:800;margin-bottom:10px">&#128196; Regolamento</div>';
+    h+='<div style="font-size:13px;color:#64748b;line-height:1.8">';
+    h+='&#8226; I punti globali sono la somma di tutti i punti accumulati in ogni locale Ristoflow + punti social.<br>';
+    h+='&#8226; I punti locale sono spendibili esclusivamente nel locale dove sono stati maturati.<br>';
+    h+='&#8226; I premi Ristoflow sono finanziati proporzionalmente dai locali partner in base alle visite generate.<br>';
+    h+='&#8226; Un premio Ristoflow per utente ogni 90 giorni.<br>';
+    h+='&#8226; I punti scadono dopo 18 mesi di inattivit&#224;.<br>';
+    h+='&#8226; Ristoflow si riserva di modificare il programma con 30 giorni di preavviso.<br>';
+    h+='&#8226; Per riscattare un premio: <a href="mailto:premi@ristoflow-ai.com" style="color:#0E5A7A;font-weight:700">premi@ristoflow-ai.com</a>';
+    h+='</div></div>';
+
+    el.innerHTML=h;
   }
 
-  async function renderProfilo(c){
+    async function renderProfilo(c){
     if(!ME){showAuth();return;}
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
     var meta=ME.user_metadata||{};
@@ -923,7 +1029,10 @@
   function formatData(ts){if(!ts)return"";return new Date(ts).toLocaleDateString("it-IT",{day:"2-digit",month:"short"});}
 
 
-  // ── LOCALI PAGE ─────────────────────────────────────────────────────────────
+  // ── ROUTER aggiornato con locali ─────────────────────────────────────────────
+  // (già incluso nel navTo esistente)
+
+  // ── LOCALI PAGE ───────────────────────────────────────────────────────────────
   async function renderLocali(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
     var{data:sedi}=await supa.from("sedi").select("id,nome,indirizzo,tipo,lat,lng,foto_url").order("nome");
@@ -933,47 +1042,44 @@
     wrap.appendChild(hdr);
     if(!sedi||sedi.length===0){
       var empty=document.createElement("div");empty.className="empty-state";
-      empty.innerHTML='<div class="empty-icon">&#128205;</div><div class="empty-title">Nessun locale ancora</div>';
+      empty.innerHTML='<div class="empty-icon">&#128205;</div><div class="empty-title">Nessun locale ancora</div><div class="empty-sub">I locali Ristoflow appariranno qui</div>';
       wrap.appendChild(empty);
     }else{
       sedi.forEach(function(s){
         var dest=encodeURIComponent((s.indirizzo||s.nome||""));
         var mapUrl="https://www.google.com/maps/dir/?api=1&destination="+dest;
         var card=document.createElement("div");card.className="locale-card";
-        var imgEl="";
-        if(s.foto_url){imgEl='<img src="'+esc(s.foto_url)+'" style="width:100%;height:140px;object-fit:cover"/>';}
-        else{imgEl='<div class="locale-card-img">&#127869;&#65039;</div>';}
+        if(s.foto_url){var img=document.createElement("img");img.src=s.foto_url;img.style.cssText="width:100%;height:140px;object-fit:cover";card.appendChild(img);}
+        else{var ph=document.createElement("div");ph.className="locale-card-img";ph.textContent="🍽️";card.appendChild(ph);}
         var body=document.createElement("div");body.className="locale-card-body";
-        body.innerHTML='<div class="locale-card-nome">'+esc(s.nome||"Locale")+'</div>'+'<div class="locale-card-tipo">'+esc(s.indirizzo||"")+'</div>';
+        var nome=document.createElement("div");nome.className="locale-card-nome";nome.textContent=s.nome||"Locale";
+        var ind=document.createElement("div");ind.className="locale-card-tipo";ind.textContent=s.indirizzo||"";
         var acts=document.createElement("div");acts.className="locale-card-actions";
-        var aBtn=document.createElement("a");
-        aBtn.href=mapUrl;aBtn.target="_blank";aBtn.className="locale-action-btn primary";aBtn.textContent="📍 Indicazioni";
-        var pBtn=document.createElement("button");
-        pBtn.className="locale-action-btn";pBtn.textContent="📅 Prenota";
-        pBtn.onclick=function(){window.open("https://ristoflow-ai.com/prenotazione.html?sede="+encodeURIComponent(s.id),"_blank");};
+        var aBtn=document.createElement("a");aBtn.href=mapUrl;aBtn.target="_blank";aBtn.className="locale-action-btn primary";aBtn.textContent="📍 Indicazioni";
+        var pBtn=document.createElement("button");pBtn.className="locale-action-btn";pBtn.textContent="📅 Prenota";
+        pBtn.onclick=(function(id){return function(){window.open("https://ristoflow-ai.com/prenotazione.html?sede="+encodeURIComponent(id),"_blank");};})(s.id);
         acts.appendChild(aBtn);acts.appendChild(pBtn);
-        body.appendChild(acts);
-        card.innerHTML=imgEl;card.appendChild(body);
-        wrap.appendChild(card);
+        body.appendChild(nome);body.appendChild(ind);body.appendChild(acts);
+        card.appendChild(body);wrap.appendChild(card);
       });
     }
     c.innerHTML="";c.appendChild(wrap);
-  };
+  }
 
-  // ── PULSANTE SEGUI ───────────────────────────────────────────────────────────
+  // ── PULSANTE SEGUI ────────────────────────────────────────────────────────────
   window.toggleSegui=async function(targetUserId,btn){
     if(!ME){showAuth();return;}
     var{data:exists}=await supa.from("social_follower").select("id").eq("follower_id",ME.id).eq("following_id",targetUserId).maybeSingle();
     if(exists){
       await supa.from("social_follower").delete().eq("follower_id",ME.id).eq("following_id",targetUserId);
-      if(btn){btn.textContent="Segui";btn.classList.remove("following");}
+      if(btn){btn.textContent="Segui";btn.style.background="#fff";btn.style.color="var(--brand)";}
     }else{
       await supa.from("social_follower").insert({follower_id:ME.id,following_id:targetUserId});
-      if(btn){btn.textContent="Stai seguendo";btn.classList.add("following");}
+      if(btn){btn.textContent="Stai seguendo";btn.style.background="var(--brand)";btn.style.color="#fff";}
     }
   };
 
-  // ── MENU REAZIONI TENDINA
+  // ── MENU REAZIONI TENDINA ─────────────────────────────────────────────────────
   var reazMenuOpen=null;
   window.toggleReazMenu=function(postId,evt){
     evt.stopPropagation();
@@ -984,82 +1090,69 @@
     if(!wrap)return;
     var m=document.createElement("div");
     m.className="reaz-menu";m.id="reaz-menu-"+postId;
-    var items=[["fuoco","reaz_fuoco","😍","Mi piace"],["applauso","reaz_applauso","👏","Bravo!"],["cuore","reaz_cuore","🔥","Top!"],["wow","reaz_fuoco","🤯","Wow"],["yum","reaz_fuoco","😋","Yum"]];
-    items.forEach(function(r){
-      var btn=document.createElement("button");
-      btn.className="reaz-menu-btn";
-      btn.innerHTML=r[2]+"<span>"+r[3]+"</span>";
-      (function(k,c){btn.onclick=function(){reagisci(postId,k,c);chiudiReazMenu();};})(r[0],r[1]);
-      m.appendChild(btn);
+    [["fuoco","reaz_fuoco","😍","Mi piace"],["applauso","reaz_applauso","👏","Bravo!"],["cuore","reaz_cuore","🔥","Top!"],["wow","reaz_fuoco","🤯","Wow"],["yum","reaz_fuoco","😋","Yum"]].forEach(function(r){
+      var b=document.createElement("button");b.className="reaz-menu-btn";
+      var e=document.createElement("div");e.className="reaz-e";e.textContent=r[2];
+      var l=document.createElement("div");l.className="reaz-l";l.textContent=r[3];
+      b.appendChild(e);b.appendChild(l);
+      (function(k,c){b.onclick=function(ev){ev.stopPropagation();reagisci(postId,k,c);chiudiReazMenu();};})(r[0],r[1]);
+      m.appendChild(b);
     });
     wrap.style.position="relative";
     wrap.appendChild(m);
     setTimeout(function(){document.addEventListener("click",chiudiReazMenu,{once:true});},50);
   };
   window.chiudiReazMenu=function(){
-    if(reazMenuOpen){var m=document.getElementById("reaz-menu-"+reazMenuOpen);if(m)m.remove();reazMenuOpen=null;}
+    if(reazMenuOpen!==null){var m=document.getElementById("reaz-menu-"+reazMenuOpen);if(m)m.remove();reazMenuOpen=null;}
   };
 
   // ── CONDIVIDI POST ────────────────────────────────────────────────────────────
   window.condividiPost=function(postId){
     var url=window.location.origin+"?post="+postId;
-    if(navigator.share){navigator.share({title:"RistoflowBook",url:url});}
-    else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){alert("Link copiato!");});}
-  };
-
-  // ── STICKER STORIA ────────────────────────────────────────────────────────────
-  var storiaStickersList=[];
-  window.aggiungiStickerStoria=function(tipo){
-    var val="",emoji="";
-    if(tipo==="ora"){val=new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});emoji="&#128336; ";}
-    else if(tipo==="timer"){val=prompt("Countdown (es. 3 giorni, 2 ore):");if(!val)return;emoji="&#9203; ";}
-    else if(tipo==="posizione"){val=prompt("Luogo o posizione:");if(!val)return;emoji="&#128205; ";}
-    else if(tipo==="link"){val=prompt("URL da inserire:");if(!val)return;emoji="&#128279; ";}
-    else if(tipo==="tag"){val=prompt("Tagga un utente o locale (@nome):");if(!val)return;emoji="";}
-    else if(tipo==="musica"){val=prompt("Canzone (artista - titolo):");if(!val)return;emoji="&#127925; ";}
-    else if(tipo==="gif"){val=prompt("URL GIF:");if(!val)return;emoji="&#127827; ";}
-    if(!val)return;
-    storiaStickersList.push({tipo,val,emoji});
-    var sp=document.getElementById("stickers-preview");
-    if(sp){
-      var badge=document.createElement("div");
-      badge.style.cssText="background:#0E5A7A;color:#fff;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px;";
-      badge.innerHTML=emoji+esc(val.substring(0,30))+'<span onclick="this.parentNode.remove()" style="cursor:pointer;margin-left:4px;opacity:.7">&#10005;</span>';
-      sp.appendChild(badge);
-    }
+    if(navigator.share)navigator.share({title:"RistoflowBook",url:url});
+    else if(navigator.clipboard)navigator.clipboard.writeText(url).then(function(){alert("Link copiato!");});
   };
 
   // ── STORIA VIEWER ─────────────────────────────────────────────────────────────
   var storieList=[],storiaIdx=0,storiaTimer=null;
   window.apriStoria=function(items,idx){
+    if(!items||!items.length)return;
     storieList=items;storiaIdx=idx||0;
     document.getElementById("storia-viewer").classList.add("open");
     mostraStoria(storiaIdx);
   };
-  function mostraStoria(idx){
+  window.mostraStoria=function(idx){
     if(storiaTimer)clearTimeout(storiaTimer);
-    var s=storieList[idx];if(!s)return chiudiStoriaViewer();
-    document.getElementById("storia-av-el").textContent=(s.nome||"?").charAt(0).toUpperCase();
-    document.getElementById("storia-nome-el").textContent=s.nome||"Storia";
+    var s=storieList[idx];if(!s){chiudiStoriaViewer();return;}
+    var nome=s.nome_completo||s.nome||"?";
+    document.getElementById("storia-av-el").textContent=nome.charAt(0).toUpperCase();
+    document.getElementById("storia-nome-el").textContent=nome;
     document.getElementById("storia-ora-el").textContent=formatData(s.created_at);
     var media=document.getElementById("storia-media-el");
-    var testo=document.getElementById("storia-testo-el");
     if(s.media_url){
-      var isVid=s.media_url.match(/\.(mp4|mov|webm)(\?|$)/i);
-      media.innerHTML=isVid?'<video src="'+esc(s.media_url)+'" autoplay playsinline muted style="max-width:100%;max-height:100%"></video>':'<img src="'+esc(s.media_url)+'" style="max-width:100%;max-height:100%;object-fit:contain"/>';
-    }else{media.innerHTML='<div style="font-size:80px">&#127837;</div>';}
-    testo.innerHTML=s.testo&&s.testo.trim()&&s.testo.trim()!=" "?'<p>'+esc(s.testo)+'</p>':"";
+      var isVid=/\.(mp4|mov|webm)(\?|$)/i.test(s.media_url);
+      if(isVid){var v=document.createElement("video");v.src=s.media_url;v.autoplay=true;v.playsInline=true;v.muted=true;v.style.cssText="max-width:100%;max-height:100%";media.innerHTML="";media.appendChild(v);}
+      else{var img=document.createElement("img");img.src=s.media_url;img.style.cssText="max-width:100%;max-height:100%;object-fit:contain";media.innerHTML="";media.appendChild(img);}
+    }else{media.innerHTML='<div style="font-size:80px;color:#fff">&#127837;</div>';}
+    var tEl=document.getElementById("storia-testo-el");
+    var t=s.testo&&s.testo.trim()&&s.testo.trim()!==" ";
+    tEl.innerHTML=t?'<p>'+esc(s.testo)+'</p>':"";
     var prog=document.getElementById("storia-progress");
-    prog.innerHTML=storieList.map(function(_,i){return'<div class="storia-bar"><div class="storia-bar-fill" id="sp-'+i+'" style="width:'+(i<idx?"100%":"0%")+'"></div></div>';}).join("");
+    prog.innerHTML=storieList.map(function(_,i){return'<div class="storia-bar"><div class="storia-bar-fill" id="sp-'+i+'"></div></div>';}).join("");
+    for(var i=0;i<idx;i++){var f=document.getElementById("sp-"+i);if(f)f.style.width="100%";}
     var fill=document.getElementById("sp-"+idx);
-    if(fill){fill.style.transition="width 5s linear";setTimeout(function(){fill.style.width="100%";},50);}
+    if(fill){setTimeout(function(){fill.style.transition="width 5s linear";fill.style.width="100%";},50);}
     storiaTimer=setTimeout(function(){storiaIdx++;mostraStoria(storiaIdx);},5000);
-    media.onclick=function(){storiaIdx++;mostraStoria(storiaIdx);};
-  }
+  };
   window.chiudiStoriaViewer=function(){
     if(storiaTimer)clearTimeout(storiaTimer);
     document.getElementById("storia-viewer").classList.remove("open");
-    storieList=[];storiaIdx=0;
+    storieList=[];storiaIdx=0;storiaTimer=null;
+  };
+
+
+  window.apriStoriaEncoded=function(el){
+    try{var g=JSON.parse(decodeURIComponent(el.dataset.g));apriStoria(g,0);}catch(e){console.warn(e);}
   };
 
   init();
