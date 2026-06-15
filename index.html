@@ -201,6 +201,84 @@
     .pb-nav{padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);}
     .hidden{display:none!important;}
 
+    /* STORIA EDITOR */
+    #storia-editor{position:fixed;inset:0;z-index:600;background:#000;display:none;flex-direction:column;}
+    #storia-editor.open{display:flex;}
+    .se-toolbar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + var(--safe-top)) 14px 10px;z-index:10;}
+    .se-btn{background:rgba(0,0,0,.55);border:none;color:#fff;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;}
+    .se-btn-icon{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.55);border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+    .se-media-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+    .se-media-wrap img,.se-media-wrap video{width:100%;height:100%;object-fit:cover;}
+    .se-empty-bg{width:100%;height:100%;background:linear-gradient(135deg,#0a3f57,#0E5A7A,#00c896);display:flex;align-items:center;justify-content:center;font-size:64px;}
+    .se-stickers-layer{position:absolute;inset:0;pointer-events:none;}
+    .se-sticker{position:absolute;pointer-events:all;cursor:move;user-select:none;background:rgba(0,0,0,.6);color:#fff;border-radius:14px;padding:8px 14px;font-size:15px;font-weight:700;touch-action:none;}
+    .se-text-overlay{position:absolute;bottom:180px;left:0;right:0;display:flex;justify-content:center;padding:0 20px;}
+    .se-text-input{background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:14px;padding:12px 16px;font-size:18px;font-weight:700;text-align:center;outline:none;width:100%;max-width:340px;font-family:inherit;resize:none;min-height:48px;}
+    .se-sticker-bar{position:absolute;bottom:90px;left:0;right:0;display:flex;gap:10px;overflow-x:auto;padding:0 14px;scrollbar-width:none;}
+    .se-sticker-bar::-webkit-scrollbar{display:none;}
+    .se-sticker-tile{flex-shrink:0;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border:none;border-radius:14px;padding:10px 14px;color:#fff;font-size:22px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .se-sticker-tile span{font-size:10px;font-weight:700;color:rgba(255,255,255,.8);}
+    .se-bottom-bar{position:absolute;bottom:0;left:0;right:0;padding:14px 16px calc(14px + var(--safe-bottom));display:flex;gap:10px;}
+    .se-pubblica-btn{flex:1;padding:14px;background:linear-gradient(135deg,#0E5A7A,#00c896);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;}
+    .se-musica-bar{position:absolute;bottom:140px;left:14px;right:14px;background:rgba(0,0,0,.75);border-radius:14px;padding:14px;color:#fff;}
+    /* MESSAGGI */
+    .msg-conv-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;}
+    .msg-conv-item:hover{background:var(--bg);}
+    .msg-conv-av{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--brand-light),var(--brand-mid));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--brand);flex-shrink:0;overflow:hidden;}
+    .msg-conv-av img{width:100%;height:100%;object-fit:cover;}
+    .msg-conv-body{flex:1;min-width:0;}
+    .msg-conv-nome{font-size:15px;font-weight:700;}
+    .msg-conv-preview{font-size:13px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+    .msg-conv-time{font-size:11px;color:var(--text-3);flex-shrink:0;}
+    /* CHAT */
+    #chat-screen{position:fixed;inset:0;z-index:400;background:var(--bg);display:none;flex-direction:column;}
+    #chat-screen.open{display:flex;}
+    .chat-header{display:flex;align-items:center;gap:12px;padding:calc(10px + var(--safe-top)) 14px 10px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;}
+    .chat-back{background:none;border:none;font-size:24px;cursor:pointer;padding:4px;}
+    .chat-nome{font-size:16px;font-weight:800;flex:1;}
+    .chat-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
+    .msg-bubble{max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.5;word-break:break-word;}
+    .msg-bubble.out{background:var(--brand);color:#fff;border-bottom-right-radius:4px;align-self:flex-end;}
+    .msg-bubble.in{background:var(--surface);color:var(--text);border-bottom-left-radius:4px;align-self:flex-start;border:1px solid var(--border);}
+    .msg-time{font-size:10px;opacity:.6;margin-top:4px;text-align:right;}
+    .chat-input-bar{display:flex;gap:8px;padding:10px 14px calc(10px + var(--safe-bottom));background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;}
+    .chat-input{flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:15px;font-family:inherit;outline:none;background:var(--bg);resize:none;max-height:120px;}
+    .chat-input:focus{border-color:var(--brand);background:#fff;}
+    .chat-send-btn{width:40px;height:40px;border-radius:50%;background:var(--brand);color:#fff;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    /* POST MENU */
+    .post-menu-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);display:none;align-items:flex-end;}
+    .post-menu-overlay.open{display:flex;}
+    .post-menu-sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;padding:12px 16px calc(16px + var(--safe-bottom));}
+    .post-menu-item{display:flex;align-items:center;gap:14px;padding:14px 8px;cursor:pointer;border-radius:12px;font-size:15px;font-weight:600;}
+    .post-menu-item:hover{background:var(--bg);}
+    .post-menu-item.danger{color:#dc2626;}
+    /* REAZIONI */
+    .post-actions-wrap{position:relative;}
+    .reaz-menu{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#fff;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:12px 16px;display:flex;gap:14px;z-index:50;border:1px solid var(--border);}
+    .reaz-menu-btn{display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px;}
+    .reaz-menu-btn .reaz-e{font-size:26px;line-height:1;}
+    .reaz-menu-btn .reaz-l{font-size:10px;font-weight:700;color:var(--text-2);}
+    /* LOCALI */
+    .locale-card{background:#fff;border-radius:16px;margin:0 12px 12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);}
+    .locale-card-img{width:100%;height:140px;background:linear-gradient(135deg,var(--brand-light),#dbeafe);display:flex;align-items:center;justify-content:center;font-size:48px;}
+    .locale-card-body{padding:14px 16px;}
+    .locale-card-nome{font-size:16px;font-weight:800;}
+    .locale-card-tipo{font-size:12px;color:var(--text-3);margin-top:2px;}
+    .locale-card-actions{display:flex;gap:8px;margin-top:12px;}
+    .locale-action-btn{flex:1;padding:10px;border:1.5px solid var(--brand);border-radius:10px;background:#fff;color:var(--brand);font-size:13px;font-weight:700;cursor:pointer;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:5px;}
+    .locale-action-btn.primary{background:var(--brand);color:#fff;}
+    /* PREMI */
+    .premio-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+    .premio-icon{font-size:36px;flex-shrink:0;width:48px;text-align:center;}
+    .premio-body{flex:1;}
+    .premio-nome{font-size:15px;font-weight:800;}
+    .premio-desc{font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.4;}
+    .premio-soglia{font-size:12px;font-weight:700;color:var(--brand);margin-top:6px;}
+    .premio-stato{font-size:11px;font-weight:800;border-radius:999px;padding:4px 12px;margin-top:8px;display:inline-block;}
+    .premio-stato.ok{background:#dcfce7;color:#16a34a;}
+    .premio-stato.nok{background:#f3f4f6;color:#6b7280;}
+
+
     /* STICKER MODAL */
     #sticker-modal{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.7);display:none;align-items:flex-end;}
     #sticker-modal.open{display:flex;}
@@ -362,8 +440,69 @@
     <button class="nav-item" data-page="ricette" onclick="navTo('ricette')"><span class="nav-icon">&#127859;</span><span class="nav-label">Ricette</span></button>
     <button class="nav-item" data-page="pubblica" onclick="apriPubblica()" style="overflow:visible;"><div class="nav-center-wrap">&#43;</div><span class="nav-label" style="margin-top:2px;">Pubblica</span></button>
     <button class="nav-item" data-page="tessera" onclick="navTo('tessera')"><span class="nav-icon">&#127915;</span><span class="nav-label">Tessera</span></button>
+    <button class="nav-item" data-page="messaggi" onclick="navTo('messaggi')" style="position:relative;"><span class="nav-icon">&#128172;</span><span class="nav-label">Messaggi</span><span id="msg-dot" style="display:none;position:absolute;top:6px;right:8px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid #fff"></span></button>
     <button class="nav-item" data-page="profilo" onclick="navTo('profilo')"><span class="nav-icon">&#128100;</span><span class="nav-label">Profilo</span></button>
   </nav>
+</div>
+
+
+<!-- STORIA EDITOR FULLSCREEN -->
+<div id="storia-editor">
+  <div class="se-toolbar">
+    <button class="se-btn" onclick="chiudiEditorStoria()">&#10005; Annulla</button>
+    <div style="display:flex;gap:8px;">
+      <button class="se-btn-icon" onclick="seToggleText()" title="Testo">T</button>
+      <button class="se-btn-icon" onclick="seToggleStickerBar()" title="Sticker">&#128512;</button>
+      <button class="se-btn-icon" onclick="document.getElementById('se-file-input').click()" title="Media">&#128247;</button>
+      <button class="se-btn-icon" onclick="seToggleMusicaBar()" title="Musica">&#127925;</button>
+    </div>
+  </div>
+  <div class="se-media-wrap" id="se-media-wrap">
+    <div class="se-empty-bg">&#127869;&#65039;</div>
+  </div>
+  <div class="se-stickers-layer" id="se-stickers-layer"></div>
+  <div class="se-text-overlay" id="se-text-overlay" style="display:none;">
+    <textarea class="se-text-input" id="se-text-input" placeholder="Scrivi qualcosa..." rows="2"></textarea>
+  </div>
+  <div class="se-sticker-bar" id="se-sticker-bar" style="display:none;">
+    <button class="se-sticker-tile" onclick="seAddSticker('&#128336;','ora')">&#128336;<span>Ora</span></button>
+    <button class="se-sticker-tile" onclick="seAddStickerPrompt('&#128205;','Dove sei?')">&#128205;<span>Posto</span></button>
+    <button class="se-sticker-tile" onclick="seApriMusicaGalleria()">&#127925;<span>Musica</span></button>
+    <button class="se-sticker-tile" onclick="seAddStickerPrompt('&#128279;','URL link:')">&#128279;<span>Link</span></button>
+    <button class="se-sticker-tile" onclick="seAddStickerPrompt('@','Tag (@nome):')">@<span>Tag</span></button>
+    <button class="se-sticker-tile" onclick="seAddStickerPrompt('&#9203;','Countdown:')">&#9203;<span>Timer</span></button>
+    <button class="se-sticker-tile" onclick="seAddStickerPrompt('&#127780;','Meteo:')">&#127780;<span>Meteo</span></button>
+  </div>
+  <div class="se-musica-bar" id="se-musica-bar" style="display:none;">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;">&#127925; Musica dalla galleria</div>
+    <input type="file" id="se-audio-input" accept="audio/*" style="display:none;" onchange="seCaricaMusica(this)"/>
+    <button class="se-btn" style="width:100%;justify-content:center;margin-bottom:0;" onclick="document.getElementById('se-audio-input').click()">Scegli brano &#127925;</button>
+    <div id="se-musica-nome" style="font-size:12px;opacity:.7;margin-top:8px;text-align:center;"></div>
+  </div>
+  <div class="se-bottom-bar">
+    <button class="se-pubblica-btn" onclick="sePublish()">&#9200; Pubblica storia</button>
+  </div>
+  <input type="file" id="se-file-input" accept="image/*,video/*" style="display:none;" onchange="seFileSelected(this)"/>
+</div>
+
+<!-- CHAT SCREEN -->
+<div id="chat-screen">
+  <div class="chat-header">
+    <button class="chat-back" onclick="chiudiChat()">&#8592;</button>
+    <div class="chat-nome" id="chat-nome-el">Chat</div>
+  </div>
+  <div class="chat-messages" id="chat-messages-el"></div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chat-input-el" placeholder="Scrivi un messaggio..." rows="1"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();inviaChatMsg();}"></textarea>
+    <button class="chat-send-btn" onclick="inviaChatMsg()">&#9658;</button>
+  </div>
+</div>
+
+<!-- POST MENU -->
+<div class="post-menu-overlay" id="post-menu-overlay" onclick="if(event.target===this)chiudiPostMenu()">
+  <div class="post-menu-sheet" id="post-menu-sheet"></div>
 </div>
 
 <!-- STORIA VIEWER -->
@@ -402,7 +541,7 @@
         <button class="tipo-btn" onclick="scegliTipo('recensione')"><span class="tipo-icon">&#11088;</span><span class="tipo-label">Recensione</span></button>
         <button class="tipo-btn" onclick="scegliTipo('lavoro')"><span class="tipo-icon">&#128188;</span><span class="tipo-label">Offerta lavoro</span></button>
         <button class="tipo-btn" onclick="scegliTipo('cerco-lavoro')"><span class="tipo-icon">&#128587;</span><span class="tipo-label">Cerco lavoro</span></button>
-        <button class="tipo-btn" onclick="scegliTipo('storia')"><span class="tipo-icon">&#9200;&#65039;</span><span class="tipo-label">Storia 24h</span></button>
+        <button class="tipo-btn" onclick="chiudiModale();setTimeout(apriEditorStoria,100)"><span class="tipo-icon">&#9200;&#65039;</span><span class="tipo-label">Storia 24h</span></button>
         <button class="tipo-btn" onclick="scegliTipo('offerta')"><span class="tipo-icon">&#127873;</span><span class="tipo-label">Offerta</span></button>
       </div>
     </div>
@@ -571,13 +710,13 @@
   window.navTo=function(page){
     document.querySelectorAll(".nav-item").forEach(function(b){b.classList.toggle("active",b.dataset.page===page);});
     var c=document.getElementById("page-content");c.scrollTop=0;
-    var pages={home:renderHome,ricette:renderRicette,tessera:renderTessera,profilo:renderProfilo,locali:renderLocali};
+    var pages={home:renderHome,ricette:renderRicette,tessera:renderTessera,profilo:renderProfilo,locali:renderLocali,messaggi:renderMessaggi};
     (pages[page]||renderHome)(c);
   };
 
   async function renderHome(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
-    var q=supa.from("v_social_feed").select("*").eq("visibile",true).order("created_at",{ascending:false}).limit(20);
+    var q=supa.from("v_social_feed").select("*").eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(20);
     if(filtroAttivo!=="tutti")q=q.eq("categoria",filtroAttivo);
     var[{data:posts},{data:reaz}]=await Promise.all([q,ME?supa.from("social_reactions").select("post_id,emoji").eq("user_id",ME.id):{data:[]}]);
     if(reaz)reaz.forEach(function(r){myReaz[r.post_id]=r.emoji;});
@@ -721,6 +860,7 @@
     if(sf){sf.classList.add("hidden");sf.innerHTML="";}
     document.querySelectorAll(".tipo-btn").forEach(function(b){b.classList.remove("selected");});
     document.getElementById("modal-pubblica").classList.add("open");
+    if(tipoDefault==="storia"){chiudiModale();setTimeout(apriEditorStoria,100);return;}
     if(tipoDefault)scegliTipo(tipoDefault);
   };
   window.chiudiSeFuori=function(e){if(e.target===document.getElementById("modal-pubblica"))chiudiModale();};
@@ -1276,5 +1416,341 @@
   init();
 })();
 </script>
-</body>
+
 </html>
+<script>
+// ── INIEZIONE FUNZIONI AGGIUNTIVE ─────────────────────────────────────────────
+// Questo script si aggiunge dopo il main script e aggiunge le funzioni mancanti
+
+// ── STORIA EDITOR ─────────────────────────────────────────────────────────────
+var _seFile=null,_seAudioFile=null;
+
+window.apriEditorStoria=function(){
+  var me=window._socialME||null;
+  if(!me){if(window.showAuth)window.showAuth();return;}
+  _seFile=null;_seAudioFile=null;
+  document.getElementById("se-media-wrap").innerHTML='<div class="se-empty-bg">&#127869;&#65039;</div>';
+  var ti=document.getElementById("se-text-input");if(ti)ti.value="";
+  var to=document.getElementById("se-text-overlay");if(to)to.style.display="none";
+  var sb=document.getElementById("se-sticker-bar");if(sb)sb.style.display="none";
+  var mb=document.getElementById("se-musica-bar");if(mb)mb.style.display="none";
+  var sl=document.getElementById("se-stickers-layer");if(sl)sl.innerHTML="";
+  document.getElementById("storia-editor").classList.add("open");
+};
+
+window.chiudiEditorStoria=function(){
+  document.getElementById("storia-editor").classList.remove("open");
+};
+
+window.seToggleText=function(){
+  var el=document.getElementById("se-text-overlay");
+  el.style.display=el.style.display==="none"?"flex":"none";
+  if(el.style.display!=="none"){var t=document.getElementById("se-text-input");if(t)t.focus();}
+};
+
+window.seToggleStickerBar=function(){
+  var el=document.getElementById("se-sticker-bar");
+  el.style.display=el.style.display==="none"?"flex":"none";
+};
+
+window.seToggleMusicaBar=function(){
+  var el=document.getElementById("se-musica-bar");
+  el.style.display=el.style.display==="none"?"block":"none";
+};
+
+window.seApriMusicaGalleria=function(){
+  document.getElementById("se-audio-input").click();
+};
+
+window.seFileSelected=function(input){
+  var f=input.files[0];if(!f)return;
+  _seFile=f;
+  var url=URL.createObjectURL(f);
+  var wrap=document.getElementById("se-media-wrap");
+  if(f.type.startsWith("video/")){
+    wrap.innerHTML='<video src="'+url+'" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>';
+  }else{
+    wrap.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover"/>';
+  }
+};
+
+window.seCaricaMusica=function(input){
+  var f=input.files[0];if(!f)return;
+  _seAudioFile=f;
+  var nome=f.name.replace(/\.[^.]+$/,"").substring(0,30);
+  document.getElementById("se-musica-nome").textContent="&#127925; "+nome;
+  seAddSticker("&#127925;","musica-"+nome);
+  document.getElementById("se-musica-bar").style.display="none";
+};
+
+window.seAddSticker=function(emoji,valore){
+  var layer=document.getElementById("se-stickers-layer");
+  var s=document.createElement("div");
+  s.className="se-sticker";
+  s.textContent=(emoji+" "+(valore||"")).trim();
+  s.style.left="30%";s.style.top="35%";
+  // Touch drag
+  var ox=0,oy=0,sx=0,sy=0;
+  s.addEventListener("touchstart",function(e){
+    var t=e.touches[0];ox=t.clientX;oy=t.clientY;
+    var r=s.getBoundingClientRect();sx=r.left;sy=r.top;
+    s.style.transform="none";s.style.left=sx+"px";s.style.top=sy+"px";
+  },{passive:true});
+  s.addEventListener("touchmove",function(e){
+    var t=e.touches[0];
+    s.style.left=(sx+t.clientX-ox)+"px";s.style.top=(sy+t.clientY-oy)+"px";
+  },{passive:true});
+  var lt=0;
+  s.addEventListener("touchend",function(){var n=Date.now();if(n-lt<300)s.remove();lt=n;});
+  layer.appendChild(s);
+  document.getElementById("se-sticker-bar").style.display="none";
+};
+
+window.seAddStickerPrompt=function(emoji,label){
+  // Su mobile usa un input nel DOM invece di prompt()
+  var existing=document.getElementById("se-inline-input-wrap");
+  if(existing)existing.remove();
+  var wrap=document.createElement("div");
+  wrap.id="se-inline-input-wrap";
+  wrap.style.cssText="position:absolute;bottom:160px;left:14px;right:14px;background:rgba(0,0,0,.8);border-radius:14px;padding:14px;z-index:20;";
+  wrap.innerHTML='<div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:8px">'+label+'</div>'+
+    '<input id="se-inline-inp" style="width:100%;padding:10px;border-radius:8px;border:none;font-size:15px;box-sizing:border-box;outline:none;" placeholder="Scrivi..."/>'+
+    '<div style="display:flex;gap:8px;margin-top:10px;">'+
+    '<button onclick="seConfInlineInput(\''+emoji+'\')" style="flex:1;padding:10px;background:#0E5A7A;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;">Aggiungi</button>'+
+    '<button onclick="document.getElementById(\'se-inline-input-wrap\').remove()" style="padding:10px 16px;background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;">Annulla</button>'+
+    '</div>';
+  document.getElementById("storia-editor").appendChild(wrap);
+  setTimeout(function(){var i=document.getElementById("se-inline-inp");if(i)i.focus();},100);
+};
+
+window.seConfInlineInput=function(emoji){
+  var inp=document.getElementById("se-inline-inp");
+  var val=inp?inp.value.trim():"";
+  if(val)seAddSticker(emoji,val);
+  var w=document.getElementById("se-inline-input-wrap");if(w)w.remove();
+};
+
+window.sePublish=async function(){
+  var supa=window.supabaseClient||window.supabase;
+  var ME=window._socialME;
+  if(!ME){alert("Accedi prima");return;}
+  var AZIENDA="b331365f-17db-4dda-aa2f-77a09427fe42";
+  var testo=(document.getElementById("se-text-input")||{}).value||"";
+  testo=testo.trim();
+  // Raccoglie sticker
+  var stickerTexts=[];
+  document.querySelectorAll(".se-sticker").forEach(function(s){
+    if(s.textContent.trim())stickerTexts.push(s.textContent.trim());
+  });
+  if(stickerTexts.length)testo=(testo?testo+"\n\n":"")+stickerTexts.join(" · ");
+  if(!testo&&!_seFile){alert("Aggiungi almeno una foto o un testo!");return;}
+  var btn=document.querySelector(".se-pubblica-btn");
+  if(btn){btn.textContent="Pubblicazione...";btn.disabled=true;}
+  var mediaUrl=null;
+  if(_seFile){
+    var ext=_seFile.name.split(".").pop().toLowerCase();
+    var path="stories/"+ME.id+"-"+Date.now()+"."+ext;
+    var up=await supa.storage.from("social-media").upload(path,_seFile,{cacheControl:"3600",upsert:false});
+    if(up.error){alert("Errore upload: "+up.error.message);if(btn){btn.textContent="&#9200; Pubblica storia";btn.disabled=false;}return;}
+    mediaUrl=supa.storage.from("social-media").getPublicUrl(path).data.publicUrl;
+  }
+  var payload={user_id:ME.id,testo:testo||" ",tipo:"storia",categoria:"esperienze",visibile:true,punti_assegnati:50,azienda_id:AZIENDA,scade_at:new Date(Date.now()+86400000).toISOString()};
+  if(mediaUrl)payload.media_url=mediaUrl;
+  var{error}=await supa.from("social_post").insert(payload);
+  if(error){alert("Errore: "+error.message);if(btn){btn.textContent="&#9200; Pubblica storia";btn.disabled=false;}return;}
+  try{await supa.rpc("aggiungi_punti_cliente",{p_user_id:ME.id,p_punti:50,p_motivo:"storia_pubblicata"});}catch(e){}
+  chiudiEditorStoria();
+  if(btn){btn.textContent="&#9200; Pubblica storia";btn.disabled=false;}
+  setTimeout(function(){alert("Storia pubblicata! Visibile per 24 ore.");},200);
+};
+
+// ── POST MENU ─────────────────────────────────────────────────────────────────
+window.apriPostMenu=function(e,postId){
+  e.stopPropagation();
+  var sheet=document.getElementById("post-menu-sheet");
+  var overlay=document.getElementById("post-menu-overlay");
+  sheet.innerHTML='<div style="width:40px;height:4px;background:#e5e7eb;border-radius:999px;margin:0 auto 12px"></div>'+
+    '<div class="post-menu-item" onclick="modificaPost(\''+postId+'\')">&#9998; Modifica post</div>'+
+    '<div class="post-menu-item danger" onclick="eliminaPost(\''+postId+'\')">&#128465; Elimina post</div>'+
+    '<div class="post-menu-item" onclick="chiudiPostMenu()">Annulla</div>';
+  overlay.classList.add("open");
+};
+window.chiudiPostMenu=function(){
+  document.getElementById("post-menu-overlay").classList.remove("open");
+};
+window.eliminaPost=async function(postId){
+  var ME=window._socialME;
+  if(!ME||!confirm("Eliminare questo post?"))return;
+  var supa=window.supabaseClient||window.supabase;
+  await supa.from("social_post").delete().eq("id",postId).eq("user_id",ME.id);
+  chiudiPostMenu();
+  if(window.navTo)window.navTo("home");
+};
+window.modificaPost=async function(postId){
+  var ME=window._socialME;if(!ME)return;
+  var supa=window.supabaseClient||window.supabase;
+  var{data:p}=await supa.from("social_post").select("testo").eq("id",postId).eq("user_id",ME.id).maybeSingle();
+  if(!p)return;
+  var nuovoTesto=prompt("Modifica:",p.testo&&p.testo.trim()!==" "?p.testo:"");
+  if(nuovoTesto===null)return;
+  await supa.from("social_post").update({testo:nuovoTesto||" "}).eq("id",postId).eq("user_id",ME.id);
+  chiudiPostMenu();
+  if(window.navTo)window.navTo("home");
+};
+
+// Event delegation per dots
+document.addEventListener("click",function(e){
+  var d=e.target.closest(".post-dots");
+  if(d&&d.dataset.pid)apriPostMenu(e,d.dataset.pid);
+});
+
+// ── MESSAGGI ──────────────────────────────────────────────────────────────────
+var _chatConvId=null,_chatAltroNome=null,_chatSub=null;
+
+window.renderMessaggi=async function(c){
+  var ME=window._socialME;
+  var supa=window.supabaseClient||window.supabase;
+  if(!ME){if(window.showAuth)window.showAuth();return;}
+  c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
+  var{data:convs}=await supa.from("messaggi_conversazioni")
+    .select("id,partecipante_1,partecipante_2,ultimo_messaggio,ultimo_messaggio_at")
+    .or("partecipante_1.eq."+ME.id+",partecipante_2.eq."+ME.id)
+    .order("ultimo_messaggio_at",{ascending:false});
+
+  var altriIds=(convs||[]).map(function(c){return c.partecipante_1===ME.id?c.partecipante_2:c.partecipante_1;});
+  var profiliMap={};
+  if(altriIds.length){
+    var{data:pf}=await supa.from("clienti_profilo").select("user_id,nome_completo,avatar_url").in("user_id",altriIds);
+    (pf||[]).forEach(function(p){profiliMap[p.user_id]=p;});
+  }
+
+  var h='<div class="pb-nav">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px;">';
+  h+='<div style="font-size:22px;font-weight:900">&#128172; Messaggi</div>';
+  h+='<button onclick="apriNuovaChat()" style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;">+ Nuova</button>';
+  h+='</div>';
+
+  if(!convs||convs.length===0){
+    h+='<div class="empty-state"><div class="empty-icon">&#128172;</div><div class="empty-title">Nessun messaggio</div><div class="empty-sub">Inizia una conversazione</div></div>';
+  }else{
+    convs.forEach(function(conv){
+      var altroId=conv.partecipante_1===ME.id?conv.partecipante_2:conv.partecipante_1;
+      var pr=profiliMap[altroId]||{};
+      var nome=pr.nome_completo||"Utente";
+      var av=pr.avatar_url?'<img src="'+pr.avatar_url+'"/>':nome.charAt(0).toUpperCase();
+      var ora=conv.ultimo_messaggio_at?new Date(conv.ultimo_messaggio_at).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}):"";
+      h+='<div class="msg-conv-item" onclick="apriChat(\''+conv.id+'\',\''+altroId+'\',\''+nome.replace(/'/g,"&#39;")+'\')">'+
+        '<div class="msg-conv-av">'+av+'</div>'+
+        '<div class="msg-conv-body"><div class="msg-conv-nome">'+nome+'</div>'+
+        '<div class="msg-conv-preview">'+(conv.ultimo_messaggio||"")+'</div></div>'+
+        '<div class="msg-conv-time">'+ora+'</div>'+
+        '</div>';
+    });
+  }
+  h+='</div>';
+  c.innerHTML=h;
+};
+
+window.apriNuovaChat=async function(){
+  var ME=window._socialME;
+  var supa=window.supabaseClient||window.supabase;
+  var{data:utenti}=await supa.from("clienti_profilo").select("user_id,nome_completo").neq("user_id",ME.id).order("nome_completo").limit(60);
+  var sheet=document.getElementById("post-menu-sheet");
+  var overlay=document.getElementById("post-menu-overlay");
+  var items=(utenti||[]).map(function(u){
+    return '<div class="post-menu-item" onclick="avviaChat(\''+u.user_id+'\',\''+( u.nome_completo||"Utente").replace(/'/g,"&#39;")+'\')">'+( u.nome_completo||"Utente")+'</div>';
+  }).join("");
+  sheet.innerHTML='<div style="width:40px;height:4px;background:#e5e7eb;border-radius:999px;margin:0 auto 12px"></div>'+
+    '<div style="font-size:16px;font-weight:800;margin-bottom:12px">Nuova conversazione</div>'+
+    '<input placeholder="Cerca utente..." style="width:100%;padding:10px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:14px;margin-bottom:10px;box-sizing:border-box;outline:none;" oninput="this.nextElementSibling.querySelectorAll(\'.post-menu-item\').forEach(function(el){el.style.display=el.textContent.toLowerCase().includes(this.value.toLowerCase())?\'flex\':\'none\';}.bind(this))"/>'+
+    '<div style="max-height:50vh;overflow-y:auto;">'+items+'</div>'+
+    '<div class="post-menu-item" onclick="chiudiPostMenu()">Annulla</div>';
+  overlay.classList.add("open");
+};
+
+window.avviaChat=async function(altroId,altroNome){
+  chiudiPostMenu();
+  var ME=window._socialME;
+  var supa=window.supabaseClient||window.supabase;
+  var p1=ME.id<altroId?ME.id:altroId;
+  var p2=ME.id<altroId?altroId:ME.id;
+  var{data:ex}=await supa.from("messaggi_conversazioni").select("id").eq("partecipante_1",p1).eq("partecipante_2",p2).maybeSingle();
+  if(ex){
+    apriChat(ex.id,altroId,altroNome);
+  }else{
+    var{data:nv}=await supa.from("messaggi_conversazioni").insert({partecipante_1:p1,partecipante_2:p2}).select("id").single();
+    if(nv)apriChat(nv.id,altroId,altroNome);
+  }
+};
+
+window.apriChat=async function(convId,altroId,altroNome){
+  _chatConvId=convId;_chatAltroNome=altroNome;
+  document.getElementById("chat-nome-el").textContent=altroNome||"Chat";
+  document.getElementById("chat-messages-el").innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
+  document.getElementById("chat-screen").classList.add("open");
+  await _caricaMsg();
+  var supa=window.supabaseClient||window.supabase;
+  if(_chatSub)supa.removeChannel(_chatSub);
+  _chatSub=supa.channel("chat"+convId)
+    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messaggi",filter:"conversazione_id=eq."+convId},_caricaMsg)
+    .subscribe();
+};
+
+async function _caricaMsg(){
+  if(!_chatConvId)return;
+  var ME=window._socialME;
+  var supa=window.supabaseClient||window.supabase;
+  var{data:msgs}=await supa.from("messaggi").select("*").eq("conversazione_id",_chatConvId).order("created_at",{ascending:true}).limit(100);
+  var el=document.getElementById("chat-messages-el");if(!el)return;
+  if(!msgs||msgs.length===0){el.innerHTML='<div style="text-align:center;padding:32px;color:#9ca3af;font-size:14px">Nessun messaggio. Dì ciao!</div>';return;}
+  el.innerHTML=msgs.map(function(m){
+    var out=m.mittente_id===ME.id;
+    var ora=new Date(m.created_at).toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
+    return '<div class="msg-bubble '+(out?"out":"in")+'">'+( m.testo||"")+'<div class="msg-time">'+ora+'</div></div>';
+  }).join("");
+  el.scrollTop=el.scrollHeight;
+}
+
+window.chiudiChat=function(){
+  var supa=window.supabaseClient||window.supabase;
+  if(_chatSub)supa.removeChannel(_chatSub);
+  _chatSub=null;_chatConvId=null;
+  document.getElementById("chat-screen").classList.remove("open");
+};
+
+window.inviaChatMsg=async function(){
+  var ME=window._socialME;
+  if(!ME||!_chatConvId)return;
+  var supa=window.supabaseClient||window.supabase;
+  var inp=document.getElementById("chat-input-el");
+  var testo=inp.value.trim();if(!testo)return;
+  inp.value="";inp.style.height="auto";
+  await supa.from("messaggi").insert({conversazione_id:_chatConvId,mittente_id:ME.id,testo});
+  await supa.from("messaggi_conversazioni").update({ultimo_messaggio:testo,ultimo_messaggio_at:new Date().toISOString()}).eq("id",_chatConvId);
+  await _caricaMsg();
+};
+
+// ── BRIDGE ME ─────────────────────────────────────────────────────────────────
+// Il script principale usa ME come variabile locale nell'IIFE — la esponiamo
+// intercettando onAuthStateChange che già chiama showApp
+var _origShowApp=null;
+(function waitForShowApp(){
+  var attempts=0;
+  var check=setInterval(function(){
+    attempts++;
+    if(window.supabaseClient||window.supabase){
+      var supa=window.supabaseClient||window.supabase;
+      supa.auth.getSession().then(function(r){
+        if(r.data&&r.data.session)window._socialME=r.data.session.user;
+      });
+      supa.auth.onAuthStateChange(function(ev,sess){
+        window._socialME=sess?sess.user:null;
+      });
+      clearInterval(check);
+    }
+    if(attempts>30)clearInterval(check);
+  },200);
+})();
+
+</script>
+</body>
