@@ -927,31 +927,37 @@
   async function renderLocali(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
     var{data:sedi}=await supa.from("sedi").select("id,nome,indirizzo,tipo,lat,lng,foto_url").order("nome");
-    var h='<div class="pb-nav">';
-    h+='<div style="padding:16px 16px 12px"><div style="font-size:22px;font-weight:900">&#128205; Locali Partner</div>';
-    h+='<div style="font-size:13px;color:var(--text-2);margin-top:4px">Ristoranti e locali su Ristoflow</div></div>';
+    var wrap=document.createElement("div");wrap.className="pb-nav";
+    var hdr=document.createElement("div");hdr.style.cssText="padding:16px 16px 12px";
+    hdr.innerHTML='<div style="font-size:22px;font-weight:900">&#128205; Locali Partner</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">Ristoranti e locali su Ristoflow</div>';
+    wrap.appendChild(hdr);
     if(!sedi||sedi.length===0){
-      h+='<div class="empty-state"><div class="empty-icon">&#128205;</div><div class="empty-title">Nessun locale ancora</div></div>';
+      var empty=document.createElement("div");empty.className="empty-state";
+      empty.innerHTML='<div class="empty-icon">&#128205;</div><div class="empty-title">Nessun locale ancora</div>';
+      wrap.appendChild(empty);
     }else{
       sedi.forEach(function(s){
-        var mapUrl="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent((s.indirizzo||s.nome||"")+"+"+(s.lat&&s.lng?s.lat+","+s.lng:""));
-        h+='<div class="locale-card">';
-        if(s.foto_url)h+='<img src="'+esc(s.foto_url)+'" style="width:100%;height:140px;object-fit:cover"/>';
-        else h+='<div class="locale-card-img">&#127869;&#65039;</div>';
-        h+='<div class="locale-card-body">';
-        h+='<div class="locale-card-nome">'+esc(s.nome||"Locale")+'</div>';
-        h+='<div class="locale-card-tipo">'+esc(s.indirizzo||"")+'</div>';
-        h+='<div class="locale-card-actions">';
-        h+='<a href="'+mapUrl+'" target="_blank" class="locale-action-btn primary">&#128205; Indicazioni</a>';
-        h+='<button class="locale-action-btn" onclick="prenotaLocale(this.dataset.id)" data-id="'+s.id+'">&#128197; Prenota</button>';
-        h+='</div></div></div>';
+        var dest=encodeURIComponent((s.indirizzo||s.nome||""));
+        var mapUrl="https://www.google.com/maps/dir/?api=1&destination="+dest;
+        var card=document.createElement("div");card.className="locale-card";
+        var imgEl="";
+        if(s.foto_url){imgEl='<img src="'+esc(s.foto_url)+'" style="width:100%;height:140px;object-fit:cover"/>';}
+        else{imgEl='<div class="locale-card-img">&#127869;&#65039;</div>';}
+        var body=document.createElement("div");body.className="locale-card-body";
+        body.innerHTML='<div class="locale-card-nome">'+esc(s.nome||"Locale")+'</div>'+'<div class="locale-card-tipo">'+esc(s.indirizzo||"")+'</div>';
+        var acts=document.createElement("div");acts.className="locale-card-actions";
+        var aBtn=document.createElement("a");
+        aBtn.href=mapUrl;aBtn.target="_blank";aBtn.className="locale-action-btn primary";aBtn.textContent="📍 Indicazioni";
+        var pBtn=document.createElement("button");
+        pBtn.className="locale-action-btn";pBtn.textContent="📅 Prenota";
+        pBtn.onclick=function(){window.open("https://ristoflow-ai.com/prenotazione.html?sede="+encodeURIComponent(s.id),"_blank");};
+        acts.appendChild(aBtn);acts.appendChild(pBtn);
+        body.appendChild(acts);
+        card.innerHTML=imgEl;card.appendChild(body);
+        wrap.appendChild(card);
       });
     }
-    h+='</div>';c.innerHTML=h;
-  }
-
-  window.prenotaLocale=function(id){
-    window.open("https://ristoflow-ai.com/prenotazione.html?sede="+id,"_blank");
+    c.innerHTML="";c.appendChild(wrap);
   };
 
   // ── PULSANTE SEGUI ───────────────────────────────────────────────────────────
@@ -967,7 +973,7 @@
     }
   };
 
-  // ── MENU REAZIONI TENDINA ─────────────────────────────────────────────────────
+  // ── MENU REAZIONI TENDINA
   var reazMenuOpen=null;
   window.toggleReazMenu=function(postId,evt){
     evt.stopPropagation();
@@ -978,15 +984,14 @@
     if(!wrap)return;
     var m=document.createElement("div");
     m.className="reaz-menu";m.id="reaz-menu-"+postId;
-    m.innerHTML=[
-      {k:"fuoco",c:"reaz_fuoco",e:"&#128525;",l:"Mi piace"},
-      {k:"applauso",c:"reaz_applauso",e:"&#128079;",l:"Bravo!"},
-      {k:"cuore",c:"reaz_cuore",e:"&#128293;",l:"Top!"},
-      {k:"wow",c:"reaz_fuoco",e:"&#129327;",l:"Wow"},
-      {k:"yum",c:"reaz_fuoco",e:"&#128523;",l:"Yum"}
-    ].map(function(r){
-      return '<button class="reaz-menu-btn" onclick="reagisci('+postId+',''+r.k+'',''+r.c+'');chiudiReazMenu()">'+r.e+'<span>'+r.l+'</span></button>';
-    }).join("");
+    var items=[["fuoco","reaz_fuoco","😍","Mi piace"],["applauso","reaz_applauso","👏","Bravo!"],["cuore","reaz_cuore","🔥","Top!"],["wow","reaz_fuoco","🤯","Wow"],["yum","reaz_fuoco","😋","Yum"]];
+    items.forEach(function(r){
+      var btn=document.createElement("button");
+      btn.className="reaz-menu-btn";
+      btn.innerHTML=r[2]+"<span>"+r[3]+"</span>";
+      (function(k,c){btn.onclick=function(){reagisci(postId,k,c);chiudiReazMenu();};})(r[0],r[1]);
+      m.appendChild(btn);
+    });
     wrap.style.position="relative";
     wrap.appendChild(m);
     setTimeout(function(){document.addEventListener("click",chiudiReazMenu,{once:true});},50);
