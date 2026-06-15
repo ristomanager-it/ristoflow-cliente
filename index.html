@@ -413,7 +413,6 @@
     var{data,error}=await supa.auth.signUp({
       email,password:pwd,
       options:{
-        emailRedirectTo:"https://social.ristoflow-ai.com",
         data:{nome_completo:nome,telefono:tel}
       }
     });
