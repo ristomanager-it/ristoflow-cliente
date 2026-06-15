@@ -1531,7 +1531,7 @@ window.seConfInlineInput=function(emoji){
 };
 
 window.sePublish=async function(){
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   var ME=window._socialME;
   if(!ME){alert("Accedi prima");return;}
   var AZIENDA="b331365f-17db-4dda-aa2f-77a09427fe42";
@@ -1581,14 +1581,14 @@ window.chiudiPostMenu=function(){
 window.eliminaPost=async function(postId){
   var ME=window._socialME;
   if(!ME||!confirm("Eliminare questo post?"))return;
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   await supa.from("social_post").delete().eq("id",postId).eq("user_id",ME.id);
   chiudiPostMenu();
   if(window.navTo)window.navTo("home");
 };
 window.modificaPost=async function(postId){
   var ME=window._socialME;if(!ME)return;
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   var{data:p}=await supa.from("social_post").select("testo").eq("id",postId).eq("user_id",ME.id).maybeSingle();
   if(!p)return;
   var nuovoTesto=prompt("Modifica:",p.testo&&p.testo.trim()!==" "?p.testo:"");
@@ -1609,7 +1609,7 @@ var _chatConvId=null,_chatAltroNome=null,_chatSub=null;
 
 window.renderMessaggi=async function(c){
   var ME=window._socialME;
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   if(!ME){if(window.showAuth)window.showAuth();return;}
   c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
   var{data:convs}=await supa.from("messaggi_conversazioni")
@@ -1653,7 +1653,7 @@ window.renderMessaggi=async function(c){
 
 window.apriNuovaChat=async function(){
   var ME=window._socialME;
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   var{data:utenti}=await supa.from("clienti_profilo").select("user_id,nome_completo").neq("user_id",ME.id).order("nome_completo").limit(60);
   var sheet=document.getElementById("post-menu-sheet");
   var overlay=document.getElementById("post-menu-overlay");
@@ -1671,7 +1671,7 @@ window.apriNuovaChat=async function(){
 window.avviaChat=async function(altroId,altroNome){
   chiudiPostMenu();
   var ME=window._socialME;
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   var p1=ME.id<altroId?ME.id:altroId;
   var p2=ME.id<altroId?altroId:ME.id;
   var{data:ex}=await supa.from("messaggi_conversazioni").select("id").eq("partecipante_1",p1).eq("partecipante_2",p2).maybeSingle();
@@ -1689,7 +1689,7 @@ window.apriChat=async function(convId,altroId,altroNome){
   document.getElementById("chat-messages-el").innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
   document.getElementById("chat-screen").classList.add("open");
   await _caricaMsg();
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   if(_chatSub)supa.removeChannel(_chatSub);
   _chatSub=supa.channel("chat"+convId)
     .on("postgres_changes",{event:"INSERT",schema:"public",table:"messaggi",filter:"conversazione_id=eq."+convId},_caricaMsg)
@@ -1699,7 +1699,7 @@ window.apriChat=async function(convId,altroId,altroNome){
 async function _caricaMsg(){
   if(!_chatConvId)return;
   var ME=window._socialME;
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   var{data:msgs}=await supa.from("messaggi").select("*").eq("conversazione_id",_chatConvId).order("created_at",{ascending:true}).limit(100);
   var el=document.getElementById("chat-messages-el");if(!el)return;
   if(!msgs||msgs.length===0){el.innerHTML='<div style="text-align:center;padding:32px;color:#9ca3af;font-size:14px">Nessun messaggio. Dì ciao!</div>';return;}
@@ -1712,7 +1712,7 @@ async function _caricaMsg(){
 }
 
 window.chiudiChat=function(){
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   if(_chatSub)supa.removeChannel(_chatSub);
   _chatSub=null;_chatConvId=null;
   document.getElementById("chat-screen").classList.remove("open");
@@ -1721,7 +1721,7 @@ window.chiudiChat=function(){
 window.inviaChatMsg=async function(){
   var ME=window._socialME;
   if(!ME||!_chatConvId)return;
-  var supa=window.supabaseClient||window.supabase;
+  var supa=window._supaExtra||window.supabaseClient||window.supabase;
   var inp=document.getElementById("chat-input-el");
   var testo=inp.value.trim();if(!testo)return;
   inp.value="";inp.style.height="auto";
@@ -1731,24 +1731,31 @@ window.inviaChatMsg=async function(){
 };
 
 // ── BRIDGE ME ─────────────────────────────────────────────────────────────────
-// Il script principale usa ME come variabile locale nell'IIFE — la esponiamo
-// intercettando onAuthStateChange che già chiama showApp
-var _origShowApp=null;
+// Il client Supabase viene creato dentro l'IIFE con window.supabase.createClient
+// Aspettiamo che window.supabase (la libreria CDN) sia caricata
 (function waitForShowApp(){
   var attempts=0;
   var check=setInterval(function(){
     attempts++;
-    if(window.supabaseClient||window.supabase){
-      var supa=window.supabaseClient||window.supabase;
-      supa.auth.getSession().then(function(r){
+    // La libreria CDN espone window.supabase con createClient
+    if(window.supabase&&window.supabase.createClient){
+      // Il client dell'app viene creato con le stesse credenziali
+      var SUPA_URL="https://cuhcscpvhypoaplcmtjk.supabase.co";
+      var SUPA_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0";
+      // Crea un secondo client dedicato per i moduli aggiuntivi
+      if(!window._supaExtra){
+        window._supaExtra=window.supabase.createClient(SUPA_URL,SUPA_ANON);
+      }
+      var sc=window._supaExtra;
+      sc.auth.getSession().then(function(r){
         if(r.data&&r.data.session)window._socialME=r.data.session.user;
       });
-      supa.auth.onAuthStateChange(function(ev,sess){
+      sc.auth.onAuthStateChange(function(ev,sess){
         window._socialME=sess?sess.user:null;
       });
       clearInterval(check);
     }
-    if(attempts>30)clearInterval(check);
+    if(attempts>50)clearInterval(check);
   },200);
 })();
 
