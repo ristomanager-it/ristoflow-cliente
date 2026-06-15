@@ -30,15 +30,45 @@
     @keyframes spin{to{transform:rotate(360deg);}}
     .page-loader{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--text-2);font-size:13px;font-weight:600;}
     .page-loader.full{height:100vh;}
-    #auth-screen{display:none;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh;padding:40px 20px 40px;background:linear-gradient(160deg,#0a3f57 0%,#0E5A7A 45%,#00c896 100%);overflow-y:auto;position:fixed;inset:0;z-index:300;}
-    .auth-card{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.25);margin-top:20px;position:relative;z-index:301;}
+
+    /* SCHERMATE FULL */
+    .full-screen{position:fixed;inset:0;z-index:300;overflow-y:auto;display:none;}
+    .full-screen.active{display:flex;flex-direction:column;}
+
+    /* AUTH */
+    #auth-screen{background:linear-gradient(160deg,#0a3f57 0%,#0E5A7A 45%,#00c896 100%);align-items:center;justify-content:flex-start;padding:40px 20px;}
+    .auth-card{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.25);margin-top:16px;}
     .auth-tabs{display:flex;gap:4px;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:20px;}
     .auth-tab{flex:1;padding:9px;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;background:transparent;color:var(--text-2);}
     .auth-tab.active{background:#fff;color:var(--brand);box-shadow:0 2px 8px rgba(0,0,0,.08);}
     .auth-input{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;outline:none;background:var(--bg);color:var(--text);margin-bottom:10px;display:block;}
     .auth-input:focus{border-color:var(--brand);background:#fff;}
-    .auth-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--brand),var(--brand-mid));color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;}
-    .auth-error{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;display:none;margin-bottom:12px;}
+    .auth-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--brand),var(--brand-mid));color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:800;cursor:pointer;}
+    .auth-btn:active{opacity:.88;}
+    .auth-error{border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;display:none;margin-bottom:12px;line-height:1.4;}
+    .auth-error.err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;}
+    .auth-error.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;}
+
+    /* COMPLETA PROFILO */
+    #completa-screen{background:linear-gradient(160deg,#0a3f57 0%,#0E5A7A 60%,#00c896 100%);align-items:center;justify-content:flex-start;padding:30px 20px 40px;}
+    .completa-card{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.25);margin-top:16px;}
+    .completa-title{font-size:20px;font-weight:900;color:var(--text);margin-bottom:4px;}
+    .completa-sub{font-size:13px;color:var(--text-2);margin-bottom:20px;line-height:1.5;}
+    .avatar-upload{width:80px;height:80px;border-radius:50%;background:var(--brand-light);border:3px dashed var(--brand);display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;margin:0 auto 16px;overflow:hidden;position:relative;}
+    .avatar-upload img{width:100%;height:100%;object-fit:cover;}
+    .avatar-upload-label{font-size:11px;color:var(--brand);font-weight:700;text-align:center;margin-bottom:16px;cursor:pointer;}
+    .completa-input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:inherit;outline:none;background:var(--bg);color:var(--text);margin-bottom:10px;display:block;}
+    .completa-input:focus{border-color:var(--brand);background:#fff;}
+    .interessi-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+    .interesse-btn{padding:7px 14px;border-radius:999px;border:1.5px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;color:var(--text-2);cursor:pointer;}
+    .interesse-btn.sel{background:var(--brand-light);border-color:var(--brand);color:var(--brand);}
+    .completa-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--brand),var(--accent));color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:800;cursor:pointer;margin-top:4px;}
+    .skip-btn{width:100%;background:none;border:none;font-size:13px;font-weight:700;color:var(--text-3);cursor:pointer;padding:10px;margin-top:4px;}
+
+    /* CONFERMA EMAIL */
+    #conferma-screen{background:linear-gradient(160deg,#0a3f57 0%,#0E5A7A 45%,#00c896 100%);align-items:center;justify-content:center;padding:40px 20px;}
+
+    /* APP */
     #app-shell{display:none;flex-direction:column;height:100vh;height:100dvh;}
     .top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:calc(var(--top-h) + var(--safe-top));padding-top:var(--safe-top);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:100;}
     .top-bar-logo{font-size:22px;font-weight:900;letter-spacing:-.8px;}
@@ -48,7 +78,8 @@
     .top-bar-right{display:flex;gap:6px;}
     .top-btn{width:38px;height:38px;border:none;background:var(--bg);border-radius:50%;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;}
     .notif-dot::after{content:"";position:absolute;top:7px;right:7px;width:9px;height:9px;background:#ef4444;border-radius:50%;border:2px solid var(--surface);}
-    .top-avatar-circle{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--accent));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;}
+    .top-avatar-circle{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--accent));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;overflow:hidden;}
+    .top-avatar-circle img{width:100%;height:100%;object-fit:cover;}
     #page-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--bg);}
     .bottom-nav{display:flex;background:var(--surface);border-top:1px solid var(--border);padding-bottom:var(--safe-bottom);flex-shrink:0;height:calc(var(--nav-h) + var(--safe-bottom));}
     .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 0;border:none;background:none;cursor:pointer;color:var(--text-3);overflow:visible;}
@@ -56,6 +87,8 @@
     .nav-icon{font-size:24px;line-height:1;}
     .nav-label{font-size:10px;font-weight:700;letter-spacing:.02em;}
     .nav-center-wrap{width:52px;height:52px;background:linear-gradient(135deg,var(--brand),var(--accent));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 18px rgba(14,90,122,.4);margin-top:-14px;}
+
+    /* FEED */
     .filtri-wrap{background:var(--surface);border-bottom:1px solid var(--border);padding:10px 0;}
     .filtri-strip{display:flex;gap:8px;padding:0 12px;overflow-x:auto;scrollbar-width:none;}
     .filtri-strip::-webkit-scrollbar{display:none;}
@@ -137,10 +170,11 @@
     .ricetta-meta{font-size:11px;color:var(--text-3);margin-top:4px;}
     .ricetta-tag{display:inline-block;background:var(--brand-light);color:var(--brand);border-radius:999px;padding:2px 8px;font-size:10px;font-weight:700;margin-top:6px;}
     .profilo-hero{background:linear-gradient(135deg,var(--brand),var(--brand-mid));padding:28px 20px 44px;text-align:center;color:#fff;position:relative;}
-    .profilo-av{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 12px;overflow:hidden;}
+    .profilo-av{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 12px;overflow:hidden;cursor:pointer;}
     .profilo-av img{width:100%;height:100%;object-fit:cover;}
     .profilo-nome-el{font-size:22px;font-weight:900;}
     .profilo-email-el{font-size:13px;opacity:.75;margin-top:3px;}
+    .profilo-bio-el{font-size:13px;opacity:.8;margin-top:4px;line-height:1.4;}
     .profilo-livello-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border-radius:999px;padding:5px 14px;font-size:13px;font-weight:700;margin-top:10px;}
     .profilo-stats{display:flex;background:var(--surface);margin:-24px 16px 0;border-radius:var(--radius);box-shadow:0 4px 24px rgba(0,0,0,.1);overflow:hidden;position:relative;z-index:1;}
     .p-stat{flex:1;padding:14px 6px;text-align:center;border-right:1px solid var(--border);}
@@ -164,20 +198,20 @@
     .empty-title{font-size:18px;font-weight:800;}
     .empty-sub{font-size:14px;color:var(--text-2);line-height:1.5;max-width:260px;}
     .empty-btn{background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px 28px;font-size:14px;font-weight:800;cursor:pointer;margin-top:4px;}
-    .section-card{background:var(--surface);margin:8px 12px;border-radius:var(--radius);padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
     .pb-nav{padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);}
     .hidden{display:none!important;}
   </style>
 </head>
 <body>
+
 <div id="initial-loader" class="page-loader full"><div class="spinner"></div>Caricamento...</div>
 
 <!-- AUTH -->
-<div id="auth-screen">
-  <div style="text-align:center;margin-bottom:20px;">
+<div id="auth-screen" class="full-screen">
+  <div style="text-align:center;margin-bottom:16px;">
     <div style="display:inline-flex;align-items:center;gap:12px;margin-bottom:8px;">
-      <div style="width:56px;height:56px;background:rgba(255,255,255,.15);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;">&#127869;&#65039;</div>
-      <div style="font-size:32px;font-weight:900;letter-spacing:-1px;"><span style="color:#fff">Risto</span><span style="color:#00c896">flow</span><span style="color:#f97316">Book</span></div>
+      <div style="width:52px;height:52px;background:rgba(255,255,255,.15);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;">&#127869;&#65039;</div>
+      <div style="font-size:30px;font-weight:900;letter-spacing:-1px;"><span style="color:#fff">Risto</span><span style="color:#00c896">flow</span><span style="color:#f97316">Book</span></div>
     </div>
     <div style="font-size:14px;color:rgba(255,255,255,.7);">Il social della ristorazione italiana.</div>
   </div>
@@ -186,7 +220,7 @@
       <button class="auth-tab active" onclick="switchTab('login',this)">Accedi</button>
       <button class="auth-tab" onclick="switchTab('register',this)">Registrati</button>
     </div>
-    <div id="auth-error" class="auth-error"></div>
+    <div id="auth-msg" class="auth-error"></div>
     <div id="form-login">
       <input class="auth-input" type="email" id="login-email" placeholder="Email" autocomplete="email"/>
       <input class="auth-input" type="password" id="login-pwd" placeholder="Password" autocomplete="current-password"/>
@@ -202,6 +236,49 @@
   </div>
 </div>
 
+<!-- CONFERMA EMAIL -->
+<div id="conferma-screen" class="full-screen">
+  <div style="background:#fff;border-radius:24px;padding:32px;width:calc(100% - 40px);max-width:400px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.25);">
+    <div style="font-size:56px;margin-bottom:16px;">&#128231;</div>
+    <div style="font-size:20px;font-weight:900;margin-bottom:8px;">Controlla la tua email</div>
+    <div id="conferma-email-txt" style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:24px;"></div>
+    <div style="font-size:13px;color:var(--text-3);margin-bottom:16px;">Clicca il link nell'email per attivare il tuo account e accedere.</div>
+    <button onclick="showAuth()" style="width:100%;padding:13px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-weight:700;color:var(--text-2);cursor:pointer;">
+      &#8592; Torna al login
+    </button>
+  </div>
+</div>
+
+<!-- COMPLETA PROFILO -->
+<div id="completa-screen" class="full-screen">
+  <div style="text-align:center;margin-bottom:12px;">
+    <div style="font-size:24px;font-weight:900;color:#fff;">Benvenuto! &#127881;</div>
+    <div style="font-size:14px;color:rgba(255,255,255,.7);margin-top:4px;">Completa il tuo profilo per entrare</div>
+  </div>
+  <div class="completa-card">
+    <div onclick="cambiaFotoCompleta()" class="avatar-upload" id="avatar-completa">&#128247;</div>
+    <div class="avatar-upload-label" onclick="cambiaFotoCompleta()">Aggiungi foto profilo</div>
+    <input type="date" class="completa-input" id="c-nascita" placeholder="Data di nascita"/>
+    <input type="text" class="completa-input" id="c-citta" placeholder="Dove vivi? (es. Milano)" autocomplete="city"/>
+    <input type="text" class="completa-input" id="c-lavoro" placeholder="Ruolo / Professione (es. Chef, Barista, Cliente)" />
+    <div style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:10px;">I tuoi interessi &#128247;</div>
+    <div class="interessi-grid" id="interessi-grid">
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Cucina italiana')">&#127869; Cucina italiana</button>
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Ricette')">&#127859; Ricette</button>
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Vino')">&#127863; Vino</button>
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Pizza')">&#127829; Pizza</button>
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Sushi')">&#127843; Sushi</button>
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Street food')">&#127791; Street food</button>
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Pasticceria')">&#127874; Pasticceria</button>
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Cocktail')">&#127864; Cocktail</button>
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Fine dining')">&#127869; Fine dining</button>
+      <button class="interesse-btn" onclick="toggleInteresse(this,'Lavoro ristorazione')">&#128188; Lavoro</button>
+    </div>
+    <button class="completa-btn" onclick="salvaProfiloCompleto()">Entra nel social &#8594;</button>
+    <button class="skip-btn" onclick="saltaCompleta()">Salta per ora</button>
+  </div>
+</div>
+
 <!-- APP -->
 <div id="app-shell">
   <div class="top-bar">
@@ -213,22 +290,11 @@
   </div>
   <div id="page-content"></div>
   <nav class="bottom-nav">
-    <button class="nav-item active" data-page="home" onclick="navTo('home')">
-      <span class="nav-icon">&#127968;</span><span class="nav-label">Home</span>
-    </button>
-    <button class="nav-item" data-page="ricette" onclick="navTo('ricette')">
-      <span class="nav-icon">&#128104;&#8205;&#127859;</span><span class="nav-label">Ricette</span>
-    </button>
-    <button class="nav-item" data-page="pubblica" onclick="apriPubblica()" style="overflow:visible;">
-      <div class="nav-center-wrap">&#43;</div>
-      <span class="nav-label" style="margin-top:2px;">Pubblica</span>
-    </button>
-    <button class="nav-item" data-page="tessera" onclick="navTo('tessera')">
-      <span class="nav-icon">&#127915;</span><span class="nav-label">Tessera</span>
-    </button>
-    <button class="nav-item" data-page="profilo" onclick="navTo('profilo')">
-      <span class="nav-icon">&#128100;</span><span class="nav-label">Profilo</span>
-    </button>
+    <button class="nav-item active" data-page="home" onclick="navTo('home')"><span class="nav-icon">&#127968;</span><span class="nav-label">Home</span></button>
+    <button class="nav-item" data-page="ricette" onclick="navTo('ricette')"><span class="nav-icon">&#127859;</span><span class="nav-label">Ricette</span></button>
+    <button class="nav-item" data-page="pubblica" onclick="apriPubblica()" style="overflow:visible;"><div class="nav-center-wrap">&#43;</div><span class="nav-label" style="margin-top:2px;">Pubblica</span></button>
+    <button class="nav-item" data-page="tessera" onclick="navTo('tessera')"><span class="nav-icon">&#127915;</span><span class="nav-label">Tessera</span></button>
+    <button class="nav-item" data-page="profilo" onclick="navTo('profilo')"><span class="nav-icon">&#128100;</span><span class="nav-label">Profilo</span></button>
   </nav>
 </div>
 
@@ -259,17 +325,58 @@
   var SUPA_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0";
   var AZIENDA="b331365f-17db-4dda-aa2f-77a09427fe42";
   var supa=window.supabase.createClient(SUPA_URL,SUPA_ANON);
-  var ME=null,myReaz={},filtroAttivo="tutti",tipoSel=null,votoSel=0,uploadFile=null;
+  var ME=null,myReaz={},filtroAttivo="tutti",tipoSel=null,votoSel=0,uploadFile=null,avatarFileCompleta=null;
+  var interessiSelezionati=[];
 
   async function init(){
-    hide("initial-loader");
+    hideAll();
     var{data:{session}}=await supa.auth.getSession();
-    if(session){ME=session.user;showApp();return;}
+    if(session){
+      ME=session.user;
+      var profiloCompleto=await checkProfiloCompleto();
+      if(profiloCompleto)showApp();
+      else showCompleta();
+      return;
+    }
     showAuth();
-    supa.auth.onAuthStateChange(function(ev,sess){
-      if(ev==="SIGNED_IN"&&sess){ME=sess.user;showApp();}
-      else if(ev==="SIGNED_OUT"){ME=null;showAuth();}
+    supa.auth.onAuthStateChange(async function(ev,sess){
+      if(ev==="SIGNED_IN"&&sess){
+        ME=sess.user;
+        var ok=await checkProfiloCompleto();
+        if(ok)showApp();else showCompleta();
+      }else if(ev==="SIGNED_OUT"){ME=null;showAuth();}
     });
+  }
+
+  async function checkProfiloCompleto(){
+    if(!ME)return false;
+    var{data}=await supa.from("clienti_profilo").select("nome_completo,citta").eq("user_id",ME.id).maybeSingle();
+    return !!(data&&data.citta);
+  }
+
+  function hideAll(){
+    document.getElementById("initial-loader").style.display="none";
+    document.getElementById("auth-screen").classList.remove("active");
+    document.getElementById("conferma-screen").classList.remove("active");
+    document.getElementById("completa-screen").classList.remove("active");
+    document.getElementById("app-shell").style.display="none";
+  }
+
+  window.showAuth=function(){hideAll();document.getElementById("auth-screen").classList.add("active");};
+  function showConferma(email){hideAll();document.getElementById("conferma-screen").classList.add("active");document.getElementById("conferma-email-txt").innerHTML="Abbiamo inviato un link di conferma a:<br><strong>"+esc(email)+"</strong>";}
+  function showCompleta(){hideAll();document.getElementById("completa-screen").classList.add("active");}
+  function showApp(){
+    hideAll();
+    document.getElementById("app-shell").style.display="flex";
+    aggiornaTopAvatar();
+    navTo("home");
+  }
+
+  function aggiornaTopAvatar(){
+    var av=document.getElementById("top-av");
+    if(!av)return;
+    var nome=(ME&&ME.user_metadata&&ME.user_metadata.nome_completo)||"";
+    if(nome)av.textContent=nome.charAt(0).toUpperCase();
   }
 
   window.switchTab=function(tab,btn){
@@ -277,45 +384,98 @@
     btn.classList.add("active");
     document.getElementById("form-login").style.display=tab==="login"?"block":"none";
     document.getElementById("form-register").style.display=tab==="register"?"block":"none";
-    hide("auth-error");
+    var msg=document.getElementById("auth-msg");msg.style.display="none";
   };
+
+  function showMsg(txt,ok){
+    var el=document.getElementById("auth-msg");
+    el.textContent=txt;
+    el.className="auth-error "+(ok?"ok":"err");
+    el.style.display="block";
+  }
 
   window.doLogin=async function(){
     var email=val("login-email"),pwd=val("login-pwd");
-    if(!email||!pwd){showErr("Inserisci email e password");return;}
+    if(!email||!pwd){showMsg("Inserisci email e password");return;}
     var btn=document.querySelector("#form-login .auth-btn");
     if(btn){btn.textContent="...";btn.disabled=true;}
     var{error}=await supa.auth.signInWithPassword({email,password:pwd});
     if(btn){btn.textContent="Entra \u2192";btn.disabled=false;}
-    if(error)showErr(error.message==="Invalid login credentials"?"Email o password errati":error.message);
+    if(error)showMsg(error.message==="Invalid login credentials"?"Email o password errati":error.message);
   };
 
   window.doRegister=async function(){
     var nome=val("reg-nome"),email=val("reg-email"),tel=val("reg-tel"),pwd=val("reg-pwd");
-    if(!nome||!email||!pwd){showErr("Compila tutti i campi");return;}
-    if(pwd.length<6){showErr("Password minimo 6 caratteri");return;}
+    if(!nome||!email||!pwd){showMsg("Compila tutti i campi");return;}
+    if(pwd.length<6){showMsg("Password minimo 6 caratteri");return;}
     var btn=document.querySelector("#form-register .auth-btn");
     if(btn){btn.textContent="...";btn.disabled=true;}
-    var{data,error}=await supa.auth.signUp({email,password:pwd,options:{data:{nome_completo:nome,telefono:tel}}});
+    var{data,error}=await supa.auth.signUp({
+      email,password:pwd,
+      options:{
+        emailRedirectTo:"https://social.ristoflow-ai.com",
+        data:{nome_completo:nome,telefono:tel}
+      }
+    });
     if(btn){btn.textContent="Crea account \u2192";btn.disabled=false;}
-    if(error){showErr(error.message);return;}
-    if(data.user)try{await supa.from("clienti_profilo").upsert({user_id:data.user.id,nome_completo:nome,email,telefono:tel},{onConflict:"user_id"});}catch(e){}
-    showErr("\u2705 Account creato! Puoi accedere adesso.");
+    if(error){showMsg(error.message);return;}
+    // Salva profilo base
+    if(data.user){
+      try{await supa.from("clienti_profilo").upsert({user_id:data.user.id,nome_completo:nome,email,telefono:tel},{onConflict:"user_id"});}catch(e){}
+    }
+    showConferma(email);
   };
 
-  function showErr(m){var e=document.getElementById("auth-error");if(e){e.textContent=m;e.style.display="block";}}
-  function showAuth(){hide("app-shell");show("auth-screen","flex");}
-  window.showAuth=showAuth;
   window.doLogout=async function(){await supa.auth.signOut();};
 
-  function showApp(){
-    hide("auth-screen");show("app-shell","flex");
-    var av=document.getElementById("top-av");
-    var nome=(ME&&ME.user_metadata&&ME.user_metadata.nome_completo)||"";
-    if(av&&nome)av.textContent=nome.charAt(0).toUpperCase();
-    navTo("home");
-  }
+  // COMPLETA PROFILO
+  window.cambiaFotoCompleta=function(){
+    var i=document.createElement("input");i.type="file";i.accept="image/*";
+    i.onchange=function(e){
+      var f=e.target.files[0];if(!f)return;
+      avatarFileCompleta=f;
+      var av=document.getElementById("avatar-completa");
+      var url=URL.createObjectURL(f);
+      av.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>';
+    };
+    i.click();
+  };
 
+  window.toggleInteresse=function(btn,nome){
+    btn.classList.toggle("sel");
+    if(btn.classList.contains("sel")){
+      if(!interessiSelezionati.includes(nome))interessiSelezionati.push(nome);
+    }else{
+      interessiSelezionati=interessiSelezionati.filter(function(i){return i!==nome;});
+    }
+  };
+
+  window.salvaProfiloCompleto=async function(){
+    if(!ME)return;
+    var citta=val("c-citta"),nascita=val("c-nascita"),lavoro=val("c-lavoro");
+    var btn=document.querySelector("#completa-screen .completa-btn");
+    if(btn){btn.textContent="Salvataggio...";btn.disabled=true;}
+    var avatarUrl=null;
+    if(avatarFileCompleta){
+      var ext=avatarFileCompleta.name.split(".").pop().toLowerCase();
+      var path="avatar/"+ME.id+"."+ext;
+      var{error:upErr}=await supa.storage.from("profili").upload(path,avatarFileCompleta,{cacheControl:"3600",upsert:true});
+      if(!upErr){var{data:ud}=supa.storage.from("profili").getPublicUrl(path);avatarUrl=ud.publicUrl;}
+    }
+    var payload={user_id:ME.id,citta:citta||" ",data_nascita:nascita||null,bio:lavoro||null,interessi:interessiSelezionati.length?JSON.stringify(interessiSelezionati):null};
+    if(avatarUrl)payload.avatar_url=avatarUrl;
+    await supa.from("clienti_profilo").upsert(payload,{onConflict:"user_id"});
+    if(btn){btn.textContent="Entra nel social \u2192";btn.disabled=false;}
+    showApp();
+  };
+
+  window.saltaCompleta=async function(){
+    if(!ME)return;
+    await supa.from("clienti_profilo").upsert({user_id:ME.id,citta:" "},{onConflict:"user_id"});
+    showApp();
+  };
+
+  // ROUTER
   window.navTo=function(page){
     document.querySelectorAll(".nav-item").forEach(function(b){b.classList.toggle("active",b.dataset.page===page);});
     var c=document.getElementById("page-content");c.scrollTop=0;
@@ -332,9 +492,7 @@
     var h='<div class="pb-nav">';
     h+='<div class="storie-wrap"><div class="storie-strip">';
     h+='<div class="storia-item" onclick="apriPubblica(\'storia\')"><div class="storia-add-ring"><div class="storia-add-inner">+</div></div><div class="storia-label">La tua</div></div>';
-    ["Campo Antico","Trattoria","Catering"].forEach(function(n){
-      h+='<div class="storia-item"><div class="storia-ring"><div class="storia-inner">&#127869;&#65039;</div></div><div class="storia-label">'+esc(n)+'</div></div>';
-    });
+    ["Campo Antico","Trattoria","Catering"].forEach(function(n){h+='<div class="storia-item"><div class="storia-ring"><div class="storia-inner">&#127869;&#65039;</div></div><div class="storia-label">'+esc(n)+'</div></div>';});
     h+='</div></div>';
     var filtri=[{s:"tutti",i:"&#127968;",l:"Feed"},{s:"esperienze",i:"&#128247;",l:"Momenti"},{s:"ricette",i:"&#127859;",l:"Ricette"},{s:"recensioni",i:"&#11088;",l:"Recensioni"},{s:"offerte",i:"&#127873;",l:"Offerte"},{s:"lavoro",i:"&#128188;",l:"Lavoro"}];
     h+='<div class="filtri-wrap"><div class="filtri-strip">';
@@ -434,9 +592,7 @@
     cc.forEach(function(c){
       var nome=(c.clienti_profilo&&c.clienti_profilo.nome_completo)||"Anonimo";
       h+='<div class="commento-row"><div class="commento-av">'+esc(nome.charAt(0).toUpperCase())+'</div>';
-      h+='<div class="commento-bubble"><div class="commento-nome">'+esc(nome)+'</div>';
-      h+='<div class="commento-testo">'+esc(c.testo)+'</div>';
-      h+='<div class="commento-data">'+formatData(c.created_at)+'</div></div></div>';
+      h+='<div class="commento-bubble"><div class="commento-nome">'+esc(nome)+'</div><div class="commento-testo">'+esc(c.testo)+'</div><div class="commento-data">'+formatData(c.created_at)+'</div></div></div>';
     });
     items.innerHTML=h;
   }
@@ -475,24 +631,20 @@
   function buildForm(tipo){
     var h='<button class="back-btn" onclick="document.getElementById(\'step-tipo\').style.display=\'block\';document.getElementById(\'step-form\').style.display=\'none\'">&#8592; Cambia tipo</button>';
     if(tipo==="esperienza"||tipo==="storia"){
-      var punti=tipo==="storia"?50:30;
       h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:36px;margin-bottom:6px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand)">Aggiungi foto o video</div></div>';
-      h+='<div id="preview-wrap"></div>';
-      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza..."></textarea>';
+      h+='<div id="preview-wrap"></div><textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza..."></textarea>';
       h+='<button class="pub-btn" onclick="pubblica(\''+tipo+'\')">Pubblica</button>';
     }else if(tipo==="ricetta"){
       h+='<input class="pub-input" id="pub-titolo" placeholder="Nome della ricetta"/>';
       h+='<textarea class="pub-textarea" id="pub-ingredienti" placeholder="Ingredienti (uno per riga)" style="min-height:80px"></textarea>';
       h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Procedimento..."></textarea>';
       h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:28px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand);margin-top:4px">Foto del piatto</div></div>';
-      h+='<div id="preview-wrap"></div>';
-      h+='<button class="pub-btn" onclick="pubblica(\'ricetta\')">Pubblica ricetta</button>';
+      h+='<div id="preview-wrap"></div><button class="pub-btn" onclick="pubblica(\'ricetta\')">Pubblica ricetta</button>';
     }else if(tipo==="recensione"){
       h+='<div style="font-size:14px;font-weight:700;margin-bottom:10px">Il tuo voto</div>';
       h+='<div class="stella-sel" id="stella-sel">';
       for(var i=1;i<=5;i++)h+='<span data-v="'+i+'" onclick="setVoto('+i+')">&#11088;</span>';
-      h+='</div>';
-      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza..."></textarea>';
+      h+='</div><textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza..."></textarea>';
       h+='<div style="font-size:12px;color:var(--text-3);margin-bottom:12px">&#10003; Verificata tramite visita registrata</div>';
       h+='<button class="pub-btn" onclick="pubblica(\'recensione\')">Pubblica recensione</button>';
     }else if(tipo==="lavoro"){
@@ -509,8 +661,7 @@
       h+='<input class="pub-input" id="pub-titolo" placeholder="Titolo offerta (es. -20% su tutti i secondi)"/>';
       h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Descrivi l\'offerta: validita, condizioni..."></textarea>';
       h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:28px">&#128247;</div><div style="font-size:13px;font-weight:700;color:var(--brand);margin-top:4px">Aggiungi foto</div></div>';
-      h+='<div id="preview-wrap"></div>';
-      h+='<button class="pub-btn" onclick="pubblica(\'offerta\')">Pubblica offerta</button>';
+      h+='<div id="preview-wrap"></div><button class="pub-btn" onclick="pubblica(\'offerta\')">Pubblica offerta</button>';
     }
     return h;
   }
@@ -551,8 +702,7 @@
       var{error:upErr}=await supa.storage.from("social-media").upload(path,uploadFile,{cacheControl:"3600",upsert:false});
       if(upErr){alert("Errore upload: "+upErr.message);return;}
       var{data:urlData}=supa.storage.from("social-media").getPublicUrl(path);
-      mediaUrl=urlData.publicUrl;
-      uploadFile=null;
+      mediaUrl=urlData.publicUrl;uploadFile=null;
     }
     var payload={user_id:ME.id,testo:testoCompleto||" ",tipo:tipo,categoria:cat,visibile:true,punti_assegnati:punti,azienda_id:AZIENDA};
     if(mediaUrl)payload.media_url=mediaUrl;
@@ -575,35 +725,30 @@
     }else{
       h+='<div class="ricette-grid">';
       ricette.forEach(function(r){
-        var autore=r.nome_completo||"Anonimo";
         var titolo=r.testo?r.testo.split("\n")[0].substring(0,40):"Ricetta";
         h+='<div class="ricetta-card">';
         if(r.media_url)h+='<img class="ricetta-img" src="'+esc(r.media_url)+'" loading="lazy" style="display:block"/>';
         else h+='<div class="ricetta-img">&#127837;</div>';
-        h+='<div class="ricetta-body"><div class="ricetta-nome">'+esc(titolo)+'</div>';
-        h+='<div class="ricetta-meta">di '+esc(autore)+'</div>';
-        h+='<div class="ricetta-tag">Ricetta</div></div></div>';
+        h+='<div class="ricetta-body"><div class="ricetta-nome">'+esc(titolo)+'</div><div class="ricetta-meta">di '+(r.nome_completo||"Anonimo")+'</div><div class="ricetta-tag">Ricetta</div></div></div>';
       });
       h+='</div>';
     }
-    h+='</div>';
-    c.innerHTML=h;
+    h+='</div>';c.innerHTML=h;
   }
 
   function renderTessera(c){
     if(!ME){showAuth();return;}
-    c.innerHTML='<div class="pb-nav"><div style="padding:16px"><div style="font-size:22px;font-weight:900">&#127915; Tessera Fidelity</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">I tuoi punti e premi</div></div><div id="tessera-content"><div class="page-loader"><div class="spinner"></div></div></div></div>';
+    c.innerHTML='<div class="pb-nav"><div style="padding:16px"><div style="font-size:22px;font-weight:900">&#127915; Tessera Fidelity</div></div><div id="tessera-content"><div class="page-loader"><div class="spinner"></div></div></div></div>';
     caricaTessera();
   }
   async function caricaTessera(){
-    var el=document.getElementById("tessera-content");
-    if(!el)return;
+    var el=document.getElementById("tessera-content");if(!el)return;
     var{data:profilo}=await supa.from("clienti_profilo").select("*").eq("user_id",ME.id).maybeSingle();
     var punti=(profilo&&profilo.punti_totali)||0;
     var livello="Bronzo";if(punti>=5000)livello="Oro";else if(punti>=2000)livello="Argento";
     var nome=(ME&&ME.user_metadata&&ME.user_metadata.nome_completo)||"Cliente";
     var h='<div style="background:linear-gradient(135deg,#0E5A7A,#1a8fb5);margin:0 16px;border-radius:24px;padding:24px;color:#fff;box-shadow:0 8px 32px rgba(14,90,122,.3);position:relative">';
-    h+='<div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:4px">Campo Antico Ricevimenti</div>';
+    h+='<div style="font-size:13px;font-weight:700;opacity:.8;margin-bottom:4px">Rete Ristoflow</div>';
     h+='<div style="font-size:22px;font-weight:800;margin-bottom:16px">'+esc(nome)+'</div>';
     h+='<div style="font-size:11px;font-weight:700;opacity:.7;text-transform:uppercase;letter-spacing:.06em">Punti</div>';
     h+='<div style="font-size:48px;font-weight:800;line-height:1">'+punti+'</div>';
@@ -613,8 +758,7 @@
     [{i:"&#128247;",t:"Pubblica una storia",p:"+50 pt"},{i:"&#127859;",t:"Condividi una ricetta",p:"+80 pt"},{i:"&#11088;",t:"Scrivi una recensione",p:"+100 pt"},{i:"&#128101;",t:"Porta un amico",p:"+150 pt"}].forEach(function(m){
       h+='<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f6fa"><span style="font-size:24px">'+m.i+'</span><span style="flex:1;font-size:14px;font-weight:600">'+m.t+'</span><span style="background:#e8f4f8;color:#0E5A7A;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:800">'+m.p+'</span></div>';
     });
-    h+='</div></div>';
-    el.innerHTML=h;
+    h+='</div></div>';el.innerHTML=h;
   }
 
   async function renderProfilo(c){
@@ -631,18 +775,19 @@
     var storie=(profilo&&profilo.storie_pubblicate)||0;
     var views=(profilo&&profilo.views_totali)||0;
     var avatarUrl=(profilo&&profilo.avatar_url)||"";
+    var bio=(profilo&&profilo.bio)||"";
     var livello="Bronzo",nextLiv=2000,nextNome="Argento";
     if(tot>=5000){livello="Oro";nextLiv=10000;nextNome="Platinum";}
     else if(tot>=2000){livello="Argento";nextLiv=5000;nextNome="Oro";}
     var pct=Math.min(100,Math.round((tot/nextLiv)*100));
     var livIco={"Bronzo":"&#129355;","Argento":"&#129354;","Oro":"&#129353;","Platinum":"&#128142;"}[livello]||"";
-    var h='<div class="pb-nav">';
-    h+='<div class="profilo-hero">';
-    h+='<div class="profilo-av" onclick="cambiaFotoProfilo()" style="cursor:pointer">';
-    if(avatarUrl)h+='<img src="'+esc(avatarUrl)+'" style="width:100%;height:100%;object-fit:cover"/>';
+    var h='<div class="pb-nav"><div class="profilo-hero">';
+    h+='<div class="profilo-av" onclick="cambiaFotoProfilo()">';
+    if(avatarUrl)h+='<img src="'+esc(avatarUrl)+'"/>';
     else h+=esc(nome.charAt(0).toUpperCase());
     h+='</div>';
     h+='<div class="profilo-nome-el">'+esc(nome)+'</div>';
+    if(bio)h+='<div class="profilo-bio-el">'+esc(bio)+'</div>';
     h+='<div class="profilo-email-el">'+esc(email)+'</div>';
     h+='<div class="profilo-livello-badge">'+livIco+' '+livello+'</div>';
     h+='<button onclick="apriModificaProfilo()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.2);border:none;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer">Modifica</button>';
@@ -657,13 +802,12 @@
     h+='<div class="punti-bar-track"><div class="punti-bar-fill" style="width:'+pct+'%"></div></div>';
     h+='<div class="punti-next-label">Ancora '+Math.max(0,nextLiv-tot)+' punti per '+nextNome+'</div></div>';
     var menuItems=[{icon:"&#127915;",text:"Tessera fidelity",fn:"navTo('tessera')"},{icon:"&#128247;",text:"I miei post",fn:""},{icon:"&#11088;",text:"Le mie recensioni",fn:""}];
-    var menuSupp=[{icon:"&#128172;",text:"Contattaci su WhatsApp",fn:""},{icon:"&#128274;",text:"Privacy e dati",fn:""}];
     h+='<div class="profilo-menu"><div class="menu-group-title">Il mio account</div>';
     menuItems.forEach(function(m){h+='<div class="menu-row"'+(m.fn?' onclick="'+m.fn+'"':'')+'>'+
       '<div class="menu-row-icon">'+m.icon+'</div><div class="menu-row-text">'+m.text+'</div><div class="menu-row-arrow">&#8250;</div></div>';});
     h+='<div class="menu-group-title" style="margin-top:8px">Supporto</div>';
-    menuSupp.forEach(function(m){h+='<div class="menu-row"'+(m.fn?' onclick="'+m.fn+'"':'')+'>'+
-      '<div class="menu-row-icon">'+m.icon+'</div><div class="menu-row-text">'+m.text+'</div><div class="menu-row-arrow">&#8250;</div></div>';});
+    h+='<div class="menu-row"><div class="menu-row-icon">&#128172;</div><div class="menu-row-text">Contattaci su WhatsApp</div><div class="menu-row-arrow">&#8250;</div></div>';
+    h+='<div class="menu-row"><div class="menu-row-icon">&#128274;</div><div class="menu-row-text">Privacy e dati</div><div class="menu-row-arrow">&#8250;</div></div>';
     h+='</div><button class="logout-btn" onclick="doLogout()">Esci dall\'account</button></div>';
     c.innerHTML=h;
   }
@@ -671,7 +815,7 @@
   window.apriModificaProfilo=async function(){
     if(!ME)return;
     var{data:profilo}=await supa.from("clienti_profilo").select("*").eq("user_id",ME.id).maybeSingle();
-    var nomeCompleto=(profilo&&profilo.nome_completo)||(ME.user_metadata&&ME.user_metadata.nome_completo)||"";
+    var nomeC=(profilo&&profilo.nome_completo)||(ME.user_metadata&&ME.user_metadata.nome_completo)||"";
     var bio=(profilo&&profilo.bio)||"";
     var citta=(profilo&&profilo.citta)||"";
     var tel=(profilo&&profilo.telefono)||(ME.user_metadata&&ME.user_metadata.telefono)||"";
@@ -679,8 +823,8 @@
     var sheet=document.getElementById("modal-sheet");
     document.getElementById("modal-pubblica").classList.add("open");
     sheet.innerHTML='<div class="modal-handle"></div><div class="modal-title">Modifica profilo</div>'+
-      '<input class="pub-input" id="edit-nome" placeholder="Nome completo" value="'+esc(nomeCompleto)+'"/>'+
-      '<input class="pub-input" id="edit-bio" placeholder="Bio" value="'+esc(bio)+'"/>'+
+      '<input class="pub-input" id="edit-nome" placeholder="Nome completo" value="'+esc(nomeC)+'"/>'+
+      '<input class="pub-input" id="edit-bio" placeholder="Bio / Ruolo" value="'+esc(bio)+'"/>'+
       '<input class="pub-input" id="edit-citta" placeholder="Citta" value="'+esc(citta)+'"/>'+
       '<input class="pub-input" id="edit-tel" placeholder="Telefono WhatsApp" value="'+esc(tel)+'" type="tel"/>'+
       '<select class="pub-input" id="edit-ruolo">'+
@@ -698,10 +842,9 @@
     if(!nome){alert("Inserisci il tuo nome");return;}
     var btn=document.querySelector("#modal-sheet .pub-btn");
     if(btn){btn.textContent="Salvataggio...";btn.disabled=true;}
-    var{error}=await supa.from("clienti_profilo").upsert({user_id:ME.id,nome_completo:nome,bio,citta,telefono:tel,tipo_utente:ruolo,email:ME.email},{onConflict:"user_id"});
-    if(btn){btn.textContent="Salva profilo";btn.disabled=false;}
-    if(error){alert("Errore: "+error.message);return;}
+    await supa.from("clienti_profilo").upsert({user_id:ME.id,nome_completo:nome,bio,citta:citta||" ",telefono:tel,tipo_utente:ruolo,email:ME.email},{onConflict:"user_id"});
     await supa.auth.updateUser({data:{nome_completo:nome,telefono:tel}});
+    if(btn){btn.textContent="Salva profilo";btn.disabled=false;}
     document.getElementById("modal-pubblica").classList.remove("open");
     navTo("profilo");
   };
@@ -713,9 +856,9 @@
       var ext=f.name.split(".").pop().toLowerCase();
       var path="avatar/"+ME.id+"."+ext;
       var{error:upErr}=await supa.storage.from("profili").upload(path,f,{cacheControl:"3600",upsert:true});
-      if(upErr){alert("Errore upload foto: "+upErr.message);return;}
-      var{data:urlData}=supa.storage.from("profili").getPublicUrl(path);
-      await supa.from("clienti_profilo").upsert({user_id:ME.id,avatar_url:urlData.publicUrl},{onConflict:"user_id"});
+      if(upErr){alert("Errore: "+upErr.message);return;}
+      var{data:ud}=supa.storage.from("profili").getPublicUrl(path);
+      await supa.from("clienti_profilo").upsert({user_id:ME.id,avatar_url:ud.publicUrl},{onConflict:"user_id"});
       navTo("profilo");
     };
     i.click();
