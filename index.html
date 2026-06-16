@@ -637,7 +637,12 @@
 
   async function init(){
     hideAll();
-    var{data:{session}}=await supa.auth.getSession();
+    var sessionResult=await supa.auth.getSession();
+    if(sessionResult.error){
+      await supa.auth.signOut();
+      showAuth();return;
+    }
+    var{data:{session}}=sessionResult;
     if(session){
       ME=session.user;window._socialME=ME;
       var profiloCompleto=await checkProfiloCompleto();
