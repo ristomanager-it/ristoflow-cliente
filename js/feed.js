@@ -247,18 +247,36 @@
   };
 
   // ── RENDER FEED ───────────────────────────────────────────────────────────────
+  var _seguiti = {};  // user_id → true per chi seguo
+
   window.renderFeed = async function(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
     var ME=window._ME;
 
-    var q=supa.from("v_social_feed").select("*").eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(20);
+    // Carica chi seguo
+    _seguiti = {};
+    if(ME){
+      var{data:fw}=await supa.from("social_follower").select("following_id").eq("follower_id",ME.id);
+      (fw||[]).forEach(function(r){_seguiti[r.following_id]=true;});
+    }
+
+    // Feed personalizzato: prima i seguiti, poi gli altri
+    var q=supa.from("v_social_feed").select("*").eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(40);
     if(filtroAttivo!=="tutti") q=q.eq("categoria",filtroAttivo);
 
-    var [{data:posts},{data:reaz}]=await Promise.all([
+    var [{data:allPosts},{data:reaz}]=await Promise.all([
       q,
       ME?supa.from("social_reactions").select("post_id,emoji").eq("user_id",ME.id):{data:[]}
     ]);
     if(reaz) reaz.forEach(function(r){myReaz[r.post_id]=r.emoji;});
+
+    // Ordina: seguiti prima, poi gli altri (max 20 totali)
+    var seguiti=[], altri=[];
+    (allPosts||[]).forEach(function(p){
+      if(ME&&_seguiti[p.user_id]) seguiti.push(p);
+      else altri.push(p);
+    });
+    var posts=seguiti.concat(altri).slice(0,20);
 
     var h='<div class="pb-nav">';
 
@@ -298,14 +316,19 @@
         h+='<div class="feed-post" id="post-'+p.id+'">';
 
         // Header post
+                var isFollowed=_seguiti[p.user_id]||false;
         h+='<div class="post-header">';
-        h+='<div class="post-avatar">'+esc(autore.charAt(0).toUpperCase())+'</div>';
-        h+='<div class="post-meta"><div class="post-nome">'+esc(autore)+'</div>';
+        h+='<div class="post-avatar" onclick="apriProfiloUtente(\''+( p.user_id||'')+'\')" style="cursor:pointer">'+esc(autore.charAt(0).toUpperCase())+'</div>';
+        h+='<div class="post-meta">';
+        h+='<div class="post-nome">'+esc(autore)+'</div>';
         h+='<div class="post-sub">'+formatData(p.created_at);
         if(locale) h+=' · <span class="badge badge-locale">📍 '+esc(locale)+'</span>';
         if(p.tipo_utente==="titolare") h+=' <span class="badge badge-titolare">🏛 Titolare</span>';
         h+='</div></div>';
-        // Tre puntini solo su propri post
+        if(!isMine && p.user_id){
+          var sfollowed=_seguiti[p.user_id]||false;
+          h+='<button id="segui-btn-'+esc(p.user_id)+'" onclick="toggleSeguiPost(\''+esc(p.user_id)+'\',this)" style="'+(sfollowed?'background:var(--brand);color:#fff;border:none':'background:#fff;color:var(--brand);border:1.5px solid var(--brand)')+';border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">'+(sfollowed?'✓ Segui':'+ Segui')+'</button>';
+        }
         if(isMine) h+='<div onclick="apriPostMenu(event,\''+p.id+'\')" style="font-size:20px;color:var(--text-3);cursor:pointer;padding:4px 8px;line-height:1">···</div>';
         h+='</div>';
 
@@ -352,6 +375,79 @@
         if(el&&count>0) el.textContent=count+" commenti";
       });
     }
+  };
+
+
+  window.toggleSeguiPost = async function(targetId, btn){
+    if(!window._ME){window.showAuth();return;}
+    if(!targetId||targetId==="undefined"||targetId===window._ME.id) return;
+    var seguito=_seguiti[targetId]||false;
+    if(seguito){
+      await supa.from("social_follower").delete().eq("follower_id",window._ME.id).eq("following_id",targetId);
+      _seguiti[targetId]=false;
+      // Aggiorna tutti i bottoni segui per questo utente
+      document.querySelectorAll("#segui-btn-"+targetId).forEach(function(b){
+        b.textContent="+ Segui";b.style.background="#fff";b.style.color="var(--brand)";b.style.border="1.5px solid var(--brand)";
+      });
+    } else {
+      await supa.from("social_follower").insert({follower_id:window._ME.id,following_id:targetId});
+      _seguiti[targetId]=true;
+      document.querySelectorAll("#segui-btn-"+targetId).forEach(function(b){
+        b.textContent="✓ Segui";b.style.background="var(--brand)";b.style.color="#fff";b.style.border="none";
+      });
+    }
+  };
+
+  window.apriProfiloUtente = async function(userId, nome){
+    if(!userId||userId==="undefined") return;
+    var c=document.getElementById("page-content");
+    c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
+    var [{data:profilo},{data:postUtente}]=await Promise.all([
+      supa.from("clienti_profilo").select("*").eq("user_id",userId).maybeSingle(),
+      supa.from("social_post").select("id,testo,media_url,created_at,reaz_fuoco,reaz_applauso,reaz_cuore").eq("user_id",userId).eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(12)
+    ]);
+    var nomeProfilo=(profilo&&profilo.nome_completo)||nome||"Utente";
+    var avatar=(profilo&&profilo.avatar_url)||"";
+    var bio=(profilo&&profilo.bio)||"";
+    var punti=(profilo&&(profilo.punti_totali||0)+(profilo.punti_social||0))||0;
+    var livello=punti>=5000?"🥇 Oro":punti>=2000?"🥈 Argento":"🥉 Bronzo";
+    var isMe=window._ME&&userId===window._ME.id;
+    var isFollowed=_seguiti[userId]||false;
+
+    var h='<div class="pb-nav">';
+    h+='<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border-bottom:1px solid var(--border)">';
+    h+='<button onclick="navTo(\'scopri\')" style="background:none;border:none;font-size:22px;cursor:pointer">←</button>';
+    h+='<div style="font-size:16px;font-weight:800;flex:1">'+esc(nomeProfilo)+'</div>';
+    if(!isMe){
+      var sfBtn=isFollowed?'background:var(--brand);color:#fff;border:none':'background:#fff;color:var(--brand);border:1.5px solid var(--brand)';
+      h+='<button id="segui-profilo-btn" onclick="toggleSeguiPost(\''+userId+'\',this)" style="'+sfBtn+';border-radius:999px;padding:7px 18px;font-size:13px;font-weight:700;cursor:pointer">'+(isFollowed?"✓ Segui":"+ Segui")+'</button>';
+    }
+    h+='</div>';
+    h+='<div style="background:linear-gradient(135deg,var(--brand),var(--brand-mid));padding:28px 20px 20px;text-align:center;color:#fff">';
+    h+='<div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px;overflow:hidden">';
+    h+=avatar?'<img src="'+esc(avatar)+'" style="width:100%;height:100%;object-fit:cover"/>':esc(nomeProfilo.charAt(0).toUpperCase());
+    h+='</div>';
+    h+='<div style="font-size:20px;font-weight:900">'+esc(nomeProfilo)+'</div>';
+    if(bio) h+='<div style="font-size:13px;opacity:.8;margin-top:4px">'+esc(bio)+'</div>';
+    h+='<div style="font-size:13px;margin-top:8px;opacity:.8">'+livello+' · '+punti+' punti</div>';
+    h+='</div>';
+    // Post dell'utente
+    h+='<div style="padding:16px 12px 8px"><div style="font-size:14px;font-weight:800;margin-bottom:12px">Post di '+esc(nomeProfilo)+'</div>';
+    if(!postUtente||postUtente.length===0){
+      h+='<div style="color:var(--text-3);font-size:13px;text-align:center;padding:24px">Nessun post ancora</div>';
+    } else {
+      h+='<div class="ricette-grid">';
+      postUtente.forEach(function(p){
+        h+='<div class="ricetta-card">';
+        if(p.media_url) h+='<img class="ricetta-img" src="'+esc(p.media_url)+'" loading="lazy" style="display:block"/>';
+        else h+='<div class="ricetta-img" style="display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text-3);padding:8px;text-align:center">'+esc((p.testo||"").substring(0,60))+'</div>';
+        h+='<div class="ricetta-body"><div class="ricetta-meta">'+new Date(p.created_at).toLocaleDateString("it-IT",{day:"2-digit",month:"short"})+'</div></div>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+    h+='</div></div>';
+    c.innerHTML=h;
   };
 
   // ── RICETTE ───────────────────────────────────────────────────────────────────
