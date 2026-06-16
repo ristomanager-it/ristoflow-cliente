@@ -14,7 +14,7 @@
     }catch(e){}
 
     var {data:sedi} = await supa.from("sedi")
-      .select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,attiva")
+      .select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,attiva,azienda_id,aziende(nome,logo_url,tipo_locale,colore_brand)")
       .eq("attiva",true).order("nome");
 
     // Calcola distanze
@@ -66,12 +66,15 @@
     sedi.forEach(function(s){
       var dest=encodeURIComponent((s.indirizzo||"")+" "+(s.citta||""));
       var mapUrl="https://www.google.com/maps/dir/?api=1&destination="+dest;
-      var dist=s._dist?('<span style="background:#e8f4f8;color:#0E5A7A;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700">📡 '+s._dist.toFixed(1)+' km</span>'):"";
+            var dist=s._dist?('<span style="background:#e8f4f8;color:#0E5A7A;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700">📡 '+s._dist.toFixed(1)+' km</span>'):"";
+      var az=s.aziende||{};
+      var coverImg=s.logo_url||az.logo_url||"";
       h+='<div class="locale-card">';
-      if(s.logo_url) h+='<img src="'+esc(s.logo_url)+'" style="width:100%;height:140px;object-fit:cover"/>';
+      if(coverImg) h+='<img src="'+esc(coverImg)+'" style="width:100%;height:140px;object-fit:cover"/>';
       else h+='<div class="locale-card-img">🍽️</div>';
       h+='<div class="locale-card-body">';
-      h+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px"><div class="locale-card-nome">'+esc(s.nome||"")+'</div>'+dist+'</div>';
+      h+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px"><div class="locale-card-nome">'+esc(s.nome||az.nome||"")+'</div>'+dist+'</div>';
+      if(az.tipo_locale) h+='<div style="font-size:11px;font-weight:700;color:var(--brand);margin-bottom:2px">'+esc(az.tipo_locale)+'</div>';
       if(s.indirizzo) h+='<div class="locale-card-tipo">'+esc(s.indirizzo)+(s.citta?" · "+esc(s.citta):"")+'</div>';
       h+='<div class="locale-card-actions">';
       h+='<a href="'+mapUrl+'" target="_blank" class="locale-action-btn primary">📍 Indicazioni</a>';
