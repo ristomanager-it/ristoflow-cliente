@@ -6,7 +6,7 @@
   <title>RistoflowBook</title>
   <link rel="manifest" href="/manifest.json"/>
   <meta name="theme-color" content="#0E5A7A"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <link rel="apple-touch-icon" href="/favicon-192.png"/>
   <link rel="icon" sizes="32x32" href="/favicon-32.png"/>
@@ -350,79 +350,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<div id="initial-loader" class="page-loader full"><div class="spinner"></div></div>
-<div id="auth-screen" class="full-screen">
-  <div style="text-align:center;margin-bottom:16px;">
-    <div style="display:inline-flex;align-items:center;gap:12px;margin-bottom:8px;">
-      <div style="width:52px;height:52px;background:rgba(255,255,255,.15);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;">&#127869;&#65039;</div>
-      <div style="font-size:30px;font-weight:900;letter-spacing:-1px;"><span style="color:#fff">Risto</span><span style="color:#00c896">flow</span><span style="color:#f97316">Book</span></div>
-    </div>
-    <div style="font-size:14px;color:rgba(255,255,255,.7);">Il social della ristorazione italiana.</div>
-  </div>
-  <div class="auth-card">
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchTab('login',this)">Accedi</button>
-      <button class="auth-tab" onclick="switchTab('register',this)">Registrati</button>
-    </div>
-    <div id="auth-msg" class="auth-error"></div>
-    <div id="form-login">
-      <input class="auth-input" type="email" id="login-email" placeholder="Email" autocomplete="email"/>
-      <input class="auth-input" type="password" id="login-pwd" placeholder="Password" autocomplete="current-password"/>
-      <button class="auth-btn" onclick="doLogin()">Entra &#8594;</button>
-    </div>
-    <div id="form-register" style="display:none;">
-      <input class="auth-input" type="text" id="reg-nome" placeholder="Nome e cognome" autocomplete="name"/>
-      <input class="auth-input" type="email" id="reg-email" placeholder="Email" autocomplete="email"/>
-      <input class="auth-input" type="tel" id="reg-tel" placeholder="Telefono WhatsApp" autocomplete="tel"/>
-      <input class="auth-input" type="password" id="reg-pwd" placeholder="Password (min 6 caratteri)" autocomplete="new-password"/>
-      <button class="auth-btn" onclick="doRegister()">Crea account &#8594;</button>
-    </div>
-  </div>
-</div>
-
-<!-- CONFERMA EMAIL -->
-
-<div id="conferma-screen" class="full-screen">
-  <div style="background:#fff;border-radius:24px;padding:32px;width:calc(100% - 40px);max-width:400px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.25);">
-    <div style="font-size:56px;margin-bottom:16px;">&#128231;</div>
-    <div style="font-size:20px;font-weight:900;margin-bottom:8px;">Controlla la tua email</div>
-    <div id="conferma-email-txt" style="font-size:14px;color:#64748b;line-height:1.6;margin-bottom:20px;">Abbiamo inviato un link di conferma.</div>
-    <button onclick="window.showAuth()" style="background:#0E5A7A;color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;">← Torna al login</button>
-  </div>
-</div>
-
-<div id="completa-screen" class="full-screen">
-  <div style="text-align:center;margin-bottom:12px;">
-    <div style="font-size:24px;font-weight:900;color:#fff;">Benvenuto! &#127881;</div>
-    <div style="font-size:14px;color:rgba(255,255,255,.7);margin-top:4px;">Completa il tuo profilo per entrare</div>
-  </div>
-  <div class="completa-card">
-    <div onclick="cambiaFotoCompleta()" class="avatar-upload" id="avatar-completa">&#128247;</div>
-    <div class="avatar-upload-label" onclick="cambiaFotoCompleta()">Aggiungi foto profilo</div>
-    <input type="date" class="completa-input" id="c-nascita" placeholder="Data di nascita"/>
-    <input type="text" class="completa-input" id="c-citta" placeholder="Dove vivi? (es. Milano)" autocomplete="city"/>
-    <input type="text" class="completa-input" id="c-lavoro" placeholder="Ruolo / Professione (es. Chef, Barista, Cliente)" />
-    <div style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:10px;">I tuoi interessi &#128247;</div>
-    <div class="interessi-grid" id="interessi-grid">
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Cucina italiana')">&#127869; Cucina italiana</button>
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Ricette')">&#127859; Ricette</button>
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Vino')">&#127863; Vino</button>
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Pizza')">&#127829; Pizza</button>
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Sushi')">&#127843; Sushi</button>
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Street food')">&#127791; Street food</button>
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Pasticceria')">&#127874; Pasticceria</button>
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Cocktail')">&#127864; Cocktail</button>
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Fine dining')">&#127869; Fine dining</button>
-      <button class="interesse-btn" onclick="toggleInteresse(this,'Lavoro ristorazione')">&#128188; Lavoro</button>
-    </div>
-    <button class="completa-btn" onclick="salvaProfiloCompleto()">Entra nel social &#8594;</button>
-    <button class="skip-btn" onclick="saltaCompleta()">Salta per ora</button>
-  </div>
-</div>
-
-<!-- APP -->
-
-
 
 <div id="initial-loader" class="page-loader full"><div class="spinner"></div>Caricamento...</div>
 
@@ -512,7 +439,7 @@
   <nav class="bottom-nav">
     <button class="nav-item active" data-page="scopri" onclick="navTo('scopri')"><span class="nav-icon">&#127968;</span><span class="nav-label">Scopri</span></button>
     <button class="nav-item" data-page="locali" onclick="navTo('locali')"><span class="nav-icon">&#128205;</span><span class="nav-label">Locali</span></button>
-    <button class="nav-item" data-page="pubblica" onclick="apriPubblica()" style="overflow:visible;"><div class="nav-center-wrap">&#43;</div><span class="nav-label" style="margin-top:2px;">Pubblica</span></button>
+    <button class="nav-item" data-page="pubblica" onclick="apriPubblica()" style="overflow:visible;"><div class="nav-center-wrap">&#43;</div><span class="nav-label" style="margin-top:2px">Pubblica</span></button>
     <button class="nav-item" data-page="tessera" onclick="navTo('tessera')"><span class="nav-icon">&#127915;</span><span class="nav-label">Tessera</span></button>
     <button class="nav-item" data-page="profilo" onclick="navTo('profilo')"><span class="nav-icon">&#128100;</span><span class="nav-label">Profilo</span></button>
   </nav>
@@ -616,7 +543,6 @@
         <button class="tipo-btn" onclick="scegliTipo('cerco-lavoro')"><span class="tipo-icon">&#128587;</span><span class="tipo-label">Cerco lavoro</span></button>
         <button class="tipo-btn" onclick="chiudiModale();setTimeout(apriEditorStoria,100)"><span class="tipo-icon">&#9200;&#65039;</span><span class="tipo-label">Storia 24h</span></button>
         <button class="tipo-btn" onclick="scegliTipo('offerta')"><span class="tipo-icon">&#127873;</span><span class="tipo-label">Offerta</span></button>
-        <button class="tipo-btn" onclick="chiudiModale();navTo('cultura')"><span class="tipo-icon">&#127859;</span><span class="tipo-label">Cultura</span></button>
       </div>
     </div>
     <div id="step-form" class="hidden"></div>
@@ -624,7 +550,6 @@
 </div>
 
 <script>
-
 (function(){
   var SUPA_URL="https://cuhcscpvhypoaplcmtjk.supabase.co";
   var SUPA_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGNzY3B2aHlwb2FwbGNtdGprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjY4MjgsImV4cCI6MjA3OTQwMjgyOH0.q9zAs0oh8F1-whtORHBIORF5jIn1NTS3LvSMWleP0a0";
@@ -637,12 +562,7 @@
 
   async function init(){
     hideAll();
-    var sessionResult=await supa.auth.getSession();
-    if(sessionResult.error){
-      await supa.auth.signOut();
-      showAuth();return;
-    }
-    var{data:{session}}=sessionResult;
+    var{data:{session}}=await supa.auth.getSession();
     if(session){
       ME=session.user;window._socialME=ME;
       var profiloCompleto=await checkProfiloCompleto();
@@ -663,15 +583,12 @@
   async function checkProfiloCompleto(){
     if(!ME)return false;
     try{
-      var timeoutP=new Promise(function(res){setTimeout(function(){res(null);},3000);});
-      var queryP=supa.from("clienti_profilo").select("nome_completo,citta").eq("user_id",ME.id).maybeSingle();
-      var result=await Promise.race([queryP,timeoutP]);
-      var data=result&&result.data!==undefined?result.data:result;
+      var t=new Promise(function(r){setTimeout(function(){r(null);},3000);});
+      var q=supa.from("clienti_profilo").select("nome_completo,citta").eq("user_id",ME.id).maybeSingle();
+      var res=await Promise.race([q,t]);
+      var data=res&&res.data!==undefined?res.data:res;
       return !!(data&&data.citta);
-    }catch(e){
-      console.warn("checkProfiloCompleto error:",e);
-      return true; // fallback: mostra app direttamente
-    }
+    }catch(e){return true;}
   }
 
   function hideAll(){
@@ -1503,39 +1420,63 @@
   }
 
 
-  // ── PRENOTA ──────────────────────────────────────────────────────────────────
-  async function renderPrenota(c){
+    async function renderPrenota(c){
     if(!ME){showAuth();return;}
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
-    var{data:sedi}=await supa.from("sedi").select("id,nome,indirizzo,latitudine,longitudine").eq("azienda_id",AZIENDA).eq("attiva",true).order("nome");
-    var h='<div class="pb-nav"><div style="padding:16px 16px 8px"><div style="font-size:22px;font-weight:900">&#128197; Prenota un tavolo</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">Scegli il locale e la data</div></div>';
-    if(!sedi||sedi.length===0){h+='<div class="empty-state"><div class="empty-icon">&#128197;</div><div class="empty-title">Nessun locale disponibile</div></div>';}
-    else{sedi.forEach(function(s){h+='<div class="locale-card" onclick="apriFormPrenotazione(\''+s.id+'\',\''+esc(s.nome)+'\')">'+'<div class="locale-card-body" style="padding:20px"><div class="locale-card-nome">'+esc(s.nome)+'</div><div class="locale-card-tipo">'+esc(s.indirizzo||'')+'</div>'+'<div style="margin-top:12px"><span style="background:var(--brand);color:#fff;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:700">&#128197; Prenota ora</span></div></div></div>';});}
-    h+='</div>';c.innerHTML=h;
+    var{data:sedi}=await supa.from("sedi").select("id,nome,indirizzo").eq("azienda_id",AZIENDA).eq("attiva",true).order("nome");
+    var wrap=document.createElement("div");wrap.className="pb-nav";
+    var hdr=document.createElement("div");hdr.style.cssText="padding:16px 16px 8px";
+    hdr.innerHTML='<div style="font-size:22px;font-weight:900">&#128197; Prenota un tavolo</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">Scegli il locale</div>';
+    wrap.appendChild(hdr);
+    if(!sedi||sedi.length===0){
+      var em=document.createElement("div");em.className="empty-state";
+      em.innerHTML='<div class="empty-icon">&#128197;</div><div class="empty-title">Nessun locale disponibile</div>';
+      wrap.appendChild(em);
+    }else{
+      sedi.forEach(function(s){
+        var card=document.createElement("div");card.className="locale-card";
+        card.style.cursor="pointer";
+        var body=document.createElement("div");body.className="locale-card-body";body.style.padding="20px";
+        var nome=document.createElement("div");nome.className="locale-card-nome";nome.textContent=s.nome||"";
+        var ind=document.createElement("div");ind.className="locale-card-tipo";ind.textContent=s.indirizzo||"";
+        var btn=document.createElement("div");btn.style.marginTop="12px";
+        btn.innerHTML='<span style="background:var(--brand);color:#fff;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:700">&#128197; Prenota ora</span>';
+        body.appendChild(nome);body.appendChild(ind);body.appendChild(btn);card.appendChild(body);
+        card.addEventListener("click",(function(id,n){return function(){apriFormPrenotazione(id,n);};})(s.id,s.nome));
+        wrap.appendChild(card);
+      });
+    }
+    c.innerHTML="";c.appendChild(wrap);
   }
   window.apriFormPrenotazione=function(sedeId,sedeNome){
-    var sheet=document.getElementById('modal-sheet');
-    document.getElementById('modal-pubblica').classList.add('open');
     var oggi=new Date().toISOString().split("T")[0];
-    var orari=['12:00','12:30','13:00','13:30','19:00','19:30','20:00','20:30','21:00','21:30'];
-    sheet.innerHTML='<div class="modal-handle"></div>'+'<div class="modal-title">&#128197; '+esc(sedeNome)+'</div>'+
-      '<input class="pub-input" id="pren-nome" placeholder="Nome e cognome" value="'+(ME&&ME.user_metadata&&ME.user_metadata.nome_completo?esc(ME.user_metadata.nome_completo):'')+'"/>'+
-      '<input class="pub-input" id="pren-tel" type="tel" placeholder="Telefono" value="'+(ME&&ME.user_metadata&&ME.user_metadata.telefono?esc(ME.user_metadata.telefono):'')+'"/>'+
-      '<input class="pub-input" id="pren-data" type="date" min="'+oggi+'"/>'+
-      '<select class="pub-input" id="pren-ora">'+orari.map(function(o){return'<option value="'+o+'">'+o+'</option>';}).join('')+'</select>'+
-      '<select class="pub-input" id="pren-coperti">'+[1,2,3,4,5,6,7,8].map(function(n){return'<option value="'+n+'">'+n+' '+(n===1?'persona':'persone')+'</option>';}).join('')+'</select>'+
-      '<textarea class="pub-textarea" id="pren-note" placeholder="Note speciali..." style="min-height:70px"></textarea>'+
-      '<button class="pub-btn" onclick="inviaPrenotazione(\''+sedeId+'\',\''+esc(sedeNome)+'\')">Conferma prenotazione</button>';
-  };
+    var orari=["12:00","12:30","13:00","13:30","19:00","19:30","20:00","20:30","21:00","21:30"];
+    var sheet=document.getElementById("modal-sheet");
+    var nomeV=(ME&&ME.user_metadata&&ME.user_metadata.nome_completo)||"";
+    var telV=(ME&&ME.user_metadata&&ME.user_metadata.telefono)||"";
+    sheet.innerHTML="";
+    var handle=document.createElement("div");handle.className="modal-handle";sheet.appendChild(handle);
+    var title=document.createElement("div");title.className="modal-title";title.textContent="Prenota - "+sedeNome;sheet.appendChild(title);
+    function addInput(id,type,placeholder,val){var i=document.createElement("input");i.className="pub-input";i.id=id;i.type=type||"text";i.placeholder=placeholder;if(val)i.value=val;sheet.appendChild(i);return i;}
+    addInput("pren-nome","text","Nome e cognome",nomeV);
+    addInput("pren-tel","tel","Telefono",telV);
+    addInput("pren-data","date","Data");document.getElementById("pren-data").min=oggi;
+    var sel=document.createElement("select");sel.className="pub-input";sel.id="pren-ora";orari.forEach(function(o){var op=document.createElement("option");op.value=o;op.textContent=o;sel.appendChild(op);});sheet.appendChild(sel);
+    var sel2=document.createElement("select");sel2.className="pub-input";sel2.id="pren-coperti";[1,2,3,4,5,6,7,8].forEach(function(n){var op=document.createElement("option");op.value=n;op.textContent=n+(n===1?" persona":" persone");sel2.appendChild(op);});sheet.appendChild(sel2);
+    var ta=document.createElement("textarea");ta.className="pub-textarea";ta.id="pren-note";ta.placeholder="Note speciali...";ta.style.minHeight="70px";sheet.appendChild(ta);
+    var btn=document.createElement("button");btn.className="pub-btn";btn.textContent="Conferma prenotazione";
+    btn.addEventListener("click",function(){inviaPrenotazione(sedeId,sedeNome);});sheet.appendChild(btn);
+    document.getElementById("modal-pubblica").classList.add("open");
+  }
   window.inviaPrenotazione=async function(sedeId,sedeNome){
-    var nome=val('pren-nome'),tel=val('pren-tel'),data=val('pren-data'),ora=(document.getElementById('pren-ora')||{}).value;
+    var nome=val('pren-nome'),tel=val('pren-tel'),data=val('pren-data');
+    var ora=(document.getElementById('pren-ora')||{}).value;
     var coperti=parseInt((document.getElementById('pren-coperti')||{}).value||2);
     var note=val('pren-note');
     if(!nome||!tel||!data){alert('Compila nome, telefono e data');return;}
     var btn=document.querySelector('#modal-sheet .pub-btn');
-    if(btn){btn.textContent='Prenotazione...';btn.disabled=true;}
-    var token=Math.random().toString(36).substring(2,10).toUpperCase();
-    var{error}=await supa.from('prenotazioni_tavoli').insert({azienda_id:AZIENDA,sede_id:sedeId,cliente_nome:nome,cliente_telefono:tel,data:data,ora:ora,coperti:coperti,note:note,stato:'confermata',canale:'rfbook',source:'rfbook',token_pubblico:token});
+    if(btn){btn.textContent='...';btn.disabled=true;}
+    var{error}=await supa.from('prenotazioni_tavoli').insert({azienda_id:AZIENDA,sede_id:sedeId,cliente_nome:nome,cliente_telefono:tel,data:data,ora:ora,coperti:coperti,note:note,stato:'confermata',canale:'rfbook',source:'rfbook',token_pubblico:Math.random().toString(36).substring(2,10).toUpperCase()});
     if(btn){btn.textContent='Conferma prenotazione';btn.disabled=false;}
     if(error){alert('Errore: '+error.message);return;}
     document.getElementById('modal-pubblica').classList.remove('open');
@@ -1544,39 +1485,47 @@
   async function renderCultura(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
     var{data:items}=await supa.from("rfbook_cultura").select("*").eq("visibile",true).order("created_at",{ascending:false}).limit(30);
-    var h='<div class="pb-nav"><div style="padding:16px 16px 8px"><div style="font-size:22px;font-weight:900">&#127859; Cultura & Ricette</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">Tradizioni, tecniche e segreti</div></div>';
-    if(!items||items.length===0){h+='<div class="empty-state"><div class="empty-icon">&#127859;</div><div class="empty-title">Presto i primi contenuti</div><div class="empty-sub">Ricette, tradizioni e storie della cucina italiana</div></div>';}
-    else{h+='<div class="ricette-grid">';items.forEach(function(r){var ico={ricetta:'&#127859;',tradizione:'&#127981;',tecnica:'&#127299;',storia:'&#128218;'}[r.tipo]||'&#127869;';h+='<div class="ricetta-card">'+(r.media_url?'<img class="ricetta-img" src="'+esc(r.media_url)+'" loading="lazy"/>':' <div class="ricetta-img" style="display:flex;align-items:center;justify-content:center;font-size:48px;background:#f0f6fa">'+ico+'</div>')+'<div class="ricetta-body"><div class="ricetta-nome">'+esc(r.titolo)+'</div>'+(r.regione?'<div class="ricetta-meta">&#128205; '+esc(r.regione)+'</div>':'')+'</div></div>';});h+='</div>';}
+    var h='<div class="pb-nav"><div style="padding:16px 16px 8px"><div style="font-size:22px;font-weight:900">&#127859; Cultura & Ricette</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">Tradizioni e segreti della cucina italiana</div></div>';
+    if(!items||items.length===0)h+='<div class="empty-state"><div class="empty-icon">&#127859;</div><div class="empty-title">Presto i primi contenuti</div></div>';
+    else{h+='<div class="ricette-grid">';items.forEach(function(r){var ico={ricetta:"&#127859;",tradizione:"&#127981;",tecnica:"&#127299;",storia:"&#128218;"}[r.tipo]||"&#127869;";h+='<div class="ricetta-card">'+(r.media_url?'<img class="ricetta-img" src="'+r.media_url+'" loading="lazy"/>':"<div class='ricetta-img' style='display:flex;align-items:center;justify-content:center;font-size:48px;background:#f0f6fa'>"+ico+"</div>")+'<div class="ricetta-body"><div class="ricetta-nome">'+r.titolo+'</div>'+(r.regione?'<div class="ricetta-meta">&#128205; '+r.regione+'</div>':"")+'</div></div>';});h+='</div>';}
     h+='</div>';c.innerHTML=h;
   }
   async function renderOfferte(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
-    var{data:offerte}=await supa.from("network_offerte").select("*,sedi(nome)").eq("attiva",true).order("created_at",{ascending:false});
-    var h='<div class="pb-nav"><div style="padding:16px 16px 8px"><div style="font-size:22px;font-weight:900">&#127873; Offerte & Sconti</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">Esclusive per iscritti RistoflowBook</div></div>';
-    if(!offerte||offerte.length===0){h+='<div class="empty-state"><div class="empty-icon">&#127873;</div><div class="empty-title">Nessuna offerta attiva</div><div class="empty-sub">Le offerte dei locali partner appariranno qui</div></div>';}
-    else{offerte.forEach(function(o){var sede=(o.sedi&&o.sedi.nome)||"";var discVal=o.tipo==="percentuale"?("-"+o.valore+"%"):o.tipo==="importo"?("-€"+o.valore):"";h+='<div style="background:#fff;border-radius:16px;margin:0 12px 12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)"><div style="background:linear-gradient(135deg,#0E5A7A,#00c896);padding:20px;color:#fff"><div style="font-size:11px;font-weight:700;opacity:.8;text-transform:uppercase">'+esc(sede)+'</div><div style="font-size:18px;font-weight:900;margin-top:4px">'+esc(o.titolo)+'</div>'+(discVal?'<div style="font-size:32px;font-weight:900;margin-top:6px">'+discVal+'</div>':'')+'</div><div style="padding:16px">'+(o.descrizione?'<div style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:10px">'+esc(o.descrizione)+'</div>':'')+'<div style="font-size:12px;color:var(--text-3)">Fino al '+esc(o.valida_al||'')+'</div><button onclick="navTo(\'prenota\')" style="margin-top:12px;background:var(--brand);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;width:100%">&#128197; Prenota ora</button></div></div>';});}
-    h+='</div>';c.innerHTML=h;
-  }
-  // Timeout sicurezza: se init() non risponde entro 5s, mostra login
-  var _initTimeout=setTimeout(function(){
-    var loader=document.getElementById("initial-loader");
-    if(loader&&loader.style.display!=="none"){
-      loader.style.display="none";
-      showAuth();
+    var{data:offerte}=await supa.from("network_offerte").select("id,titolo,descrizione,tipo,valore,valida_al,sedi(nome)").eq("attiva",true).order("created_at",{ascending:false});
+    var wrap=document.createElement("div");wrap.className="pb-nav";
+    var hdr=document.createElement("div");hdr.style.cssText="padding:16px 16px 8px";
+    hdr.innerHTML='<div style="font-size:22px;font-weight:900">&#127873; Offerte & Sconti</div>';
+    wrap.appendChild(hdr);
+    if(!offerte||offerte.length===0){
+      var em=document.createElement("div");em.className="empty-state";
+      em.innerHTML='<div class="empty-icon">&#127873;</div><div class="empty-title">Nessuna offerta attiva</div>';
+      wrap.appendChild(em);
+    }else{
+      offerte.forEach(function(o){
+        var card=document.createElement("div");
+        card.style.cssText="background:#fff;border-radius:16px;margin:0 12px 12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)";
+        var top=document.createElement("div");
+        top.style.cssText="background:linear-gradient(135deg,#0E5A7A,#00c896);padding:20px;color:#fff";
+        var h2=document.createElement("div");h2.style.cssText="font-size:18px;font-weight:900";h2.textContent=o.titolo||"";
+        top.appendChild(h2);
+        var body=document.createElement("div");body.style.padding="16px";
+        if(o.descrizione){var desc=document.createElement("div");desc.style.cssText="font-size:13px;color:#64748b;line-height:1.6;margin-bottom:10px";desc.textContent=o.descrizione;body.appendChild(desc);}
+        var btn=document.createElement("button");
+        btn.style.cssText="background:#0E5A7A;color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;width:100%";
+        btn.textContent="Prenota ora";btn.addEventListener("click",function(){navTo("prenota");});
+        body.appendChild(btn);card.appendChild(top);card.appendChild(body);wrap.appendChild(card);
+      });
     }
-  },5000);
-  init().then(function(){clearTimeout(_initTimeout);}).catch(function(e){
-    clearTimeout(_initTimeout);
-    console.error("init error:",e);
-    var loader=document.getElementById("initial-loader");
-    if(loader)loader.style.display="none";
-    showAuth();
-  });
+    c.innerHTML="";c.appendChild(wrap);
+  }
+  var _t=setTimeout(function(){var l=document.getElementById("initial-loader");if(l&&l.style.display!=="none"){l.style.display="none";showAuth();}},5000);
+  init().then(function(){clearTimeout(_t);}).catch(function(e){clearTimeout(_t);console.error(e);var l=document.getElementById("initial-loader");if(l)l.style.display="none";showAuth();});
 })();
-
 </script>
-<script>
 
+</html>
+<script>
 // ── INIEZIONE FUNZIONI AGGIUNTIVE ─────────────────────────────────────────────
 // Questo script si aggiunge dopo il main script e aggiunge le funzioni mancanti
 
@@ -1742,7 +1691,7 @@ window.eliminaPost=async function(postId){
   var supa=window._supa;if(!supa){console.warn("supa non pronto");return;}
   await supa.from("social_post").delete().eq("id",postId).eq("user_id",ME.id);
   chiudiPostMenu();
-  if(window.navTo)window.navTo("home");
+  if(window.navTo)window.navTo("scopri");
 };
 window.modificaPost=async function(postId){
   var ME=window._socialME;if(!ME)return;
@@ -1753,7 +1702,7 @@ window.modificaPost=async function(postId){
   if(nuovoTesto===null)return;
   await supa.from("social_post").update({testo:nuovoTesto||" "}).eq("id",postId).eq("user_id",ME.id);
   chiudiPostMenu();
-  if(window.navTo)window.navTo("home");
+  if(window.navTo)window.navTo("scopri");
 };
 
 // Event delegation per dots
@@ -1907,7 +1856,5 @@ window.inviaChatMsg=async function(){
   setTimeout(function(){clearInterval(check);},5000);
 })();
 
-
 </script>
 </body>
-</html>
