@@ -322,8 +322,9 @@
         // AZIONI: emoji a sx (tendina) + commenta a dx
         h+='<div class="post-actions">';
         // Bottone reazioni a tendina — lato sx
-                h+='<div id="act-reaz-'+p.id+'" style="position:relative;display:inline-flex">';
-        h+='<button class="action-btn'+(miaR?" liked":"")+" onclick="toggleReazMenu('"+p.id+"',event)" style="font-size:20px;padding:8px 10px;min-width:0">"+(miaR||"❤️")+"</button>';"
+                        h+='<div id="act-reaz-'+p.id+'" style="position:relative;display:inline-flex">';
+        var _reazIcon=miaR||"❤️";
+        h+='<button class="action-btn'+(miaR?" liked":"")+'" onclick="toggleReazMenu(\''+p.id+'\',event)" style="font-size:20px;padding:8px 10px;min-width:0">'+_reazIcon+'</button>';
         h+='</div>';
         // Bottone commenta — lato dx
         h+='<button class="action-btn" onclick="toggleCommenti('+p.id+')" style="margin-left:auto"><span class="act-icon">💬</span> Commenta</button>';
