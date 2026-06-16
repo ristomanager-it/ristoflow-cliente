@@ -662,8 +662,16 @@
 
   async function checkProfiloCompleto(){
     if(!ME)return false;
-    var{data}=await supa.from("clienti_profilo").select("nome_completo,citta").eq("user_id",ME.id).maybeSingle();
-    return !!(data&&data.citta);
+    try{
+      var timeoutP=new Promise(function(res){setTimeout(function(){res(null);},3000);});
+      var queryP=supa.from("clienti_profilo").select("nome_completo,citta").eq("user_id",ME.id).maybeSingle();
+      var result=await Promise.race([queryP,timeoutP]);
+      var data=result&&result.data!==undefined?result.data:result;
+      return !!(data&&data.citta);
+    }catch(e){
+      console.warn("checkProfiloCompleto error:",e);
+      return true; // fallback: mostra app direttamente
+    }
   }
 
   function hideAll(){
@@ -1549,7 +1557,21 @@
     else{offerte.forEach(function(o){var sede=(o.sedi&&o.sedi.nome)||"";var discVal=o.tipo==="percentuale"?("-"+o.valore+"%"):o.tipo==="importo"?("-€"+o.valore):"";h+='<div style="background:#fff;border-radius:16px;margin:0 12px 12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)"><div style="background:linear-gradient(135deg,#0E5A7A,#00c896);padding:20px;color:#fff"><div style="font-size:11px;font-weight:700;opacity:.8;text-transform:uppercase">'+esc(sede)+'</div><div style="font-size:18px;font-weight:900;margin-top:4px">'+esc(o.titolo)+'</div>'+(discVal?'<div style="font-size:32px;font-weight:900;margin-top:6px">'+discVal+'</div>':'')+'</div><div style="padding:16px">'+(o.descrizione?'<div style="font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:10px">'+esc(o.descrizione)+'</div>':'')+'<div style="font-size:12px;color:var(--text-3)">Fino al '+esc(o.valida_al||'')+'</div><button onclick="navTo(\'prenota\')" style="margin-top:12px;background:var(--brand);color:#fff;border:none;border-radius:999px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;width:100%">&#128197; Prenota ora</button></div></div>';});}
     h+='</div>';c.innerHTML=h;
   }
-  init();
+  // Timeout sicurezza: se init() non risponde entro 5s, mostra login
+  var _initTimeout=setTimeout(function(){
+    var loader=document.getElementById("initial-loader");
+    if(loader&&loader.style.display!=="none"){
+      loader.style.display="none";
+      showAuth();
+    }
+  },5000);
+  init().then(function(){clearTimeout(_initTimeout);}).catch(function(e){
+    clearTimeout(_initTimeout);
+    console.error("init error:",e);
+    var loader=document.getElementById("initial-loader");
+    if(loader)loader.style.display="none";
+    showAuth();
+  });
 })();
 
 </script>
