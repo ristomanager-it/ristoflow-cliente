@@ -76,9 +76,12 @@
 
   window.eliminaPost = async function(postId){
     if(!window._ME||!confirm("Eliminare questo post?")) return;
-    await supa.from("social_post").delete().eq("id",postId).eq("user_id",window._ME.id);
+    var{error}=await supa.from("social_post").delete().eq("id",postId).eq("user_id",window._ME.id);
+    if(error){alert("Errore: "+error.message);return;}
     chiudiPostMenu();
-    window.navTo("scopri");
+    // Rimuove il post dal DOM senza ricaricare il feed
+    var el=document.getElementById("post-"+postId);
+    if(el) el.remove();
   };
 
   window.modificaPost = async function(postId){
@@ -95,9 +98,27 @@
   // ── REAZIONI A TENDINA ────────────────────────────────────────────────────────
   var _reazOpen = null;
 
+  // 15 emoji disponibili — mappate su 3 campi DB (fuoco=❤️like, applauso=👏bravo, cuore=🔥top)
+  var EMOJI_PICKER = [
+    {e:"❤️",k:"fuoco",c:"reaz_fuoco"},
+    {e:"😍",k:"fuoco",c:"reaz_fuoco"},
+    {e:"🔥",k:"cuore",c:"reaz_cuore"},
+    {e:"👏",k:"applauso",c:"reaz_applauso"},
+    {e:"🤤",k:"fuoco",c:"reaz_fuoco"},
+    {e:"😋",k:"fuoco",c:"reaz_fuoco"},
+    {e:"🍷",k:"applauso",c:"reaz_applauso"},
+    {e:"🍕",k:"applauso",c:"reaz_applauso"},
+    {e:"⭐",k:"cuore",c:"reaz_cuore"},
+    {e:"🤩",k:"cuore",c:"reaz_cuore"},
+    {e:"💯",k:"cuore",c:"reaz_cuore"},
+    {e:"👍",k:"fuoco",c:"reaz_fuoco"},
+    {e:"🙌",k:"applauso",c:"reaz_applauso"},
+    {e:"😮",k:"cuore",c:"reaz_cuore"},
+    {e:"💪",k:"applauso",c:"reaz_applauso"},
+  ];
+
   window.toggleReazMenu = function(postId, evt){
     evt.stopPropagation();
-    // chiudi se già aperto
     if(_reazOpen===postId){ chiudiReazMenu(); return; }
     chiudiReazMenu();
     _reazOpen=postId;
@@ -105,12 +126,23 @@
     if(!wrap) return;
     var menu=document.createElement("div");
     menu.id="reaz-menu-"+postId;
-    menu.style.cssText="position:absolute;bottom:calc(100% + 8px);left:0;background:#fff;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:10px 14px;display:flex;gap:12px;z-index:50;border:1px solid #e5e7eb;white-space:nowrap;";
-    [["fuoco","reaz_fuoco","😍","Mi piace"],["applauso","reaz_applauso","👏","Bravo!"],["cuore","reaz_cuore","🔥","Top!"]].forEach(function(r){
+    menu.style.cssText="position:absolute;bottom:calc(100% + 8px);left:0;background:#fff;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.2);padding:10px 12px;display:flex;flex-wrap:wrap;gap:4px;z-index:50;border:1px solid #e5e7eb;max-width:220px;";
+    EMOJI_PICKER.forEach(function(r){
       var b=document.createElement("button");
-      b.style.cssText="display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;cursor:pointer;padding:4px;";
-      b.innerHTML='<span style="font-size:26px;line-height:1">'+r[2]+'</span><span style="font-size:10px;font-weight:700;color:#64748b">'+r[3]+'</span>';
-      (function(k,c){ b.onclick=function(ev){ev.stopPropagation();reagisci(postId,k,c);chiudiReazMenu();}; })(r[0],r[1]);
+      b.style.cssText="font-size:24px;line-height:1;border:none;background:none;cursor:pointer;padding:5px;border-radius:10px;transition:background .1s";
+      b.textContent=r.e;
+      b.onmouseover=function(){this.style.background="#f0f6fa";};
+      b.onmouseout=function(){this.style.background="none";};
+      (function(emoji,k,c){
+        b.onclick=function(ev){
+          ev.stopPropagation();
+          // Aggiorna icona bottone
+          var btn=wrap.querySelector("button");
+          if(btn) btn.textContent=emoji;
+          reagisciEmoji(postId,emoji,k,c);
+          chiudiReazMenu();
+        };
+      })(r.e,r.k,r.c);
       menu.appendChild(b);
     });
     wrap.style.position="relative";
@@ -127,6 +159,29 @@
   }
 
   // ── REAGISCI ─────────────────────────────────────────────────────────────────
+  // reagisciEmoji salva l'emoji scelta dall'utente
+  window.reagisciEmoji = async function(postId, emoji, emojiKey, campo){
+    if(!window._ME){window.showAuth();return;}
+    var prev=myReaz[postId]||null;
+    if(prev===emoji){
+      await supa.from("social_reactions").delete().eq("user_id",window._ME.id).eq("post_id",postId);
+      try{await supa.rpc("decrementa_reaction",{p_post_id:postId,p_campo:campo});}catch(e){}
+      delete myReaz[postId]; return;
+    }
+    if(prev){
+      // togli la vecchia
+      var oldCampo=_emojiCampoMap[prev]||campo;
+      try{await supa.rpc("decrementa_reaction",{p_post_id:postId,p_campo:oldCampo});}catch(e){}
+    }
+    await supa.from("social_reactions").upsert({user_id:window._ME.id,post_id:postId,emoji},{onConflict:"user_id,post_id"});
+    try{await supa.rpc("incrementa_reaction",{p_post_id:postId,p_campo:campo});}catch(e){}
+    myReaz[postId]=emoji;
+  };
+
+  // mappa emoji → campo DB per rimozione corretta
+  var _emojiCampoMap={};
+  EMOJI_PICKER.forEach(function(r){_emojiCampoMap[r.e]=r.c;});
+
   window.reagisci = async function(postId, emojiKey, campo){
     if(!window._ME){window.showAuth();return;}
     var emojiMap={fuoco:"😍",applauso:"👏",cuore:"🔥"};
@@ -267,9 +322,8 @@
         // AZIONI: emoji a sx (tendina) + commenta a dx
         h+='<div class="post-actions">';
         // Bottone reazioni a tendina — lato sx
-        h+='<div id="act-reaz-'+p.id+'" style="position:relative;display:inline-flex">';
-        var reazLabel=miaR?miaR:"😍";
-        h+='<button class="action-btn'+(miaR?" liked":"")+'" onclick="toggleReazMenu(\''+p.id+'\',event)"><span class="act-icon">'+reazLabel+'</span> Reagisci ▾</button>';
+                h+='<div id="act-reaz-'+p.id+'" style="position:relative;display:inline-flex">';
+        h+='<button class="action-btn'+(miaR?" liked":"")+" onclick="toggleReazMenu('"+p.id+"',event)" style="font-size:20px;padding:8px 10px;min-width:0">"+(miaR||"❤️")+"</button>';"
         h+='</div>';
         // Bottone commenta — lato dx
         h+='<button class="action-btn" onclick="toggleCommenti('+p.id+')" style="margin-left:auto"><span class="act-icon">💬</span> Commenta</button>';
