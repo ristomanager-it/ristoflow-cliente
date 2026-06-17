@@ -34,7 +34,7 @@
 
     // Carica sedi + rating medio recensioni
     var{data:sedi}=await supa.from("sedi")
-      .select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,azienda_id,aziende(id,nome,logo_url,tipo_locale,fascia_prezzo)")
+      .select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,azienda_id,aziende(id,nome,logo_url,tipo_locale)")
       .eq("attiva",true).order("nome");
 
     // Rating medio per sede
@@ -155,7 +155,7 @@
     c.innerHTML='<div class="page-loader full"><div class="spinner"></div></div>';
 
     var[{data:sede},{data:recensioni},{data:postSede},{data:profilo}]=await Promise.all([
-      supa.from("sedi").select("*,aziende(id,nome,logo_url,tipo_locale,fascia_prezzo,descrizione,sito_web,telefono)").eq("id",sedeId).single(),
+      supa.from("sedi").select("*,aziende(id,nome,logo_url,tipo_locale,descrizione,sito_web,telefono)").eq("id",sedeId).single(),
       supa.from("recensioni").select("id,voto,testo,created_at,verificata,user_id,clienti_profilo(nome_completo,avatar_url)").eq("sede_id",sedeId).eq("visibile",true).order("created_at",{ascending:false}).limit(20),
       supa.from("social_post").select("id,media_url,testo,created_at").eq("sede_id",sedeId).eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(9),
       supa.from("azienda_profilo_pubblico").select("*").eq("azienda_id",sede?.azienda_id||"").maybeSingle()
