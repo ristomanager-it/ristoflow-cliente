@@ -34,7 +34,7 @@
     }catch(e){}
 
     var [{data:sedi},{data:ratings}]=await Promise.all([
-      supa.from("sedi").select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,azienda_id,aziende(id,nome,logo_url,cover_url,tipo_locale,tipo_cucina,tags,fascia_prezzo,descrizione)").eq("attiva",true).order("nome"),
+      supa.from("sedi").select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,azienda_id,aziende(id,nome,logo_url,cover_url,tipo_locale,tipo_cucina,tags,fascia_prezzo,descrizione)").eq("attiva",true).eq("visibile_in_book",true).order("nome"),
       supa.from("recensioni").select("sede_id,voto").eq("visibile",true)
     ]);
 
@@ -413,6 +413,34 @@
       h+='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">Tipo di cucina</div>';
       h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
       az.tipo_cucina.forEach(function(t){h+='<span style="background:var(--bg);color:var(--text-2);border-radius:6px;padding:5px 10px;font-size:12px;border:1px solid var(--border)">'+esc(t)+'</span>';});
+      h+='</div></div>';
+    }
+
+    // Orari di apertura
+    var orariAp = az.orari_apertura || {};
+    var GIORNI_L = [{k:'lun',l:'Lunedì'},{k:'mar',l:'Martedì'},{k:'mer',l:'Mercoledì'},{k:'gio',l:'Giovedì'},{k:'ven',l:'Venerdì'},{k:'sab',l:'Sabato'},{k:'dom',l:'Domenica'}];
+    var hasOrari = Object.keys(orariAp).length > 0;
+    if(hasOrari){
+      var oggi = new Date().getDay(); // 0=dom,1=lun...
+      var mapGiorno = {0:'dom',1:'lun',2:'mar',3:'mer',4:'gio',5:'ven',6:'sab'};
+      var oggiKey = mapGiorno[oggi];
+      h+='<div style="margin-bottom:16px">';
+      h+='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">🕐 Orari di apertura</div>';
+      h+='<div style="background:var(--bg);border-radius:10px;overflow:hidden">';
+      GIORNI_L.forEach(function(g){
+        var o=orariAp[g.k]; var aperto=!o||o.aperto!==false; var isOggi=g.k===oggiKey;
+        h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 13px;'+(isOggi?'background:var(--brand-light);':'')+';border-bottom:1px solid var(--border)">';
+        h+='<span style="font-size:13px;font-weight:'+(isOggi?'700':'500')+';color:'+(isOggi?'var(--brand)':'var(--text)')+'">'+esc(g.l)+(isOggi?' (oggi)':'')+'</span>';
+        if(!aperto){
+          h+='<span style="font-size:12px;color:#dc2626;font-weight:600">Chiuso</span>';
+        } else if(o){
+          var slot=o.solo_cena?(o.cena_inizio+' – '+o.cena_fine):(o.pranzo_inizio+' – '+o.pranzo_fine+' / '+o.cena_inizio+' – '+o.cena_fine);
+          h+='<span style="font-size:12px;color:var(--text-2)">'+esc(slot)+'</span>';
+        } else {
+          h+='<span style="font-size:12px;color:var(--text-2)">12:00 – 14:30 / 19:30 – 22:30</span>';
+        }
+        h+='</div>';
+      });
       h+='</div></div>';
     }
 
