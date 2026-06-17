@@ -61,6 +61,10 @@
     document.querySelectorAll(".nav-item").forEach(function(b){
       b.classList.toggle("active", b.dataset.page===page);
     });
+    // Aggiorna titolo top bar se presente
+    var topTitle = document.getElementById("top-title");
+    var titles = {scopri:"RistoflowBook",locali:"Scopri Locali",tessera:"Tessera",profilo:"Profilo",messaggi:"Messaggi"};
+    if(topTitle && titles[page]) topTitle.textContent = titles[page];
     var c = document.getElementById("page-content");
     c.scrollTop = 0;
     loadModule(page, c);
