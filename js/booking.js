@@ -66,12 +66,28 @@
     var btn=document.querySelector("#modal-sheet .pub-btn");
     if(btn){btn.textContent="Prenotazione...";btn.disabled=true;}
 
+    // Cerca il booking_form configurato per questa sede/azienda
+    var{data:sede}=await supa.from("sedi").select("azienda_id").eq("id",sedeId).single();
+    var aziendaId=sede?.azienda_id||window.AZIENDA;
+    var{data:form}=await supa.from("booking_forms")
+      .select("id,nome,config")
+      .eq("azienda_id",aziendaId)
+      .eq("attivo",true)
+      .maybeSingle();
+
     // Edge Function per prenotazione (crea record + invia WhatsApp conferma)
     var token=(await supa.auth.getSession()).data.session?.access_token;
     var res=await fetch(window.EF_BASE+"/social-prenota",{
       method:"POST",
       headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
-      body:JSON.stringify({sede_id:sedeId, sede_nome:sedeNome, cliente_nome:nome, cliente_telefono:tel, data, ora, coperti, note:note||"", azienda_id:window.AZIENDA})
+      body:JSON.stringify({
+        sede_id:sedeId, sede_nome:sedeNome,
+        cliente_nome:nome, cliente_telefono:tel,
+        data, ora, coperti, note:note||"",
+        azienda_id:aziendaId,
+        form_id:form?.id||null,
+        rfbook_user_id:window._ME?.id||null
+      })
     });
 
     if(btn){btn.textContent="Conferma prenotazione";btn.disabled=false;}
