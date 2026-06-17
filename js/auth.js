@@ -34,7 +34,7 @@
     hideAll();
     document.getElementById("app-shell").style.display="flex";
     aggiornaTopAvatar();
-    window.navTo("scopri");
+    window.navTo("locali");
   };
 
   function aggiornaTopAvatar(){
