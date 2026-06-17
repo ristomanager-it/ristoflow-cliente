@@ -65,11 +65,21 @@
 
   window.apriFormPrenotazione = async function(sedeId, sedeNome, aziendaId){
     // Cerca il booking_form configurato
-    var{data:form}=await supa.from("booking_forms")
-      .select("id,nome,config")
+    // Cerca prima form dedicato RistoflowBook, poi fallback al primo attivo
+    var{data:formRfbook}=await supa.from("booking_forms")
+      .select("id,nome,config,sorgente")
       .eq("azienda_id", aziendaId||window.AZIENDA)
       .eq("attivo", true)
+      .eq("rfbook_attivo", true)
       .maybeSingle();
+
+    var{data:formGenerico}=!formRfbook ? await supa.from("booking_forms")
+      .select("id,nome,config,sorgente")
+      .eq("azienda_id", aziendaId||window.AZIENDA)
+      .eq("attivo", true)
+      .maybeSingle() : {data:null};
+
+    var form = formRfbook || formGenerico;
 
     var cfg = form?.config || null;
     var orari = cfg?.availability?.orari || null;
@@ -210,7 +220,8 @@
         data, ora, coperti, note,
         azienda_id:aziendaId||window.AZIENDA,
         form_id:formId||null,
-        rfbook_user_id:window._ME?.id||null
+        rfbook_user_id:window._ME?.id||null,
+        sorgente:"rfbook" 
       })
     });
 
