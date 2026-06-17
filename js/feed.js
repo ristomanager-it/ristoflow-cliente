@@ -316,19 +316,21 @@
         h+='<div class="feed-post" id="post-'+p.id+'">';
 
         // Header post
-                var isFollowed=_seguiti[p.user_id]||false;
+                        var isFollowed=_seguiti[p.user_id]||false;
         h+='<div class="post-header">';
         h+='<div class="post-avatar" onclick="apriProfiloUtente(\''+( p.user_id||'')+'\')" style="cursor:pointer">'+esc(autore.charAt(0).toUpperCase())+'</div>';
-        h+='<div class="post-meta">';
+        h+='<div class="post-meta" style="flex:1;min-width:0">';
+        h+='<div style="display:flex;align-items:center;gap:8px">';
         h+='<div class="post-nome">'+esc(autore)+'</div>';
+        if(!isMine && p.user_id){
+          var sfollowed=_seguiti[p.user_id]||false;
+          h+='<button id="segui-btn-'+esc(p.user_id)+'" onclick="toggleSeguiPost(\''+esc(p.user_id)+'\',this)" style="'+(sfollowed?'background:var(--brand);color:#fff;border:none':'background:transparent;color:var(--brand);border:none')+';font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;padding:0">'+(sfollowed?'✓ Segui':'+ Segui')+'</button>';
+        }
+        h+='</div>';
         h+='<div class="post-sub">'+formatData(p.created_at);
         if(locale) h+=' · <span class="badge badge-locale">📍 '+esc(locale)+'</span>';
         if(p.tipo_utente==="titolare") h+=' <span class="badge badge-titolare">🏛 Titolare</span>';
         h+='</div></div>';
-        if(!isMine && p.user_id){
-          var sfollowed=_seguiti[p.user_id]||false;
-          h+='<button id="segui-btn-'+esc(p.user_id)+'" onclick="toggleSeguiPost(\''+esc(p.user_id)+'\',this)" style="'+(sfollowed?'background:var(--brand);color:#fff;border:none':'background:#fff;color:var(--brand);border:1.5px solid var(--brand)')+';border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">'+(sfollowed?'✓ Segui':'+ Segui')+'</button>';
-        }
         if(isMine) h+='<div onclick="apriPostMenu(event,\''+p.id+'\')" style="font-size:20px;color:var(--text-3);cursor:pointer;padding:4px 8px;line-height:1">···</div>';
         h+='</div>';
 
