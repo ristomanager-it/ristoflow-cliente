@@ -13,11 +13,10 @@
       userLat=pos.coords.latitude; userLng=pos.coords.longitude;
     }catch(e){}
 
-    // Tutte le sedi di tutti i clienti Ristoflow attivi
+    // Tutte le sedi attive di tutti i clienti Ristoflow
     var {data:sedi} = await supa.from("sedi")
-      .select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,azienda_id,aziende!inner(id,nome,logo_url,tipo_locale,stato,attiva)")
+      .select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,azienda_id,aziende(id,nome,logo_url,tipo_locale)")
       .eq("attiva",true)
-      .eq("aziende.stato","attivo")
       .order("nome");
 
     // Calcola distanze
