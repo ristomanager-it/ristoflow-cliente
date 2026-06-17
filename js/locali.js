@@ -229,55 +229,69 @@
       (sede.latitudine&&sede.longitudine?'<a href="https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent((sede.indirizzo||"")+" "+(sede.citta||""))+'" target="_blank" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;padding:5px 8px;border-radius:6px;text-decoration:none">🗺️</a>':'');
     wrap.appendChild(topBar);
 
-    // ── GALLERIA FOTO scorrevole ──
-    var fotoList=[].concat(cover?[cover]:[]).concat(galleria).concat((galleriaPost||[]).map(function(p){return p.media_url;}).filter(Boolean));
-    if(fotoList.length>0){
-      var gallery=document.createElement("div");
-      gallery.style.cssText="position:relative;";
-      gallery.innerHTML='<div id="gallery-scroll" style="display:flex;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory;">'+
-        fotoList.map(function(url,i){
-          return '<img src="'+esc(url)+'" style="width:100%;min-width:100%;height:240px;object-fit:cover;scroll-snap-align:start;flex-shrink:0;display:block" loading="'+(i===0?"eager":"lazy")+'"/>';
-        }).join("")+
-        '</div>'+
-        (fotoList.length>1?'<div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px" id="gallery-dots">'+
-          fotoList.map(function(_,i){return '<div style="width:'+(i===0?'16':'6')+'px;height:6px;border-radius:999px;background:'+(i===0?'#fff':'rgba(255,255,255,.5)');}).join('"></div>')+
-          '</div>':'')+
-        '<div style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,.6);color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600" id="gallery-counter">1 / '+fotoList.length+'</div>';
-      wrap.appendChild(gallery);
+    // ── HERO stile Facebook: cover + logo circolare sovrapposto ──
+    var coverUrl=az.cover_url||"";
+    var logoUrl=az.logo_url||"";
+    var extraFoto=galleria.concat((galleriaPost||[]).map(function(p){return p.media_url;}).filter(Boolean));
 
-      // Scroll indicator
-      setTimeout(function(){
-        var scroll=document.getElementById("gallery-scroll");
-        var dots=document.getElementById("gallery-dots");
-        var counter=document.getElementById("gallery-counter");
-        if(scroll&&(dots||counter)){
-          scroll.addEventListener("scroll",function(){
-            var idx=Math.round(scroll.scrollLeft/scroll.offsetWidth);
-            if(counter) counter.textContent=(idx+1)+" / "+fotoList.length;
-            if(dots){
-              dots.querySelectorAll("div").forEach(function(d,i){
-                d.style.width=i===idx?"16px":"6px";
-                d.style.background=i===idx?"#fff":"rgba(255,255,255,.5)";
-              });
-            }
-          });
-        }
-      },100);
+    var hero=document.createElement("div");
+    hero.style.cssText="position:relative;";
+
+    // Cover photo
+    var coverEl=document.createElement("div");
+    coverEl.style.cssText="width:100%;height:200px;overflow:hidden;background:linear-gradient(135deg,#0E5A7A,#1a8fb5);";
+    if(coverUrl){
+      var coverImg=document.createElement("img");
+      coverImg.src=coverUrl;
+      coverImg.style.cssText="width:100%;height:100%;object-fit:cover;display:block;";
+      coverEl.appendChild(coverImg);
     } else {
-      var noCover=document.createElement("div");
-      noCover.style.cssText="height:200px;background:linear-gradient(135deg,var(--brand),var(--brand-mid));display:flex;align-items:center;justify-content:center;font-size:56px;";
-      noCover.textContent="🍽️";
-      wrap.appendChild(noCover);
+      coverEl.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:52px;color:rgba(255,255,255,.3)">🍽️</div>';
     }
+    hero.appendChild(coverEl);
+
+    // Logo circolare sovrapposto (stile Facebook)
+    var logoWrap=document.createElement("div");
+    logoWrap.style.cssText="position:absolute;bottom:-32px;left:16px;width:80px;height:80px;border-radius:50%;border:3px solid var(--surface);background:var(--surface);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);";
+    if(logoUrl){
+      var logoImg=document.createElement("img");
+      logoImg.src=logoUrl;
+      logoImg.style.cssText="width:100%;height:100%;object-fit:cover;";
+      logoWrap.appendChild(logoImg);
+    } else {
+      logoWrap.style.background="var(--brand)";
+      logoWrap.style.display="flex";
+      logoWrap.style.alignItems="center";
+      logoWrap.style.justifyContent="center";
+      logoWrap.style.fontSize="32px";
+      logoWrap.textContent="🍽️";
+    }
+    hero.appendChild(logoWrap);
+
+    // Numero foto badge
+    if(extraFoto.length>0){
+      var fotoBadge=document.createElement("div");
+      fotoBadge.style.cssText="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;backdrop-filter:blur(4px);cursor:pointer;";
+      fotoBadge.textContent="📸 "+extraFoto.length+" foto";
+      fotoBadge.onclick=function(){switchSchedaTab("foto",sedeId);};
+      hero.appendChild(fotoBadge);
+    }
+
+    wrap.appendChild(hero);
+
+    // Spacer per logo che sporge
+    var spacer=document.createElement("div");
+    spacer.style.height="40px";
+    spacer.style.background="var(--surface)";
+    wrap.appendChild(spacer);
 
     // ── HEADER LOCALE ──
     var header=document.createElement("div");
     header.style.cssText="background:var(--surface);padding:14px;border-bottom:1px solid var(--border);";
     var headerH='';
 
-    // Logo + nome
+    // Nome (logo già nel hero)
     headerH+='<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">';
-    if(az.logo_url) headerH+='<img src="'+esc(az.logo_url)+'" style="width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid var(--border);flex-shrink:0"/>';
     headerH+='<div style="flex:1">';
     headerH+='<div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px">'+esc(sede.nome||az.nome||"")+'</div>';
     var subInfo=[];
@@ -371,7 +385,7 @@
     var infoItems=[];
     if(sede.indirizzo||sede.citta) infoItems.push(["📍","Indirizzo",(sede.indirizzo||"")+(sede.citta?" · "+sede.citta:"")]);
     if(az.telefono) infoItems.push(["📞","Telefono",az.telefono]);
-    if(az.fascia_prezzo) infoItems.push(["💶","Fascia prezzo",az.fascia_prezzo+" · "+{€:"economico","€€":"medio","€€€":"alto","€€€€":"fine dining"}[az.fascia_prezzo]||""]);
+    if(az.fascia_prezzo){var fasciaDesc={"€":"economico","€€":"medio","€€€":"alto","€€€€":"fine dining"}[az.fascia_prezzo]||""; infoItems.push(["💶","Fascia prezzo",az.fascia_prezzo+" · "+fasciaDesc]);}
     if(az.sito_web) infoItems.push(["🌐","Sito web",az.sito_web]);
     if(az.instagram) infoItems.push(["📷","Instagram",az.instagram]);
 
@@ -546,7 +560,7 @@
         h+='<div style="padding:12px">';
         if(o.descrizione) h+='<div style="font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:10px">'+esc(o.descrizione)+'</div>';
         if(o.valida_al) h+='<div style="font-size:11px;color:var(--text-3);margin-bottom:10px">Valida fino al '+esc(o.valida_al)+'</div>';
-        h+='<button onclick="apriFormPrenotazione(\''+d.sedeId+'\',\''+esc(d.sede.nome||"")+'\',\''+esc(d.sede.azienda_id||"')+'\')" style="width:100%;padding:10px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">📅 Prenota e usa l\'offerta</button>';
+                h+='<button onclick="apriFormPrenotazione(\''+d.sedeId+'\',\''+esc(d.sede.nome||"")+'\',\''+esc(d.sede.azienda_id||"")+'\'" style="width:100%;padding:10px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">📅 Prenota e usa l\'offerta</button>';
         h+='</div></div>';
       });
     }
