@@ -196,6 +196,18 @@
     var az=sede.aziende||{};
     window._schedaAziendaId=az.id||sede.azienda_id;
 
+    // Variabili sede-first con fallback azienda
+    var sdCover=sede.cover_url||az.cover_url||az.logo_url||"";
+    var sdLogo=sede.logo_url||az.logo_url||"";
+    var sdDescrizione=sede.descrizione||az.descrizione||"";
+    var sdTipiCucina=(sede.tipo_cucina&&sede.tipo_cucina.length?sede.tipo_cucina:(az.tipo_cucina||[])).join(" · ");
+    var sdTags=sede.tags&&sede.tags.length?sede.tags:(az.tags||[]);
+    var sdFascia=sede.fascia_prezzo||az.fascia_prezzo||"";
+    var sdInstagram=sede.instagram||az.instagram||"";
+    var sdTelefono=sede.telefono||az.telefono||"";
+    var sdOrari=sede.orari_apertura||{};
+    var sdGalleria=(az.foto_galleria||[]);
+
     // Ricarica post azienda con id corretto
     var {data:postAz}=await supa.from("social_post").select("id,testo,media_url,tipo,created_at,reaz_fuoco,reaz_applauso,reaz_cuore,clienti_profilo(nome_completo,avatar_url)").eq("azienda_id",az.id||sede.azienda_id).eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(10);
 
@@ -203,8 +215,8 @@
     var recCount=recensioni?recensioni.length:0;
     var cover=az.cover_url||s.logo_url||"";
     var galleria=az.foto_galleria||[];
-    var tipiCucina=(az.tipo_cucina||[]).join(" · ");
-    var tags=az.tags||[];
+    var tipiCucina=sdTipiCucina;
+    var tags=sdTags;
 
     // Controlla se può recensire
     var puoRecensire=false;
@@ -225,14 +237,14 @@
     topBar.style.cssText="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--brand);position:sticky;top:0;z-index:10;";
     topBar.innerHTML='<button onclick="window.navTo(\'locali\')" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1">←</button>'+
       '<div style="font-size:15px;font-weight:700;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(sede.nome||"")+'</div>'+
-      (az.telefono?'<a href="tel:'+esc(az.telefono)+'" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;padding:5px 8px;border-radius:6px;text-decoration:none">📞</a>':'')+
+      (sdTelefono?'<a href="tel:'+esc(sdTelefono)+'" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;padding:5px 8px;border-radius:6px;text-decoration:none">📞</a>':'')+
       (sede.latitudine&&sede.longitudine?'<a href="https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent((sede.indirizzo||"")+" "+(sede.citta||""))+'" target="_blank" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;padding:5px 8px;border-radius:6px;text-decoration:none">🗺️</a>':'');
     wrap.appendChild(topBar);
 
     // ── HERO stile Facebook: cover + logo circolare sovrapposto ──
-    var coverUrl=az.cover_url||"";
-    var logoUrl=az.logo_url||"";
-    var extraFoto=galleria.concat((galleriaPost||[]).map(function(p){return p.media_url;}).filter(Boolean));
+    var coverUrl=sdCover;
+    var logoUrl=sdLogo;
+    var extraFoto=sdGalleria.concat((galleriaPost||[]).map(function(p){return p.media_url;}).filter(Boolean));
 
     var hero=document.createElement("div");
     hero.style.cssText="position:relative;";
@@ -297,7 +309,7 @@
     var subInfo=[];
     if(az.tipo_locale) subInfo.push(az.tipo_locale);
     if(tipiCucina) subInfo.push(tipiCucina);
-    if(az.fascia_prezzo) subInfo.push(az.fascia_prezzo);
+    if(sdFascia) subInfo.push(sdFascia);
     if(subInfo.length) headerH+='<div style="font-size:12px;color:var(--brand);font-weight:500;margin-bottom:4px">'+esc(subInfo.join(" · "))+'</div>';
     // Rating
     if(avgVoto>0){
@@ -320,7 +332,7 @@
     // Azioni principali
     headerH+='<div style="display:flex;gap:7px">';
     headerH+='<button onclick="apriFormPrenotazione(\''+sedeId+'\',\''+esc(sede.nome||"")+'\',\''+esc(sede.azienda_id||"")+'\')" style="flex:2;padding:11px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">📅 Prenota ora</button>';
-    if(az.instagram) headerH+='<a href="https://instagram.com/'+esc(az.instagram.replace("@",""))+'" target="_blank" style="flex:1;padding:11px;background:var(--bg);color:var(--text-2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center">📷</a>';
+    if(sdInstagram) headerH+='<a href="https://instagram.com/'+esc(sdInstagram.replace("@",""))+'" target="_blank" style="flex:1;padding:11px;background:var(--bg);color:var(--text-2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center">📷</a>';
     if(az.sito_web) headerH+='<a href="'+esc(az.sito_web)+'" target="_blank" style="flex:1;padding:11px;background:var(--bg);color:var(--text-2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center">🌐</a>';
     headerH+='</div>';
 
@@ -345,7 +357,8 @@
     // Salva dati in window per uso nei tab
     window._schedaData={
       sede, az, recensioni, postAz:postAz||[], offerte:offerte||[], galleriaPost:galleriaPost||[],
-      sedeId, puoRecensire, avgVoto, recCount
+      sedeId, puoRecensire, avgVoto, recCount,
+      sdOrari, sdDescrizione, sdTags, sdFascia, sdTipiCucina, sdInstagram, sdTelefono, sdGalleria
     };
 
     renderTabInfo();
@@ -373,10 +386,10 @@
     var h='<div style="padding:16px">';
 
     // Descrizione
-    if(az.descrizione){
+    if(d.sdDescrizione){
       h+='<div style="margin-bottom:16px">';
       h+='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Il locale</div>';
-      h+='<div style="font-size:14px;color:var(--text-2);line-height:1.6">'+esc(az.descrizione)+'</div>';
+      h+='<div style="font-size:14px;color:var(--text-2);line-height:1.6">'+esc(d.sdDescrizione)+'</div>';
       h+='</div>';
     }
 
@@ -384,7 +397,7 @@
     h+='<div style="background:var(--bg);border-radius:10px;overflow:hidden;margin-bottom:16px">';
     var infoItems=[];
     if(sede.indirizzo||sede.citta) infoItems.push(["📍","Indirizzo",(sede.indirizzo||"")+(sede.citta?" · "+sede.citta:"")]);
-    if(az.telefono) infoItems.push(["📞","Telefono",az.telefono]);
+    if(d.sdTelefono) infoItems.push(["📞","Telefono",d.sdTelefono]);
     if(az.fascia_prezzo){var fasciaDesc={"€":"economico","€€":"medio","€€€":"alto","€€€€":"fine dining"}[az.fascia_prezzo]||""; infoItems.push(["💶","Fascia prezzo",az.fascia_prezzo+" · "+fasciaDesc]);}
     if(az.sito_web) infoItems.push(["🌐","Sito web",az.sito_web]);
     if(az.instagram) infoItems.push(["📷","Instagram",az.instagram]);
@@ -399,25 +412,25 @@
     h+='</div>';
 
     // Tags / caratteristiche
-    if(az.tags&&az.tags.length){
+    if(d.sdTags&&d.sdTags.length){
       h+='<div style="margin-bottom:16px">';
       h+='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">Caratteristiche</div>';
       h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
-      az.tags.forEach(function(t){h+='<span style="background:var(--brand-light);color:var(--brand);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500">'+esc(t)+'</span>';});
+      d.sdTags.forEach(function(t){h+='<span style="background:var(--brand-light);color:var(--brand);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500">'+esc(t)+'</span>';});
       h+='</div></div>';
     }
 
     // Tipo cucina
-    if(az.tipo_cucina&&az.tipo_cucina.length){
+    if(d.sdTipiCucina){
       h+='<div style="margin-bottom:16px">';
       h+='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">Tipo di cucina</div>';
       h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
-      az.tipo_cucina.forEach(function(t){h+='<span style="background:var(--bg);color:var(--text-2);border-radius:6px;padding:5px 10px;font-size:12px;border:1px solid var(--border)">'+esc(t)+'</span>';});
+      d.sdTipiCucina.split(" · ").forEach(function(t){h+='<span style="background:var(--bg);color:var(--text-2);border-radius:6px;padding:5px 10px;font-size:12px;border:1px solid var(--border)">'+esc(t)+'</span>';});
       h+='</div></div>';
     }
 
     // Orari di apertura
-    var orariAp = az.orari_apertura || {};
+    var orariAp = d.sdOrari || {};
     var GIORNI_L = [{k:'lun',l:'Lunedì'},{k:'mar',l:'Martedì'},{k:'mer',l:'Mercoledì'},{k:'gio',l:'Giovedì'},{k:'ven',l:'Venerdì'},{k:'sab',l:'Sabato'},{k:'dom',l:'Domenica'}];
     var hasOrari = Object.keys(orariAp).length > 0;
     if(hasOrari){
