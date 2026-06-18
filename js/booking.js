@@ -1,242 +1,674 @@
-// js/booking.js — prenotazione con booking_form configurato
+// js/locali.js — scopri locali + scheda stile Google Business / Facebook
 (function(){
   var supa = window._supa;
+  var _sediAll = [], _userLat = null, _userLng = null;
+
   function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+  function formatData(ts){if(!ts)return"";return new Date(ts).toLocaleDateString("it-IT",{day:"2-digit",month:"short",year:"numeric"});}
+  function formatOra(ts){if(!ts)return"";return new Date(ts).toLocaleDateString("it-IT",{day:"2-digit",month:"short"});}
 
-  var GIORNI = ["Dom","Lun","Mar","Mer","Gio","Ven","Sab"];
+  function calcolaDistanza(lat1,lng1,lat2,lng2){
+    var R=6371,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
+    var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  }
 
-  // Genera slot orari da un range (es. 12:00-14:30 ogni 30 min)
-  function generaSlot(start, end){
-    var slots = [];
-    var [sh,sm] = start.split(":").map(Number);
-    var [eh,em] = end.split(":").map(Number);
-    var cur = sh*60+sm;
-    var fine = eh*60+em;
-    while(cur < fine){
-      var h = String(Math.floor(cur/60)).padStart(2,"0");
-      var m = String(cur%60).padStart(2,"0");
-      slots.push(h+":"+m);
-      cur += 30;
+  function stelleHTML(v,size){
+    size=size||14;
+    var h="";
+    for(var i=1;i<=5;i++){
+      h+='<span style="color:'+(i<=Math.round(v||0)?"#f59e0b":"#d1d5db")+';font-size:'+size+'px;line-height:1">★</span>';
     }
-    return slots;
+    return h;
   }
 
-  // Genera tutti gli slot disponibili dai range orari configurati
-  function tuttiSlot(orari){
-    var slots = [];
-    (orari||[]).forEach(function(o){ generaSlot(o.start, o.end).forEach(function(s){slots.push(s);}); });
-    return slots;
-  }
-
-  // Controlla se una data è nel giorno disponibile (giorni = array [0-6] dove 1=Lun)
-  function giornoDisponibile(dateStr, giorni){
-    if(!giorni||!giorni.length) return true;
-    var d = new Date(dateStr);
-    return giorni.includes(d.getDay());
-  }
-
-  window.renderPrenota = async function(c){
-    if(!window._ME){window.showAuth();return;}
+  // ── LISTA LOCALI (home) ──────────────────────────────────────────────────────
+  window.renderLocali = async function(c){
     c.innerHTML='<div class="page-loader"><div class="spinner"></div></div>';
-    var{data:sedi}=await supa.from("sedi").select("id,nome,indirizzo,citta,azienda_id").eq("attiva",true).order("nome");
-    var wrap=document.createElement("div"); wrap.className="pb-nav";
-    var hdr=document.createElement("div"); hdr.style.cssText="padding:16px 16px 8px";
-    hdr.innerHTML='<div style="font-size:22px;font-weight:900">📅 Prenota un tavolo</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">Scegli il locale</div>';
-    wrap.appendChild(hdr);
-    if(!sedi||sedi.length===0){
-      var em=document.createElement("div"); em.className="empty-state";
-      em.innerHTML='<div class="empty-icon">📅</div><div class="empty-title">Nessun locale disponibile</div>';
-      wrap.appendChild(em);
-    } else {
-      sedi.forEach(function(s){
-        var card=document.createElement("div"); card.className="locale-card"; card.style.cursor="pointer";
-        var body=document.createElement("div"); body.className="locale-card-body"; body.style.padding="20px";
-        var nome=document.createElement("div"); nome.className="locale-card-nome"; nome.textContent=s.nome||"";
-        var ind=document.createElement("div"); ind.className="locale-card-tipo"; ind.textContent=(s.indirizzo||"")+(s.citta?" · "+s.citta:"");
-        var btn=document.createElement("div"); btn.style.marginTop="12px";
-        btn.innerHTML='<span style="background:var(--brand);color:#fff;border-radius:999px;padding:6px 16px;font-size:13px;font-weight:700">📅 Prenota ora</span>';
-        body.appendChild(nome); body.appendChild(ind); body.appendChild(btn); card.appendChild(body);
-        card.addEventListener("click",(function(id,n,az){return function(){window.apriFormPrenotazione(id,n,az);};})(s.id,s.nome,s.azienda_id));
-        wrap.appendChild(card);
-      });
-    }
-    c.innerHTML=""; c.appendChild(wrap);
-  };
 
-  window.apriFormPrenotazione = async function(sedeId, sedeNome, aziendaId){
-    // Cerca il booking_form configurato
-    // Cerca prima form dedicato RistoflowBook, poi fallback al primo attivo
-    var{data:formRfbook}=await supa.from("booking_forms")
-      .select("id,nome,config,sorgente")
-      .eq("azienda_id", aziendaId||window.AZIENDA)
-      .eq("attivo", true)
-      .eq("rfbook_attivo", true)
-      .maybeSingle();
+    // Geoloc
+    _userLat=null; _userLng=null;
+    try{
+      var pos=await new Promise(function(res,rej){navigator.geolocation.getCurrentPosition(res,rej,{timeout:4000});});
+      _userLat=pos.coords.latitude; _userLng=pos.coords.longitude;
+    }catch(e){}
 
-    var{data:formGenerico}=!formRfbook ? await supa.from("booking_forms")
-      .select("id,nome,config,sorgente")
-      .eq("azienda_id", aziendaId||window.AZIENDA)
-      .eq("attivo", true)
-      .maybeSingle() : {data:null};
+    var [{data:sedi},{data:ratings}]=await Promise.all([
+      supa.from("sedi").select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,cover_url,tipo_cucina,tags,fascia_prezzo,descrizione,instagram,orari_apertura,azienda_id,aziende(id,nome,logo_url,tipo_locale)").eq("attiva",true).eq("visibile_in_book",true).order("nome"),
+      supa.from("recensioni").select("sede_id,voto").eq("visibile",true)
+    ]);
 
-    var form = formRfbook || formGenerico;
-
-    var cfg = form?.config || null;
-    var orari = cfg?.availability?.orari || null;
-    var giorni = cfg?.availability?.giorni || null;
-    var titleText = cfg?.text?.title || "Prenota un tavolo";
-    var subtitleText = cfg?.text?.subtitle || sedeNome;
-    var hasNote = cfg?.fields?.note !== false;
-    var policyText = cfg?.policy?.enabled ? cfg.policy.text : null;
-    var bgColor = cfg?.branding?.background_color || "#fff";
-    var emoji = cfg?.emoji || "🍽️";
-
-    var oggi = new Date().toISOString().split("T")[0];
-    var slots = orari ? tuttiSlot(orari) : ["12:00","12:30","13:00","13:30","19:00","19:30","20:00","20:30","21:00","21:30"];
-
-    var nomeV=(window._ME&&window._ME.user_metadata&&window._ME.user_metadata.nome_completo)||"";
-    var telV=(window._ME&&window._ME.user_metadata&&window._ME.user_metadata.telefono)||"";
-
-    var sheet=document.getElementById("modal-sheet");
-    sheet.innerHTML="";
-    sheet.style.background=bgColor;
-
-    // Header form
-    var handle=document.createElement("div"); handle.className="modal-handle"; sheet.appendChild(handle);
-
-    var hdr=document.createElement("div"); hdr.style.cssText="text-align:center;margin-bottom:20px";
-    hdr.innerHTML='<div style="font-size:36px;margin-bottom:6px">'+emoji+'</div>'+
-      '<div style="font-size:18px;font-weight:900;color:var(--text)">'+esc(titleText)+'</div>'+
-      (subtitleText?'<div style="font-size:13px;color:var(--text-2);margin-top:4px">'+esc(subtitleText)+'</div>':"");
-    sheet.appendChild(hdr);
-
-    // Se ci sono giorni configurati, mostra info
-    if(giorni&&giorni.length){
-      var giorniLabel=giorni.map(function(g){return GIORNI[g];}).join(", ");
-      var info=document.createElement("div");
-      info.style.cssText="background:#e8f4f8;border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;color:#0E5A7A;margin-bottom:14px;text-align:center";
-      info.textContent="📅 Aperto: "+giorniLabel;
-      sheet.appendChild(info);
-    }
-
-    function addLabel(txt){ var l=document.createElement("div");l.style.cssText="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:4px;margin-top:10px";l.textContent=txt;sheet.appendChild(l); }
-    function addInput(id,type,ph,v){var i=document.createElement("input");i.className="pub-input";i.id=id;i.type=type||"text";i.placeholder=ph;if(v)i.value=v;sheet.appendChild(i);return i;}
-
-    addLabel("Nome e cognome");
-    addInput("pren-nome","text","Mario Rossi",nomeV);
-    addLabel("Telefono");
-    addInput("pren-tel","tel","+39 333 000 0000",telV);
-    addLabel("Data");
-    var dateInput=addInput("pren-data","date","");
-    dateInput.min=oggi;
-    // Disabilita giorni non disponibili
-    if(giorni&&giorni.length){
-      dateInput.addEventListener("change",function(){
-        if(!giornoDisponibile(this.value,giorni)){
-          var giorniLabel=giorni.map(function(g){return GIORNI[g];}).join(", ");
-          alert("Il locale è aperto solo: "+giorniLabel+"\nScegli un altro giorno.");
-          this.value="";
-        }
-      });
-    }
-
-    addLabel("Orario");
-    var sel=document.createElement("select"); sel.className="pub-input"; sel.id="pren-ora";
-    slots.forEach(function(o){var op=document.createElement("option");op.value=o;op.textContent=o;sel.appendChild(op);});
-    sheet.appendChild(sel);
-
-    addLabel("Numero persone");
-    var sel2=document.createElement("select"); sel2.className="pub-input"; sel2.id="pren-coperti";
-    [1,2,3,4,5,6,7,8,10,12,15,20].forEach(function(n){var op=document.createElement("option");op.value=n;op.textContent=n+(n===1?" persona":" persone");sel2.appendChild(op);});
-    sheet.appendChild(sel2);
-
-    if(hasNote){
-      addLabel("Note (occasione, intolleranze...)");
-      var ta=document.createElement("textarea"); ta.className="pub-textarea"; ta.id="pren-note"; ta.placeholder="Compleanno, intolleranza al glutine..."; ta.style.minHeight="70px"; sheet.appendChild(ta);
-    }
-
-    // Campi custom del form
-    if(cfg?.fields?.custom&&cfg.fields.custom.length){
-      cfg.fields.custom.forEach(function(field){
-        addLabel(field.label+(field.required?" *":""));
-        if(field.type==="checkbox"&&field.options&&field.options.length){
-          field.options.forEach(function(opt){
-            var row=document.createElement("label"); row.style.cssText="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:6px;cursor:pointer";
-            var cb=document.createElement("input"); cb.type="checkbox"; cb.value=opt; cb.className="pren-custom-cb";
-            row.appendChild(cb); row.appendChild(document.createTextNode(opt));
-            sheet.appendChild(row);
-          });
-        }
-      });
-    }
-
-    // Policy
-    if(policyText){
-      var pol=document.createElement("div"); pol.style.cssText="background:#f9f9f9;border-radius:10px;padding:12px;font-size:12px;color:#64748b;margin:12px 0;line-height:1.5;border:1px solid #e5e7eb";
-      pol.textContent=policyText; sheet.appendChild(pol);
-      var polRow=document.createElement("label"); polRow.style.cssText="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-bottom:12px;cursor:pointer";
-      var polCb=document.createElement("input"); polCb.type="checkbox"; polCb.id="pren-policy";
-      polRow.appendChild(polCb); polRow.appendChild(document.createTextNode("Ho letto e accetto le condizioni"));
-      sheet.appendChild(polRow);
-    }
-
-    var confirmBtn=document.createElement("button"); confirmBtn.className="pub-btn"; confirmBtn.textContent="Conferma prenotazione";
-    confirmBtn.addEventListener("click",function(){window.inviaPrenotazione(sedeId,sedeNome,aziendaId,form?.id||null,!!policyText);});
-    sheet.appendChild(confirmBtn);
-
-    document.getElementById("modal-pubblica").classList.add("open");
-  };
-
-  window.inviaPrenotazione = async function(sedeId, sedeNome, aziendaId, formId, hasPolicy){
-    var nome=document.getElementById("pren-nome")?.value?.trim();
-    var tel=document.getElementById("pren-tel")?.value?.trim();
-    var data=document.getElementById("pren-data")?.value;
-    var ora=document.getElementById("pren-ora")?.value;
-    var coperti=parseInt(document.getElementById("pren-coperti")?.value||2);
-    var note=document.getElementById("pren-note")?.value?.trim()||"";
-
-    if(!nome||!tel||!data||!ora){alert("Compila tutti i campi obbligatori");return;}
-
-    if(hasPolicy){
-      var pol=document.getElementById("pren-policy");
-      if(!pol||!pol.checked){alert("Devi accettare le condizioni per procedere");return;}
-    }
-
-    // Raccoglie campi custom checkbox
-    var custom=[];
-    document.querySelectorAll(".pren-custom-cb:checked").forEach(function(cb){custom.push(cb.value);});
-    if(custom.length) note=(note?note+"\n":"")+custom.join(", ");
-
-    var btn=document.querySelector("#modal-sheet .pub-btn");
-    if(btn){btn.textContent="Prenotazione in corso...";btn.disabled=true;}
-
-    var token=(await supa.auth.getSession()).data.session?.access_token;
-    var res=await fetch(window.EF_BASE+"/social-prenota",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
-      body:JSON.stringify({
-        sede_id:sedeId, sede_nome:sedeNome,
-        cliente_nome:nome, cliente_telefono:tel,
-        data, ora, coperti, note,
-        azienda_id:aziendaId||window.AZIENDA,
-        form_id:formId||null,
-        rfbook_user_id:window._ME?.id||null,
-        sorgente:"rfbook" 
-      })
+    // Aggrega rating
+    var ratingMap={};
+    (ratings||[]).forEach(function(r){
+      if(!ratingMap[r.sede_id]) ratingMap[r.sede_id]={sum:0,count:0};
+      ratingMap[r.sede_id].sum+=r.voto||0;
+      ratingMap[r.sede_id].count++;
     });
 
-    if(btn){btn.textContent="Conferma prenotazione";btn.disabled=false;}
+    // Distanze e ordina
+    (sedi||[]).forEach(function(s){
+      s._rating=ratingMap[s.id]?ratingMap[s.id].sum/ratingMap[s.id].count:0;
+      s._recCount=ratingMap[s.id]?ratingMap[s.id].count:0;
+      if(_userLat&&s.latitudine&&s.longitudine)
+        s._dist=calcolaDistanza(_userLat,_userLng,parseFloat(s.latitudine),parseFloat(s.longitudine));
+    });
+    _sediAll=sedi||[];
+    var ordinati=_sediAll.slice().sort(function(a,b){return (a._dist||999)-(b._dist||999);});
 
-    if(!res.ok){
-      var err=await res.json().catch(function(){return{};});
-      alert("Errore: "+(err.error||"sconosciuto")); return;
+    // Shell
+    c.innerHTML='';
+    var wrap=document.createElement("div"); wrap.className="pb-nav";
+
+    // Search
+    var topBar=document.createElement("div");
+    topBar.style.cssText="position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--border);padding:10px 14px;";
+    topBar.innerHTML='<div style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;">'+
+      '<span style="font-size:16px;color:var(--text-3)">🔍</span>'+
+      '<input id="locali-search" placeholder="Cerca locale o città..." style="border:none;background:transparent;font-size:14px;font-family:var(--font);outline:none;flex:1;color:var(--text)"/>'+
+      '</div>';
+    wrap.appendChild(topBar);
+
+    // Chips filtro
+    var chipsBar=document.createElement("div");
+    chipsBar.style.cssText="background:var(--surface);border-bottom:1px solid var(--border);padding:8px 0;";
+    chipsBar.innerHTML='<div style="display:flex;gap:6px;padding:0 14px;overflow-x:auto;scrollbar-width:none">'+
+      [["all","Tutti"],["near","📍 Vicino"],["top","⭐ Migliori"],["new","🆕 Nuovi"]].map(function(f,i){
+        return '<button class="filtro-btn'+(i===0?" active":"")+'" data-fl="'+f[0]+'" onclick="filtraLocali(\''+f[0]+'\')">'+f[1]+'</button>';
+      }).join("")+'</div>';
+    wrap.appendChild(chipsBar);
+
+    var listEl=document.createElement("div"); listEl.id="locali-list"; listEl.style.padding="10px 0";
+    wrap.appendChild(listEl);
+    c.innerHTML=""; c.appendChild(wrap);
+
+    renderCards(ordinati, listEl);
+
+    // Search live
+    document.getElementById("locali-search").addEventListener("input",function(){
+      var q=this.value.toLowerCase().trim();
+      var filtered=q?_sediAll.filter(function(s){
+        return (s.nome||"").toLowerCase().includes(q)||(s.citta||"").toLowerCase().includes(q)||
+               (s.indirizzo||"").toLowerCase().includes(q)||((s.aziende&&s.aziende.nome)||"").toLowerCase().includes(q);
+      }):ordinati;
+      renderCards(filtered, document.getElementById("locali-list"));
+    });
+  };
+
+  window.filtraLocali=function(fl){
+    document.querySelectorAll("[data-fl]").forEach(function(b){b.classList.toggle("active",b.dataset.fl===fl);});
+    var list=_sediAll.slice();
+    if(fl==="near") list.sort(function(a,b){return (a._dist||999)-(b._dist||999);});
+    else if(fl==="top") list.sort(function(a,b){return (b._rating||0)-(a._rating||0);});
+    else if(fl==="new") list.sort(function(a,b){return new Date(b.created_at||0)-new Date(a.created_at||0);});
+    renderCards(list, document.getElementById("locali-list"));
+  };
+
+  function renderCards(sedi, el){
+    if(!sedi||sedi.length===0){
+      el.innerHTML='<div class="empty-state"><div class="empty-icon">📍</div><div class="empty-title">Nessun locale trovato</div></div>';
+      return;
+    }
+    var h="";
+    sedi.forEach(function(s){
+      var az=s.aziende||{};
+      var cover=s.cover_url||s.logo_url||az.logo_url||"";
+      var tipiCucina=(s.tipo_cucina||az.tipo_cucina||[]).slice(0,2).join(" · ");
+      var tags=(s.tags||az.tags||[]).slice(0,3);
+      var distLabel=s._dist?('<span style="font-size:12px;color:var(--brand);font-weight:600">📡 '+s._dist.toFixed(1)+' km</span>'):"";
+      var fascia=s.fascia_prezzo||"";
+
+      h+='<div onclick="apriSchedaLocale(\''+s.id+'\')" style="background:var(--surface);border-radius:12px;margin:0 14px 10px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:box-shadow .15s;" onmouseover="this.style.boxShadow=\'0 4px 16px rgba(0,0,0,.1)\'" onmouseout="this.style.boxShadow=\'none\'">';
+
+      // Cover photo
+      if(cover){
+        h+='<div style="position:relative"><img src="'+esc(cover)+'" style="width:100%;height:150px;object-fit:cover;display:block"/>';
+      } else {
+        var g=["linear-gradient(135deg,#0E5A7A,#1a8fb5)","linear-gradient(135deg,#0E5A7A,#00c896)","linear-gradient(135deg,#1a3a4a,#0E5A7A)"][Math.abs((s.id||"").charCodeAt(0))%3];
+        h+='<div style="position:relative"><div style="width:100%;height:150px;background:'+g+';display:flex;align-items:center;justify-content:center;font-size:40px">🍽️</div>';
+      }
+
+      // Rating badge su cover
+      if(s._rating>0){
+        h+='<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.65);color:#fff;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700;backdrop-filter:blur(4px)">★ '+s._rating.toFixed(1)+'</div>';
+      }
+
+      // Logo piccolo
+      if(az.logo_url){
+        h+='<img src="'+esc(az.logo_url)+'" style="position:absolute;bottom:-18px;left:14px;width:40px;height:40px;border-radius:8px;border:2px solid var(--surface);object-fit:cover;background:#fff"/>';
+      }
+      h+='</div>';
+
+      // Body card
+      h+='<div style="padding:'+(az.logo_url?"24px 14px 14px":"14px")+'">';
+      h+='<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px">';
+      h+='<div style="font-size:15px;font-weight:700;color:var(--text);flex:1">'+esc(s.nome||az.nome||"")+'</div>';
+      h+=distLabel;
+      h+='</div>';
+
+      // Tipo cucina + fascia
+      var subtitle=[];
+      if(az.tipo_locale) subtitle.push(esc(az.tipo_locale));
+      if(tipiCucina) subtitle.push(esc(tipiCucina));
+      if(fascia) subtitle.push(esc(fascia));
+      if(subtitle.length) h+='<div style="font-size:12px;color:var(--brand);font-weight:500;margin-bottom:4px">'+subtitle.join(" · ")+'</div>';
+
+      // Rating + indirizzo
+      if(s._rating>0){
+        h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">'+stelleHTML(s._rating,12)+'<span style="font-size:12px;font-weight:600;color:var(--text)">'+s._rating.toFixed(1)+'</span><span style="font-size:11px;color:var(--text-3)">('+s._recCount+')</span></div>';
+      } else {
+        h+='<div style="font-size:11px;color:var(--text-3);margin-bottom:4px">Nessuna recensione ancora</div>';
+      }
+      if(s.indirizzo||s.citta) h+='<div style="font-size:12px;color:var(--text-2);margin-bottom:8px">📍 '+esc((s.indirizzo||"")+(s.citta?" · "+s.citta:""))+'</div>';
+
+      // Tags
+      if(tags.length){
+        h+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">';
+        tags.forEach(function(t){h+='<span style="background:var(--brand-light);color:var(--brand);border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600">'+esc(t)+'</span>';});
+        h+='</div>';
+      }
+
+      // Azioni
+      h+='<div style="display:flex;gap:6px">';
+      h+='<button onclick="event.stopPropagation();apriFormPrenotazione(\''+s.id+'\',\''+esc(s.nome||"")+'\',\''+esc(s.azienda_id||"")+'\')" style="flex:2;padding:9px;background:var(--brand);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer">📅 Prenota</button>';
+      h+='<button onclick="event.stopPropagation();apriSchedaLocale(\''+s.id+'\')" style="flex:1;padding:9px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:7px;font-size:13px;font-weight:500;cursor:pointer">Scheda</button>';
+      h+='</div>';
+      h+='</div></div>';
+    });
+    el.innerHTML=h;
+  }
+
+  // ── SCHEDA LOCALE stile Google Business + Facebook ────────────────────────
+  window.apriSchedaLocale = async function(sedeId){
+    var c=document.getElementById("page-content");
+    c.innerHTML='<div class="page-loader full"><div class="spinner"></div></div>';
+
+    var [{data:sede},{data:recensioni},{data:postAzienda},{data:offerte},{data:galleriaPost}]=await Promise.all([
+      supa.from("sedi").select("*,aziende(id,nome,logo_url,tipo_locale,foto_galleria)").eq("id",sedeId).single(),
+      supa.from("recensioni").select("id,voto,testo,created_at,verificata,user_id,clienti_profilo(nome_completo,avatar_url)").eq("sede_id",sedeId).eq("visibile",true).order("verificata",{ascending:false}).order("created_at",{ascending:false}).limit(20),
+      supa.from("social_post").select("id,testo,media_url,tipo,created_at,reaz_fuoco,reaz_applauso,reaz_cuore").eq("azienda_id",(function(){return window._schedaAziendaId||"";}())).eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(10),
+      supa.from("network_offerte").select("*").eq("attiva",true).eq("sede_id",sedeId).order("created_at",{ascending:false}).limit(5),
+      supa.from("social_post").select("media_url").eq("sede_id",sedeId).eq("visibile",true).not("media_url","is",null).order("created_at",{ascending:false}).limit(12)
+    ]);
+
+    if(!sede){c.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-3)">Locale non trovato</div>';return;}
+
+    var az=sede.aziende||{};
+    window._schedaAziendaId=az.id||sede.azienda_id;
+    // Sede-first: i dati specifici per sede sovrascrivono quelli dell'azienda
+    var sdCover=sede.cover_url||az.cover_url||az.logo_url||"";
+    var sdLogo=sede.logo_url||az.logo_url||"";
+    var sdDescrizione=sede.descrizione||"";
+    var sdTipiCucina=(sede.tipo_cucina||az.tipo_cucina||[]).join(" · ");
+    var sdTags=sede.tags||az.tags||[];
+    var sdFascia=sede.fascia_prezzo||"";
+    var sdInstagram=sede.instagram||"";
+    var sdTelefono=sede.telefono||az.telefono||"";
+    var sdOrari=sede.orari_apertura||{};
+
+    // Ricarica post azienda con id corretto
+    var {data:postAz}=await supa.from("social_post").select("id,testo,media_url,tipo,created_at,reaz_fuoco,reaz_applauso,reaz_cuore,clienti_profilo(nome_completo,avatar_url)").eq("azienda_id",az.id||sede.azienda_id).eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(10);
+
+    var avgVoto=recensioni&&recensioni.length>0?(recensioni.reduce(function(s,r){return s+(r.voto||0);},0)/recensioni.length):0;
+    var recCount=recensioni?recensioni.length:0;
+    var cover=az.cover_url||s.logo_url||"";
+    var galleria=az.foto_galleria||[];
+    var tipiCucina=(az.tipo_cucina||[]).join(" · ");
+    var tags=az.tags||[];
+
+    // Controlla se può recensire
+    var puoRecensire=false;
+    if(window._ME){
+      var {data:pren}=await supa.from("prenotazioni_tavoli").select("id").eq("sede_id",sedeId).eq("rfbook_user_id",window._ME.id).eq("stato","completata").limit(1);
+      puoRecensire=pren&&pren.length>0;
+      if(puoRecensire){
+        var {data:miaRec}=await supa.from("recensioni").select("id").eq("sede_id",sedeId).eq("user_id",window._ME.id).limit(1);
+        if(miaRec&&miaRec.length>0) puoRecensire=false;
+      }
     }
 
-    var result=await res.json();
+    c.innerHTML='';
+    var wrap=document.createElement("div"); wrap.className="pb-nav"; wrap.id="scheda-wrap";
+
+    // ── TOP BAR sticky ──
+    var topBar=document.createElement("div");
+    topBar.style.cssText="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--brand);position:sticky;top:0;z-index:10;";
+    topBar.innerHTML='<button onclick="window.navTo(\'locali\')" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;line-height:1">←</button>'+
+      '<div style="font-size:15px;font-weight:700;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(sede.nome||"")+'</div>'+
+      (az.telefono?'<a href="tel:'+esc(az.telefono)+'" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;padding:5px 8px;border-radius:6px;text-decoration:none">📞</a>':'')+
+      (sede.latitudine&&sede.longitudine?'<a href="https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent((sede.indirizzo||"")+" "+(sede.citta||""))+'" target="_blank" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;padding:5px 8px;border-radius:6px;text-decoration:none">🗺️</a>':'');
+    wrap.appendChild(topBar);
+
+    // ── HERO stile Facebook: cover + logo circolare sovrapposto ──
+    var coverUrl=az.cover_url||"";
+    var logoUrl=az.logo_url||"";
+    var extraFoto=galleria.concat((galleriaPost||[]).map(function(p){return p.media_url;}).filter(Boolean));
+
+    var hero=document.createElement("div");
+    hero.style.cssText="position:relative;";
+
+    // Cover photo
+    var coverEl=document.createElement("div");
+    coverEl.style.cssText="width:100%;height:200px;overflow:hidden;background:linear-gradient(135deg,#0E5A7A,#1a8fb5);";
+    if(coverUrl){
+      var coverImg=document.createElement("img");
+      coverImg.src=coverUrl;
+      coverImg.style.cssText="width:100%;height:100%;object-fit:cover;display:block;";
+      coverEl.appendChild(coverImg);
+    } else {
+      coverEl.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:52px;color:rgba(255,255,255,.3)">🍽️</div>';
+    }
+    hero.appendChild(coverEl);
+
+    // Logo circolare sovrapposto (stile Facebook)
+    var logoWrap=document.createElement("div");
+    logoWrap.style.cssText="position:absolute;bottom:-32px;left:16px;width:80px;height:80px;border-radius:50%;border:3px solid var(--surface);background:var(--surface);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);";
+    if(logoUrl){
+      var logoImg=document.createElement("img");
+      logoImg.src=logoUrl;
+      logoImg.style.cssText="width:100%;height:100%;object-fit:cover;";
+      logoWrap.appendChild(logoImg);
+    } else {
+      logoWrap.style.background="var(--brand)";
+      logoWrap.style.display="flex";
+      logoWrap.style.alignItems="center";
+      logoWrap.style.justifyContent="center";
+      logoWrap.style.fontSize="32px";
+      logoWrap.textContent="🍽️";
+    }
+    hero.appendChild(logoWrap);
+
+    // Numero foto badge
+    if(extraFoto.length>0){
+      var fotoBadge=document.createElement("div");
+      fotoBadge.style.cssText="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.55);color:#fff;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;backdrop-filter:blur(4px);cursor:pointer;";
+      fotoBadge.textContent="📸 "+extraFoto.length+" foto";
+      fotoBadge.onclick=function(){switchSchedaTab("foto",sedeId);};
+      hero.appendChild(fotoBadge);
+    }
+
+    wrap.appendChild(hero);
+
+    // Spacer per logo che sporge
+    var spacer=document.createElement("div");
+    spacer.style.height="40px";
+    spacer.style.background="var(--surface)";
+    wrap.appendChild(spacer);
+
+    // ── HEADER LOCALE ──
+    var header=document.createElement("div");
+    header.style.cssText="background:var(--surface);padding:14px;border-bottom:1px solid var(--border);";
+    var headerH='';
+
+    // Nome (logo già nel hero)
+    headerH+='<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">';
+    headerH+='<div style="flex:1">';
+    headerH+='<div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:2px">'+esc(sede.nome||az.nome||"")+'</div>';
+    var subInfo=[];
+    if(az.tipo_locale) subInfo.push(az.tipo_locale);
+    if(tipiCucina) subInfo.push(tipiCucina);
+    if(az.fascia_prezzo) subInfo.push(az.fascia_prezzo);
+    if(subInfo.length) headerH+='<div style="font-size:12px;color:var(--brand);font-weight:500;margin-bottom:4px">'+esc(subInfo.join(" · "))+'</div>';
+    // Rating
+    if(avgVoto>0){
+      headerH+='<div style="display:flex;align-items:center;gap:5px">'+stelleHTML(avgVoto,14)+'<span style="font-size:13px;font-weight:700;color:var(--text)">'+avgVoto.toFixed(1)+'</span><span style="font-size:12px;color:var(--text-3)">('+recCount+' recensioni)</span></div>';
+    } else {
+      headerH+='<div style="font-size:12px;color:var(--text-3)">Nessuna recensione ancora</div>';
+    }
+    headerH+='</div></div>';
+
+    // Tags
+    if(tags.length){
+      headerH+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">';
+      tags.forEach(function(t){headerH+='<span style="background:var(--brand-light);color:var(--brand);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:500">'+esc(t)+'</span>';});
+      headerH+='</div>';
+    }
+
+    // Indirizzo
+    if(sede.indirizzo||sede.citta) headerH+='<div style="font-size:13px;color:var(--text-2);margin-bottom:10px">📍 '+esc((sede.indirizzo||"")+(sede.citta?" · "+sede.citta:""))+'</div>';
+
+    // Azioni principali
+    headerH+='<div style="display:flex;gap:7px">';
+    headerH+='<button onclick="apriFormPrenotazione(\''+sedeId+'\',\''+esc(sede.nome||"")+'\',\''+esc(sede.azienda_id||"")+'\')" style="flex:2;padding:11px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">📅 Prenota ora</button>';
+    if(az.instagram) headerH+='<a href="https://instagram.com/'+esc(az.instagram.replace("@",""))+'" target="_blank" style="flex:1;padding:11px;background:var(--bg);color:var(--text-2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center">📷</a>';
+    if(az.sito_web) headerH+='<a href="'+esc(az.sito_web)+'" target="_blank" style="flex:1;padding:11px;background:var(--bg);color:var(--text-2);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center">🌐</a>';
+    headerH+='</div>';
+
+    header.innerHTML=headerH;
+    wrap.appendChild(header);
+
+    // ── TAB NAV ──
+    var tabNav=document.createElement("div");
+    tabNav.style.cssText="background:var(--surface);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:52px;z-index:9;";
+    var TABS=[["info","ℹ️ Info"],["recensioni","⭐ Recensioni ("+recCount+")"],["notizie","📢 Notizie"],["foto","📸 Foto"],["offerte","🎁 Offerte"]];
+    tabNav.innerHTML=TABS.map(function(t,i){
+      return '<button data-stab="'+t[0]+'" onclick="switchSchedaTab(\''+t[0]+'\',\''+sedeId+'\')" style="padding:10px 14px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:'+(i===0?"700":"500")+';color:'+(i===0?"var(--brand)":"var(--text-2)")+';border-bottom:2px solid '+(i===0?"var(--brand)":"transparent")+';white-space:nowrap;flex-shrink:0;font-family:var(--font)">'+t[1]+'</button>';
+    }).join("");
+    wrap.appendChild(tabNav);
+
+    // ── CONTENUTO TAB ──
+    var tabContent=document.createElement("div"); tabContent.id="scheda-tab-content";
+    wrap.appendChild(tabContent);
+
+    c.innerHTML=""; c.appendChild(wrap);
+
+    // Salva dati in window per uso nei tab
+    window._schedaData={
+      sede, az, recensioni, postAz:postAz||[], offerte:offerte||[], galleriaPost:galleriaPost||[],
+      sedeId, puoRecensire, avgVoto, recCount
+    };
+
+    renderTabInfo();
+  };
+
+  window.switchSchedaTab=function(tab, sedeId){
+    document.querySelectorAll("[data-stab]").forEach(function(b){
+      var att=b.dataset.stab===tab;
+      b.style.color=att?"var(--brand)":"var(--text-2)";
+      b.style.borderBottomColor=att?"var(--brand)":"transparent";
+      b.style.fontWeight=att?"700":"500";
+    });
+    if(tab==="info") renderTabInfo();
+    else if(tab==="recensioni") renderTabRecensioni();
+    else if(tab==="notizie") renderTabNotizie();
+    else if(tab==="foto") renderTabFoto();
+    else if(tab==="offerte") renderTabOfferte();
+  };
+
+  // ── TAB INFO ──────────────────────────────────────────────────────────────
+  function renderTabInfo(){
+    var el=document.getElementById("scheda-tab-content"); if(!el) return;
+    var d=window._schedaData; if(!d) return;
+    var az=d.az, sede=d.sede;
+    var h='<div style="padding:16px">';
+
+    // Descrizione
+    if(az.descrizione){
+      h+='<div style="margin-bottom:16px">';
+      h+='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px">Il locale</div>';
+      h+='<div style="font-size:14px;color:var(--text-2);line-height:1.6">'+esc(az.descrizione)+'</div>';
+      h+='</div>';
+    }
+
+    // Info pratiche
+    h+='<div style="background:var(--bg);border-radius:10px;overflow:hidden;margin-bottom:16px">';
+    var infoItems=[];
+    if(sede.indirizzo||sede.citta) infoItems.push(["📍","Indirizzo",(sede.indirizzo||"")+(sede.citta?" · "+sede.citta:"")]);
+    if(az.telefono) infoItems.push(["📞","Telefono",az.telefono]);
+    if(az.fascia_prezzo){var fasciaDesc={"€":"economico","€€":"medio","€€€":"alto","€€€€":"fine dining"}[az.fascia_prezzo]||""; infoItems.push(["💶","Fascia prezzo",az.fascia_prezzo+" · "+fasciaDesc]);}
+    if(az.sito_web) infoItems.push(["🌐","Sito web",az.sito_web]);
+    if(az.instagram) infoItems.push(["📷","Instagram",az.instagram]);
+
+    infoItems.forEach(function(item,i){
+      h+='<div style="display:flex;align-items:flex-start;gap:10px;padding:11px 13px;'+(i<infoItems.length-1?"border-bottom:1px solid var(--border)":"")+'">';
+      h+='<span style="font-size:18px;width:24px;flex-shrink:0">'+item[0]+'</span>';
+      h+='<div><div style="font-size:11px;color:var(--text-3);font-weight:500;text-transform:uppercase;letter-spacing:.04em">'+esc(item[1])+'</div>';
+      h+='<div style="font-size:13px;color:var(--text);margin-top:1px">'+esc(item[2])+'</div></div>';
+      h+='</div>';
+    });
+    h+='</div>';
+
+    // Tags / caratteristiche
+    if(az.tags&&az.tags.length){
+      h+='<div style="margin-bottom:16px">';
+      h+='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">Caratteristiche</div>';
+      h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+      az.tags.forEach(function(t){h+='<span style="background:var(--brand-light);color:var(--brand);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:500">'+esc(t)+'</span>';});
+      h+='</div></div>';
+    }
+
+    // Tipo cucina
+    if(az.tipo_cucina&&az.tipo_cucina.length){
+      h+='<div style="margin-bottom:16px">';
+      h+='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">Tipo di cucina</div>';
+      h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+      az.tipo_cucina.forEach(function(t){h+='<span style="background:var(--bg);color:var(--text-2);border-radius:6px;padding:5px 10px;font-size:12px;border:1px solid var(--border)">'+esc(t)+'</span>';});
+      h+='</div></div>';
+    }
+
+    // Orari di apertura
+    var orariAp = az.orari_apertura || {};
+    var GIORNI_L = [{k:'lun',l:'Lunedì'},{k:'mar',l:'Martedì'},{k:'mer',l:'Mercoledì'},{k:'gio',l:'Giovedì'},{k:'ven',l:'Venerdì'},{k:'sab',l:'Sabato'},{k:'dom',l:'Domenica'}];
+    var hasOrari = Object.keys(orariAp).length > 0;
+    if(hasOrari){
+      var oggi = new Date().getDay(); // 0=dom,1=lun...
+      var mapGiorno = {0:'dom',1:'lun',2:'mar',3:'mer',4:'gio',5:'ven',6:'sab'};
+      var oggiKey = mapGiorno[oggi];
+      h+='<div style="margin-bottom:16px">';
+      h+='<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">🕐 Orari di apertura</div>';
+      h+='<div style="background:var(--bg);border-radius:10px;overflow:hidden">';
+      GIORNI_L.forEach(function(g){
+        var o=orariAp[g.k]; var aperto=!o||o.aperto!==false; var isOggi=g.k===oggiKey;
+        h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 13px;'+(isOggi?'background:var(--brand-light);':'')+';border-bottom:1px solid var(--border)">';
+        h+='<span style="font-size:13px;font-weight:'+(isOggi?'700':'500')+';color:'+(isOggi?'var(--brand)':'var(--text)')+'">'+esc(g.l)+(isOggi?' (oggi)':'')+'</span>';
+        if(!aperto){
+          h+='<span style="font-size:12px;color:#dc2626;font-weight:600">Chiuso</span>';
+        } else if(o){
+          var slot=o.solo_cena?(o.cena_inizio+' – '+o.cena_fine):(o.pranzo_inizio+' – '+o.pranzo_fine+' / '+o.cena_inizio+' – '+o.cena_fine);
+          h+='<span style="font-size:12px;color:var(--text-2)">'+esc(slot)+'</span>';
+        } else {
+          h+='<span style="font-size:12px;color:var(--text-2)">12:00 – 14:30 / 19:30 – 22:30</span>';
+        }
+        h+='</div>';
+      });
+      h+='</div></div>';
+    }
+
+    // Mappa
+    if(sede.latitudine&&sede.longitudine){
+      var mapUrl="https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent((sede.indirizzo||"")+" "+(sede.citta||""));
+      h+='<a href="'+mapUrl+'" target="_blank" style="display:flex;align-items:center;gap:10px;padding:13px;background:var(--bg);border-radius:10px;text-decoration:none;color:var(--text);margin-bottom:16px;border:1px solid var(--border)">';
+      h+='<span style="font-size:24px">🗺️</span><div><div style="font-size:13px;font-weight:600">Ottieni indicazioni</div><div style="font-size:11px;color:var(--text-3);margin-top:1px">Apri in Google Maps</div></div><span style="margin-left:auto;color:var(--text-3)">›</span></a>';
+    }
+
+    h+='</div>';
+    el.innerHTML=h;
+  }
+
+  // ── TAB RECENSIONI ────────────────────────────────────────────────────────
+  function renderTabRecensioni(){
+    var el=document.getElementById("scheda-tab-content"); if(!el) return;
+    var d=window._schedaData; if(!d) return;
+    var h='<div style="padding:14px">';
+
+    // Sommario rating
+    if(d.avgVoto>0){
+      h+='<div style="background:var(--bg);border-radius:12px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:16px">';
+      h+='<div style="text-align:center"><div style="font-size:40px;font-weight:700;color:var(--text);line-height:1">'+d.avgVoto.toFixed(1)+'</div>';
+      h+=stelleHTML(d.avgVoto,18);
+      h+='<div style="font-size:11px;color:var(--text-3);margin-top:3px">'+d.recCount+' recensioni</div></div>';
+      // Distribuzione stelle
+      h+='<div style="flex:1">';
+      for(var s=5;s>=1;s--){
+        var cnt=(d.recensioni||[]).filter(function(r){return Math.round(r.voto)===s;}).length;
+        var pct=d.recCount>0?Math.round((cnt/d.recCount)*100):0;
+        h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">';
+        h+='<span style="font-size:11px;color:var(--text-3);width:8px">'+s+'</span>';
+        h+='<div style="flex:1;background:var(--border);border-radius:999px;height:5px;overflow:hidden"><div style="height:100%;background:#f59e0b;width:'+pct+'%"></div></div>';
+        h+='<span style="font-size:11px;color:var(--text-3);width:24px;text-align:right">'+cnt+'</span>';
+        h+='</div>';
+      }
+      h+='</div></div>';
+    }
+
+    // Bottone scrivi recensione
+    if(d.puoRecensire){
+      h+='<button onclick="apriModalRecensione(\''+d.sedeId+'\',\''+esc(d.sede.nome||"")+'\')" style="width:100%;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:14px">✏️ Scrivi la tua recensione</button>';
+    } else if(window._ME){
+      h+='<div style="background:#fef3c7;border-radius:8px;padding:10px 13px;font-size:12px;color:#92400e;margin-bottom:14px">⚠️ Puoi recensire dopo una visita verificata</div>';
+    }
+
+    // Lista recensioni
+    if(!d.recensioni||d.recensioni.length===0){
+      h+='<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-title">Nessuna recensione ancora</div><div class="empty-sub">Sii il primo a condividere la tua esperienza</div></div>';
+    } else {
+      d.recensioni.forEach(function(r){
+        var nome=(r.clienti_profilo&&r.clienti_profilo.nome_completo)||"Utente";
+        var av=r.clienti_profilo&&r.clienti_profilo.avatar_url;
+        h+='<div style="border-bottom:1px solid var(--border);padding:13px 0">';
+        h+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">';
+        h+='<div style="width:36px;height:36px;border-radius:50%;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--brand);flex-shrink:0;overflow:hidden">';
+        h+=av?'<img src="'+esc(av)+'" style="width:100%;height:100%;object-fit:cover"/>':esc(nome.charAt(0).toUpperCase());
+        h+='</div><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--text)">'+esc(nome)+'</div>';
+        h+='<div style="display:flex;align-items:center;gap:6px;margin-top:2px">'+stelleHTML(r.voto,12);
+        if(r.verificata) h+='<span style="font-size:10px;background:#f0fdf4;color:#16a34a;border-radius:4px;padding:1px 6px;font-weight:600">✓ Verificata</span>';
+        h+='</div></div>';
+        h+='<div style="font-size:11px;color:var(--text-3)">'+formatOra(r.created_at)+'</div>';
+        h+='</div>';
+        if(r.testo) h+='<div style="font-size:14px;color:var(--text-2);line-height:1.55">'+esc(r.testo)+'</div>';
+        h+='</div>';
+      });
+    }
+    h+='</div>';
+    el.innerHTML=h;
+  }
+
+  // ── TAB NOTIZIE (stile Facebook) ─────────────────────────────────────────
+  function renderTabNotizie(){
+    var el=document.getElementById("scheda-tab-content"); if(!el) return;
+    var d=window._schedaData; if(!d) return;
+    var h='<div style="padding:14px">';
+
+    if(!d.postAz||d.postAz.length===0){
+      h+='<div class="empty-state"><div class="empty-icon">📢</div><div class="empty-title">Nessuna notizia ancora</div><div class="empty-sub">Il locale non ha ancora pubblicato notizie o aggiornamenti</div></div>';
+    } else {
+      d.postAz.forEach(function(p){
+        var totR=(p.reaz_fuoco||0)+(p.reaz_applauso||0)+(p.reaz_cuore||0);
+        var nomeLoc=d.az.nome||d.sede.nome||"Locale";
+        var logoLoc=d.az.logo_url||"";
+        h+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden">';
+        // Header post
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:12px">';
+        if(logoLoc) h+='<img src="'+esc(logoLoc)+'" style="width:38px;height:38px;border-radius:8px;object-fit:cover;flex-shrink:0"/>';
+        else h+='<div style="width:38px;height:38px;border-radius:8px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:700;flex-shrink:0">'+esc(nomeLoc.charAt(0))+'</div>';
+        h+='<div><div style="font-size:14px;font-weight:700;color:var(--text)">'+esc(nomeLoc)+'</div>';
+        h+='<div style="font-size:11px;color:var(--text-3);margin-top:1px">'+formatOra(p.created_at)+'</div></div>';
+        h+='</div>';
+        // Contenuto
+        if(p.testo&&p.testo.trim()&&p.testo.trim()!==" ") h+='<div style="padding:0 12px 10px;font-size:14px;line-height:1.55;color:var(--text)">'+esc(p.testo)+'</div>';
+        if(p.media_url) h+='<img src="'+esc(p.media_url)+'" style="width:100%;max-height:360px;object-fit:cover;display:block"/>';
+        // Reazioni
+        if(totR>0){
+          h+='<div style="padding:8px 12px;border-top:1px solid var(--border);font-size:12px;color:var(--text-3)">'+totR+' reazioni</div>';
+        }
+        h+='</div>';
+      });
+    }
+    h+='</div>';
+    el.innerHTML=h;
+  }
+
+  // ── TAB FOTO ──────────────────────────────────────────────────────────────
+  function renderTabFoto(){
+    var el=document.getElementById("scheda-tab-content"); if(!el) return;
+    var d=window._schedaData; if(!d) return;
+    var az=d.az;
+    var galleria=(az.foto_galleria||[]).concat((d.galleriaPost||[]).map(function(p){return p.media_url;}).filter(Boolean));
+    var h='<div style="padding:14px">';
+    if(galleria.length===0){
+      h+='<div class="empty-state"><div class="empty-icon">📸</div><div class="empty-title">Nessuna foto ancora</div><div class="empty-sub">Le foto della community appariranno qui</div></div>';
+    } else {
+      h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px">';
+      galleria.forEach(function(url){
+        h+='<div style="aspect-ratio:1;overflow:hidden;cursor:pointer" onclick="apriFullscreen(\''+esc(url)+'\')">';
+        h+='<img src="'+esc(url)+'" style="width:100%;height:100%;object-fit:cover;transition:transform .2s" onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'"/>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+    el.innerHTML=h;
+  }
+
+  // ── TAB OFFERTE ────────────────────────────────────────────────────────────
+  function renderTabOfferte(){
+    var el=document.getElementById("scheda-tab-content"); if(!el) return;
+    var d=window._schedaData; if(!d) return;
+    var h='<div style="padding:14px">';
+    if(!d.offerte||d.offerte.length===0){
+      h+='<div class="empty-state"><div class="empty-icon">🎁</div><div class="empty-title">Nessuna offerta attiva</div><div class="empty-sub">Le promozioni del locale appariranno qui</div></div>';
+    } else {
+      d.offerte.forEach(function(o){
+        var disc=o.tipo==="percentuale"?("-"+o.valore+"%"):o.tipo==="importo"?("-€"+o.valore):"";
+        h+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden">';
+        h+='<div style="background:linear-gradient(135deg,var(--brand),var(--brand-mid));padding:16px;color:#fff">';
+        h+='<div style="font-size:17px;font-weight:700">'+esc(o.titolo||"")+'</div>';
+        if(disc) h+='<div style="font-size:28px;font-weight:800;margin-top:4px">'+esc(disc)+'</div>';
+        h+='</div>';
+        h+='<div style="padding:12px">';
+        if(o.descrizione) h+='<div style="font-size:13px;color:var(--text-2);line-height:1.5;margin-bottom:10px">'+esc(o.descrizione)+'</div>';
+        if(o.valida_al) h+='<div style="font-size:11px;color:var(--text-3);margin-bottom:10px">Valida fino al '+esc(o.valida_al)+'</div>';
+                h+='<button onclick="apriFormPrenotazione(\''+d.sedeId+'\',\''+esc(d.sede.nome||"")+'\',\''+esc(d.sede.azienda_id||"")+'\'" style="width:100%;padding:10px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">📅 Prenota e usa l\'offerta</button>';
+        h+='</div></div>';
+      });
+    }
+    h+='</div>';
+    el.innerHTML=h;
+  }
+
+  // ── FULLSCREEN FOTO ────────────────────────────────────────────────────────
+  window.apriFullscreen=function(url){
+    var overlay=document.createElement("div");
+    overlay.style.cssText="position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;cursor:pointer;";
+    overlay.innerHTML='<img src="'+esc(url)+'" style="max-width:100%;max-height:100%;object-fit:contain"/>';
+    overlay.onclick=function(){overlay.remove();};
+    document.body.appendChild(overlay);
+  };
+
+  // ── MODAL RECENSIONE ──────────────────────────────────────────────────────
+  window.apriModalRecensione=function(sedeId, sedeNome){
+    var sheet=document.getElementById("modal-sheet");
+    document.getElementById("modal-pubblica").classList.add("open");
+    window._votoRec=0;
+    sheet.innerHTML='<div class="modal-handle"></div>'+
+      '<div class="modal-title">⭐ Recensisci '+esc(sedeNome)+'</div>'+
+      '<div style="font-size:12px;color:var(--text-3);margin-bottom:14px">✓ Recensione verificata tramite visita registrata</div>'+
+      '<div style="font-size:13px;font-weight:600;margin-bottom:8px">Il tuo voto</div>'+
+      '<div id="stelle-rec" style="display:flex;gap:10px;margin-bottom:16px">'+
+        [1,2,3,4,5].map(function(i){return '<span data-v="'+i+'" onclick="setVotoRec('+i+')" style="font-size:34px;cursor:pointer;opacity:.25;transition:opacity .15s">★</span>';}).join("")+
+      '</div>'+
+      '<textarea class="pub-textarea" id="rec-testo" placeholder="Racconta la tua esperienza: cibo, servizio, atmosfera..." style="min-height:110px"></textarea>'+
+      '<button class="pub-btn" onclick="inviaRecensione(\''+sedeId+'\')">Pubblica recensione</button>';
+  };
+
+  window.setVotoRec=function(v){
+    window._votoRec=v;
+    document.querySelectorAll("#stelle-rec span").forEach(function(s,i){s.style.opacity=i<v?"1":".25";});
+  };
+
+  window.inviaRecensione=async function(sedeId){
+    var voto=window._votoRec||0;
+    var testo=document.getElementById("rec-testo")?.value?.trim();
+    if(!voto){alert("Seleziona un voto");return;}
+    if(!testo||testo.length<10){alert("Scrivi almeno 10 caratteri");return;}
+    var btn=document.querySelector("#modal-sheet .pub-btn");
+    if(btn){btn.textContent="Pubblicazione...";btn.disabled=true;}
+    var {data:sede}=await supa.from("sedi").select("azienda_id").eq("id",sedeId).single();
+    var {error}=await supa.from("recensioni").insert({
+      user_id:window._ME.id, sede_id:sedeId,
+      azienda_id:sede?.azienda_id||window.AZIENDA,
+      voto, testo, verificata:true, fonte_verifica:"prenotazione_rfbook", visibile:true
+    });
+    if(btn){btn.textContent="Pubblica recensione";btn.disabled=false;}
+    if(error){alert("Errore: "+error.message);return;}
     document.getElementById("modal-pubblica").classList.remove("open");
+    window._votoRec=0;
     setTimeout(function(){
-      alert("✅ Prenotazione confermata!\n"+sedeNome+"\n"+data+" ore "+ora+"\n"+coperti+" "+(coperti===1?"persona":"persone")+(result.punti_assegnati?"\n\n+"+result.punti_assegnati+" punti guadagnati 🎉":""));
+      alert("✅ Recensione pubblicata! Grazie.");
+      apriSchedaLocale(sedeId);
     },200);
+  };
+
+  window.toggleSeguiLocale=async function(aziendaId, btn){
+    if(!window._ME){window.showAuth();return;}
+    var {data:ex}=await supa.from("social_follower").select("id").eq("follower_id",window._ME.id).eq("following_id",aziendaId).maybeSingle();
+    if(ex){
+      await supa.from("social_follower").delete().eq("id",ex.id);
+      if(btn){btn.textContent="+ Segui";btn.style.background="var(--bg)";btn.style.color="var(--brand)";}
+    } else {
+      await supa.from("social_follower").insert({follower_id:window._ME.id,following_id:aziendaId});
+      if(btn){btn.textContent="✓ Segui";btn.style.background="var(--brand)";btn.style.color="#fff";}
+    }
   };
 
 })();
