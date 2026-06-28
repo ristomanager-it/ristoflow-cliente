@@ -662,6 +662,320 @@
     },200);
   };
 
+  // ── FORM PRENOTAZIONE NATIVO ────────────────────────────────────────────────
+  var _prenState = {};
+
+  window.apriFormPrenotazione = async function(sedeId, sedeNome, aziendaId) {
+    if(!window._ME){ window.richiedeLogin('prenotare'); return; }
+
+    // Init tracking
+    var SID = sessionStorage.getItem('rf_sid') || (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
+    sessionStorage.setItem('rf_sid', SID);
+    function rfTrack(tipo, elemento, extra) {
+      fetch('https://cuhcscpvhypoaplcmtjk.supabase.co/functions/v1/track', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(Object.assign({
+          azienda_id: aziendaId||null, sede_id: sedeId||null,
+          pagina: 'rfbook-prenotazione', pagina_id: sedeId||null,
+          tipo, elemento: elemento||null,
+          referrer: 'social.ristoflow-ai.com',
+          utm_source: 'ristoflowbook', utm_medium: 'social',
+          device: /Mobi/.test(navigator.userAgent)?'mobile':'desktop',
+          session_id: SID
+        }, extra||{}))
+      }).catch(function(){});
+    }
+
+    rfTrack('view','form_aperto',{completato:false});
+
+    _prenState = { sedeId, sedeNome, aziendaId, step:1, data:'', ora:'', coperti:2, nome:'', telefono:'', note:'', rfTrack };
+
+    // Crea overlay bottom sheet
+    var overlay = document.getElementById('pren-overlay');
+    if(!overlay){
+      overlay = document.createElement('div');
+      overlay.id = 'pren-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:800;display:flex;align-items:flex-end;';
+      overlay.onclick = function(e){ if(e.target===overlay) chiudiFormPren(); };
+      document.body.appendChild(overlay);
+    }
+
+    var sheet = document.getElementById('pren-sheet');
+    if(!sheet){
+      sheet = document.createElement('div');
+      sheet.id = 'pren-sheet';
+      sheet.style.cssText = 'background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:0 0 32px;';
+      overlay.appendChild(sheet);
+    }
+
+    overlay.style.display = 'flex';
+    renderStepPren(1);
+  };
+
+  function chiudiFormPren(){
+    var o = document.getElementById('pren-overlay');
+    if(o) o.style.display = 'none';
+  }
+
+  async function renderStepPren(step) {
+    _prenState.step = step;
+    var s = _prenState;
+    var sheet = document.getElementById('pren-sheet');
+    if(!sheet) return;
+
+    // Header fisso
+    var header = '<div style="position:sticky;top:0;background:var(--surface);z-index:2;padding:12px 16px 0;">' +
+      '<div style="width:40px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 14px;"></div>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
+      '<div style="font-size:17px;font-weight:800;color:var(--text)">📅 Prenota — '+esc(s.sedeNome)+'</div>' +
+      '<button onclick="chiudiFormPren()" style="background:var(--bg);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--text-3)">✕</button>' +
+      '</div>' +
+      // Stepper
+      '<div style="display:flex;align-items:center;gap:4px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);">' +
+      [['1','Data'],['2','Orario'],['3','Dati']].map(function(t,i){
+        var n=i+1, att=n===step, fatto=n<step;
+        return '<div style="display:flex;align-items:center;gap:4px;flex:1;">' +
+          '<div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:'+(fatto?'var(--brand)':att?'var(--brand)':'var(--border)')+';color:'+(fatto||att?'#fff':'var(--text-3)')+';">'+(fatto?'✓':t[0])+'</div>' +
+          '<span style="font-size:11px;font-weight:'+(att?'700':'400')+';color:'+(att?'var(--brand)':'var(--text-3)')+'">'+t[1]+'</span>' +
+          (i<2?'<div style="flex:1;height:1px;background:var(--border);margin:0 4px;"></div>':'') +
+          '</div>';
+      }).join('') +
+      '</div></div>';
+
+    var body = '<div style="padding:0 16px;">';
+
+    if(step===1){
+      // Step 1 — data + coperti
+      var oggi = new Date();
+      var maxDate = new Date(); maxDate.setDate(oggi.getDate()+60);
+      var fmt = function(d){ return d.toISOString().split('T')[0]; };
+
+      body += '<div style="margin-bottom:16px;">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;">📅 Scegli la data</div>' +
+        '<input type="date" id="pren-data" value="'+esc(s.data||fmt(oggi))+'" min="'+fmt(oggi)+'" max="'+fmt(maxDate)+'" ' +
+        'onchange="_prenState.data=this.value" ' +
+        'style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:var(--font);color:var(--text);background:var(--bg);outline:none;box-sizing:border-box;">' +
+        '</div>';
+
+      body += '<div style="margin-bottom:20px;">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">👥 Numero di persone</div>' +
+        '<div style="display:flex;align-items:center;gap:14px;">' +
+        '<button onclick="cambiaCoprtiPren(-1)" style="width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);font-size:22px;cursor:pointer;color:var(--text);">−</button>' +
+        '<span id="pren-coperti-display" style="font-size:24px;font-weight:800;color:var(--text);min-width:32px;text-align:center;">'+s.coperti+'</span>' +
+        '<button onclick="cambiaCoprtiPren(1)" style="width:42px;height:42px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);font-size:22px;cursor:pointer;color:var(--text);">+</button>' +
+        '<span style="font-size:13px;color:var(--text-3);">persone</span>' +
+        '</div></div>';
+
+      body += '<button onclick="prenStep2()" style="width:100%;padding:14px;background:var(--brand);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">Continua →</button>';
+
+    } else if(step===2){
+      // Step 2 — carica slot disponibili
+      body += '<div id="pren-slot-wrap"><div style="text-align:center;padding:30px;color:var(--text-3);">⏳ Caricamento orari...</div></div>';
+      body += '<div id="pren-step2-btn" style="margin-top:16px;display:none;">' +
+        '<button onclick="prenStep3()" style="width:100%;padding:14px;background:var(--brand);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">Continua →</button>' +
+        '</div>';
+      body += '<button onclick="renderStepPren(1)" style="width:100%;padding:12px;background:none;border:none;font-size:13px;color:var(--text-3);cursor:pointer;margin-top:6px;">← Indietro</button>';
+
+    } else if(step===3){
+      // Step 3 — dati personali
+      var meInfo = null;
+      if(window._ME){
+        var {data:profilo} = await supa.from('clienti_profilo').select('nome_completo,telefono').eq('user_id',window._ME.id).maybeSingle();
+        meInfo = profilo;
+      }
+
+      body += '<div style="margin-bottom:12px;">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">👤 Nome e cognome *</div>' +
+        '<input id="pren-nome" type="text" value="'+esc(s.nome||meInfo?.nome_completo||'')+'" placeholder="Mario Rossi" ' +
+        'oninput="_prenState.nome=this.value" ' +
+        'style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;background:var(--bg);color:var(--text);outline:none;box-sizing:border-box;font-family:var(--font);">' +
+        '</div>';
+
+      body += '<div style="margin-bottom:12px;">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">📱 Telefono *</div>' +
+        '<input id="pren-tel" type="tel" value="'+esc(s.telefono||meInfo?.telefono||'')+'" placeholder="+39 333 1234567" ' +
+        'oninput="_prenState.telefono=this.value" ' +
+        'style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;background:var(--bg);color:var(--text);outline:none;box-sizing:border-box;font-family:var(--font);">' +
+        '</div>';
+
+      body += '<div style="margin-bottom:16px;">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">📝 Note (opzionale)</div>' +
+        '<textarea id="pren-note" placeholder="Allergie, occasioni speciali, richieste..." ' +
+        'oninput="_prenState.note=this.value" ' +
+        'style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);outline:none;box-sizing:border-box;resize:none;height:80px;font-family:var(--font);">'+esc(s.note||'')+'</textarea>' +
+        '</div>';
+
+      // Riepilogo
+      body += '<div style="background:var(--brand-light,#e0f2fe);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--brand);">' +
+        '📅 '+esc(s.data)+' · ⏰ '+esc(s.ora)+' · 👥 '+s.coperti+' persone' +
+        '</div>';
+
+      body += '<div id="pren-error" style="display:none;background:#fee2e2;color:#991b1b;border-radius:8px;padding:10px;font-size:13px;margin-bottom:10px;"></div>';
+
+      body += '<button onclick="inviaPrenotazionePren()" id="btn-invia-pren" style="width:100%;padding:14px;background:var(--brand);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">✅ Conferma prenotazione</button>';
+      body += '<button onclick="renderStepPren(2)" style="width:100%;padding:12px;background:none;border:none;font-size:13px;color:var(--text-3);cursor:pointer;margin-top:6px;">← Indietro</button>';
+    }
+
+    body += '</div>';
+    sheet.innerHTML = header + body;
+
+    // Se step 2 carica gli slot
+    if(step===2) caricaSlotPren();
+  }
+
+  window.cambiaCoprtiPren = function(delta){
+    _prenState.coperti = Math.max(1, Math.min(20, (_prenState.coperti||2) + delta));
+    var el = document.getElementById('pren-coperti-display');
+    if(el) el.textContent = _prenState.coperti;
+  };
+
+  window.prenStep2 = function(){
+    var data = document.getElementById('pren-data')?.value;
+    if(!data){ alert('Seleziona una data'); return; }
+    _prenState.data = data;
+    _prenState.rfTrack && _prenState.rfTrack('step','seleziona_data',{step:'data',valore:data});
+    renderStepPren(2);
+  };
+
+  async function caricaSlotPren(){
+    var s = _prenState;
+    var wrap = document.getElementById('pren-slot-wrap');
+    if(!wrap) return;
+
+    // Carica configurazione form prenotazione per questa sede
+    var {data:forms} = await supa.from('booking_forms')
+      .select('id,configurazione,nome_form')
+      .eq('sede_id', s.sedeId)
+      .eq('attivo', true)
+      .limit(1);
+
+    if(!forms||!forms.length){
+      wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-3);font-size:14px;">⚠️ Questo locale non ha ancora configurato le prenotazioni online.</div>';
+      return;
+    }
+
+    var form = forms[0];
+    var conf = form.configurazione || {};
+    var giornoData = new Date(s.data+'T12:00:00');
+    var giorno = giornoData.getDay(); // 0=dom, 1=lun...
+
+    // Mappa giorno → servizi disponibili
+    var nomiGiorni = ['domenica','lunedi','martedi','mercoledi','giovedi','venerdi','sabato'];
+    var nomeGiorno = nomiGiorni[giorno];
+    var servizi = conf.servizi || {};
+    var slots = [];
+
+    ['pranzo','cena','aperitivo'].forEach(function(tipo){
+      var srv = servizi[tipo];
+      if(!srv || !srv.attivo) return;
+      var giorni = srv.giorni || [];
+      if(!giorni.includes(nomeGiorno) && !giorni.includes(giorno)) return;
+      // Genera slot ogni 30 min
+      var oraI = srv.ora_inizio || '12:00';
+      var oraF = srv.ora_fine || '14:30';
+      var cur = new Date('2000-01-01T'+oraI+':00');
+      var end = new Date('2000-01-01T'+oraF+':00');
+      while(cur < end){
+        var hh = cur.getHours().toString().padStart(2,'0');
+        var mm = cur.getMinutes().toString().padStart(2,'0');
+        slots.push({ora: hh+':'+mm, tipo: tipo});
+        cur.setMinutes(cur.getMinutes()+30);
+      }
+    });
+
+    if(!slots.length){
+      wrap.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-3);font-size:14px;">😕 Nessun orario disponibile per questa data.<br><span style="font-size:12px;">Prova un altro giorno.</span></div>';
+      return;
+    }
+
+    var h = '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;">⏰ Scegli l\'orario</div>';
+    h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
+    slots.forEach(function(sl){
+      var sel = sl.ora === _prenState.ora;
+      h += '<button onclick="selezionaOraPren(\''+sl.ora+'\')" ' +
+        'style="padding:10px 6px;border:1.5px solid '+(sel?'var(--brand)':'var(--border)')+';border-radius:10px;background:'+(sel?'var(--brand-light,#e0f2fe)':'var(--bg)')+';cursor:pointer;text-align:center;">' +
+        '<div style="font-size:15px;font-weight:800;color:'+(sel?'var(--brand)':'var(--text)')+'">'+sl.ora+'</div>' +
+        '<div style="font-size:10px;color:var(--text-3);margin-top:2px;">'+sl.tipo+'</div>' +
+        '</button>';
+    });
+    h += '</div>';
+    wrap.innerHTML = h;
+    _prenState._formId = form.id;
+  }
+
+  window.selezionaOraPren = function(ora){
+    _prenState.ora = ora;
+    _prenState.rfTrack && _prenState.rfTrack('click','seleziona_slot',{step:'slot',valore:ora});
+    // Aggiorna UI slot selezionato
+    caricaSlotPren();
+    var btnWrap = document.getElementById('pren-step2-btn');
+    if(btnWrap) btnWrap.style.display = '';
+  };
+
+  window.prenStep3 = function(){
+    if(!_prenState.ora){ alert('Seleziona un orario'); return; }
+    _prenState.rfTrack && _prenState.rfTrack('step','vai_dati',{step:'dati',valore:_prenState.ora});
+    renderStepPren(3);
+  };
+
+  window.inviaPrenotazionePren = async function(){
+    var s = _prenState;
+    var nome = (document.getElementById('pren-nome')?.value||'').trim();
+    var telefono = (document.getElementById('pren-tel')?.value||'').trim();
+    var note = (document.getElementById('pren-note')?.value||'').trim();
+    var errEl = document.getElementById('pren-error');
+
+    if(!nome){ errEl.textContent='Inserisci il tuo nome'; errEl.style.display=''; return; }
+    if(!telefono){ errEl.textContent='Inserisci il telefono'; errEl.style.display=''; return; }
+    errEl.style.display='none';
+
+    var btn = document.getElementById('btn-invia-pren');
+    if(btn){ btn.disabled=true; btn.textContent='⏳ Invio...'; }
+
+    s.rfTrack && s.rfTrack('click','btn_invia',{step:'submit'});
+
+    try {
+      var dataOra = s.data + 'T' + s.ora + ':00';
+      var {data:pren, error} = await supa.from('prenotazioni_tavoli').insert({
+        sede_id: s.sedeId,
+        azienda_id: s.aziendaId,
+        form_id: s._formId || null,
+        rfbook_user_id: window._ME?.id || null,
+        nome_cliente: nome,
+        telefono: telefono,
+        numero_persone: s.coperti,
+        data_prenotazione: dataOra,
+        note: note || null,
+        stato: 'in_attesa',
+        canale: 'ristoflowbook',
+      }).select('id').single();
+
+      if(error) throw error;
+
+      s.rfTrack && s.rfTrack('submit','prenotazione_completata',{completato:true,step:'success',valore:s.data+' '+s.ora+' · '+s.coperti+' pers.'});
+
+      // Aggiorna stato come completata dopo il giorno
+      // Mostra successo
+      var sheet = document.getElementById('pren-sheet');
+      sheet.innerHTML = '<div style="padding:40px 20px;text-align:center;">' +
+        '<div style="font-size:60px;margin-bottom:16px;">🎉</div>' +
+        '<div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px;">Prenotazione confermata!</div>' +
+        '<div style="font-size:14px;color:var(--text-2);line-height:1.6;margin-bottom:6px;">'+esc(s.sedeNome)+'</div>' +
+        '<div style="background:var(--brand-light,#e0f2fe);border-radius:10px;padding:14px;margin:16px 0;font-size:14px;color:var(--brand);font-weight:600;">' +
+        '📅 '+esc(s.data)+' · ⏰ '+esc(s.ora)+'<br>👥 '+s.coperti+' '+(s.coperti===1?'persona':'persone') +
+        '</div>' +
+        '<div style="font-size:13px;color:var(--text-3);margin-bottom:24px;">Riceverai una conferma via WhatsApp al numero '+esc(telefono)+'</div>' +
+        '<button onclick="chiudiFormPren()" style="width:100%;padding:14px;background:var(--brand);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;">✓ Chiudi</button>' +
+        '</div>';
+
+    } catch(err) {
+      s.rfTrack && s.rfTrack('error','errore_submit',{valore:err.message||'errore'});
+      if(btn){ btn.disabled=false; btn.textContent='✅ Conferma prenotazione'; }
+      var e = document.getElementById('pren-error');
+      if(e){ e.textContent='Errore: '+(err.message||'riprova'); e.style.display=''; }
+    }
+  };
+
   window.toggleSeguiLocale=async function(aziendaId, btn){
     if(!window._ME){window.showAuth();return;}
     var {data:ex}=await supa.from("social_follower").select("id").eq("follower_id",window._ME.id).eq("following_id",aziendaId).maybeSingle();
