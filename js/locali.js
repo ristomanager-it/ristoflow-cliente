@@ -935,19 +935,22 @@
     s.rfTrack && s.rfTrack('click','btn_invia',{step:'submit'});
 
     try {
-      var dataOra = s.data + 'T' + s.ora + ':00';
+      var dataStr = s.data;
+      var oraStr = s.ora + ':00';
       var {data:pren, error} = await supa.from('prenotazioni_tavoli').insert({
         sede_id: s.sedeId,
         azienda_id: s.aziendaId,
         form_id: s._formId || null,
         rfbook_user_id: window._ME?.id || null,
-        nome_cliente: nome,
-        telefono: telefono,
-        numero_persone: s.coperti,
-        data_prenotazione: dataOra,
+        cliente_nome: nome,
+        cliente_telefono: telefono,
+        coperti: s.coperti,
+        data: dataStr,
+        ora: oraStr,
         note: note || null,
         stato: 'in_attesa',
         canale: 'ristoflowbook',
+        sorgente: 'social',
       }).select('id').single();
 
       if(error) throw error;
