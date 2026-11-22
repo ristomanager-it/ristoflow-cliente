@@ -34,11 +34,11 @@
 
     // ── TESSERA GLOBALE RISTOFLOW ────────────────────────────────────────────────
     h+='<div style="margin:0 16px 20px">';
-    h+='<div style="font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Tessera Globale Ristoflow</div>';
+    h+='<div style="font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Tessera Ospitalia</div>';
     h+='<div style="background:linear-gradient(135deg,#0d2421 0%,#12302C 50%,#1d4640 100%);border-radius:20px;padding:24px;color:#fff;box-shadow:0 8px 32px rgba(18,48,44,.35);position:relative;overflow:hidden">';
     h+='<div style="position:absolute;top:-30px;right:-30px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.05)"></div>';
     h+='<div style="position:absolute;bottom:-20px;left:-20px;width:100px;height:100px;border-radius:50%;background:rgba(0,200,150,.08)"></div>';
-    h+='<div style="font-size:10px;font-weight:700;opacity:.6;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Rete Ristoflow</div>';
+    h+='<div style="font-size:10px;font-weight:700;opacity:.6;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Rete Ospitalia</div>';
     h+='<div style="font-size:19px;font-weight:900;margin-bottom:16px">'+esc(nome)+'</div>';
     h+='<div style="display:flex;align-items:flex-end;justify-content:space-between">';
     h+='<div><div style="font-size:10px;font-weight:700;opacity:.6;text-transform:uppercase;letter-spacing:.06em">Livello</div>';
@@ -74,7 +74,7 @@
       h+='<div style="background:#fff;border-radius:14px;padding:24px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.05)">';
       h+='<div style="font-size:36px;margin-bottom:8px">🏛️</div>';
       h+='<div style="font-size:15px;font-weight:700;margin-bottom:6px">Nessuna tessera locale ancora</div>';
-      h+='<div style="font-size:13px;color:#64748b;line-height:1.5;margin-bottom:16px">Prenota un tavolo in un locale Ristoflow per ottenere la tua tessera fidelity</div>';
+      h+='<div style="font-size:13px;color:#64748b;line-height:1.5;margin-bottom:16px">Prenota un tavolo in un locale Ospitalia per ottenere la tua tessera fidelity</div>';
       h+='<button onclick="navTo(\'locali\')" style="background:var(--brand);color:#fff;border:none;border-radius:999px;padding:10px 24px;font-size:13px;font-weight:700;cursor:pointer">🏛️ Scopri i locali</button>';
       h+='</div>';
     } else {
@@ -122,7 +122,7 @@
     h+='<div style="font-size:13px;font-weight:800;color:#15803d;margin-bottom:8px">ℹ️ Come funzionano i punti</div>';
     h+='<div style="font-size:12px;color:#166534;line-height:1.7">';
     h+='<b>Punti locale</b> — accumulati visitando un locale specifico. Spendibili solo in quel locale per sconti e premi del locale.<br>';
-    h+='<b>Punti globali Ristoflow</b> — somma di tutto (visite + social). Sbloccano i premi Ristoflow.<br>';
+    h+='<b>Punti Ospitalia</b> — somma di tutto (visite + social). Sbloccano i premi Ospitalia.<br>';
     h+='I punti scadono dopo 18 mesi di inattività.';
     h+='</div></div>';
 

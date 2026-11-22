@@ -1,4 +1,4 @@
-// js/shell.js — struttura fissa di RistoflowBook (22/11/2026)
+// js/shell.js — struttura fissa di Ospitalia (22/11/2026)
 // Testata col nome del contesto + menu ☰ da destra + barra in basso.
 // Le spiegazioni stanno tutte in "Istruzioni" (menu), non dentro le pagine.
 (function(){
@@ -22,7 +22,7 @@
   window.rbDopoNav = function(page){
     var top = document.getElementById("rb-top"); if(!top) return;
     if(HOME[page] || !TITOLI[page]){
-      top.innerHTML = '<div class="rb-ctx">RistoflowBook</div>' + bottoneMenu();
+      top.innerHTML = '<div class="rb-ctx">Ospitalia</div>' + bottoneMenu();
     } else {
       top.innerHTML = '<div class="rb-interna"><button class="rb-ico" onclick="navTo(\'scopri\')" aria-label="Indietro">'+ICO.indietro+'</button><span>'+esc(TITOLI[page])+'</span></div>' + bottoneMenu();
     }
@@ -41,10 +41,10 @@
     var dr = document.getElementById("rb-drawer");
     var ME = window._ME;
     var nome = (ME && ME.user_metadata && ME.user_metadata.nome_completo) || "";
-    var h = '<div class="rb-dtt"><span>'+(nome ? "Ciao, "+esc(nome.split(" ")[0]) : "RistoflowBook")+'</span><button class="rb-ico" onclick="rbChiudiMenu()" aria-label="Chiudi">'+ICO.x+'</button></div>';
+    var h = '<div class="rb-dtt"><span>'+(nome ? "Ciao, "+esc(nome.split(" ")[0]) : "Ospitalia")+'</span><button class="rb-ico" onclick="rbChiudiMenu()" aria-label="Chiudi">'+ICO.x+'</button></div>';
     h += '<div class="rb-gr">I miei locali</div><div id="rb-miei"></div>' +
       '<button class="rb-voce" onclick="navTo(\'locali\')"><span class="mini tutti"></span>Tutti i locali</button>';
-    h += '<div class="rb-gr">RistoflowBook</div>' +
+    h += '<div class="rb-gr">Ospitalia</div>' +
       voce("scopri","Bacheca") + voce("offerte","Offerte") + voce("ricette","Ricette") + voce("cultura","Cultura del cibo");
     h += '<div class="rb-gr">Le mie cose</div>' +
       voce("tessera","Tessere e punti") + voce("messaggi","Messaggi") + voce("locali","Prenota un tavolo");
@@ -83,8 +83,8 @@
 
   window.rbInvita = function(){
     var url = "https://social.ristoflow-ai.com/";
-    var t = "Ti invito su RistoflowBook: i locali, le foto e le prenotazioni in un'unica app.";
-    if(navigator.share) navigator.share({title:"RistoflowBook", text:t, url:url}).catch(function(){});
+    var t = "Ti invito su Ospitalia: i locali, le foto e le prenotazioni in un'unica app.";
+    if(navigator.share) navigator.share({title:"Ospitalia", text:t, url:url}).catch(function(){});
     else if(navigator.clipboard) navigator.clipboard.writeText(url).then(function(){ alert("Link copiato"); });
   };
 
@@ -112,10 +112,10 @@
       s("Pubblicare","Tocca il + al centro della barra in basso e scegli cosa pubblicare: un momento, una ricetta, una recensione, un'offerta di lavoro o una storia.") +
       s("Prenotare","Tocca Prenota nella barra in basso: trovi i locali, puoi cercarli per nome o città e ordinarli per vicinanza o voto. Dalla scheda del locale scegli giorno, persone e orario.") +
       s("I miei locali","Nel menu ☰ trovi i locali che segui. Per seguire un locale apri la sua scheda e tocca Segui.") +
-      s("Messaggi","Scrivi alle persone di RistoflowBook. Il numero sulla barra indica le conversazioni con messaggi nuovi.") +
-      s("Tessere e punti","Hai una tessera per ogni locale in cui sei cliente e una tessera Ristoflow che somma i punti di tutti. Mostra il codice alla cassa per raccogliere punti. Con i punti sali di livello: Bronzo, Argento, Oro, Platinum.") +
+      s("Messaggi","Scrivi alle persone di Ospitalia. Il numero sulla barra indica le conversazioni con messaggi nuovi.") +
+      s("Tessere e punti","Hai una tessera per ogni locale in cui sei cliente e una tessera Ospitalia che somma i punti di tutti. Mostra il codice alla cassa per raccogliere punti. Con i punti sali di livello: Bronzo, Argento, Oro, Platinum.") +
       s("Salvare sul telefono","Su iPhone: tocca Condividi (□↑) e poi \"Aggiungi a schermata Home\". Su Android: tocca i tre puntini e poi \"Aggiungi a schermata Home\". Non serve scaricare app.") +
-      s("Privacy","I tuoi dati sono trattati secondo il GDPR (Reg. UE 2016/679). Dal Profilo puoi modificarli; per cancellarli scrivi al locale o a Ristoflow.") +
+      s("Privacy","I tuoi dati sono trattati secondo il GDPR (Reg. UE 2016/679). Dal Profilo puoi modificarli; per cancellarli scrivi al locale o a Ospitalia.") +
     '</div>';
   };
 

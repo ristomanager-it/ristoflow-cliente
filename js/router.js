@@ -1,4 +1,4 @@
-// js/router.js — router modulare RistoflowBook
+// js/router.js — router modulare Ospitalia
 (function(){
   var supa = window._supa;
   var _ME  = null;
@@ -96,7 +96,7 @@
       overlay.innerHTML = '<div style="background:#fff;border-radius:16px 16px 0 0;width:100%;padding:24px 20px 36px;text-align:center;">' +
         '<div style="width:36px;height:4px;background:#e2e8f0;border-radius:999px;margin:0 auto 20px;"></div>' +
         '<div style="font-size:22px;margin-bottom:8px;">👋</div>' +
-        '<div style="font-size:17px;font-weight:700;margin-bottom:6px;">Entra in RistoflowBook</div>' +
+        '<div style="font-size:17px;font-weight:700;margin-bottom:6px;">Entra in Ospitalia</div>' +
         '<div style="font-size:14px;color:#64748b;margin-bottom:20px;">Per '+(azione||"interagire")+' devi avere un profilo</div>' +
         '<button onclick="window.showAuth();document.getElementById(\'login-prompt-overlay\').remove()" style="width:100%;padding:14px;background:#12302C;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;">Accedi o Registrati</button>' +
         '<button onclick="document.getElementById(\'login-prompt-overlay\').remove()" style="width:100%;padding:12px;background:none;border:none;font-size:14px;color:#94a3b8;cursor:pointer;">Continua come ospite</button>' +
@@ -114,7 +114,7 @@
     if(!_loaded[src]){
       await new Promise(function(resolve, reject){
         var s = document.createElement("script");
-        s.src = src + "?v=4";
+        s.src = src + "?v=5";
         s.onload = resolve;
         s.onerror = reject;
         document.head.appendChild(s);

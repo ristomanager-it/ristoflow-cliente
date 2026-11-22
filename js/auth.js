@@ -1,4 +1,4 @@
-// js/auth.js — autenticazione RistoflowBook
+// js/auth.js — autenticazione Ospitalia
 (function(){
   var supa = window._supa;
 

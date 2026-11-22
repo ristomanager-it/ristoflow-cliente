@@ -8,7 +8,7 @@
     var{data:offerte}=await supa.from("network_offerte").select("id,titolo,descrizione,tipo,valore,valida_al,sede_id,sedi(nome)").eq("attiva",true).order("created_at",{ascending:false});
     var wrap=document.createElement("div"); wrap.className="pb-nav";
     var hdr=document.createElement("div"); hdr.style.cssText="padding:16px 16px 8px";
-    hdr.innerHTML='<div style="font-size:22px;font-weight:900">🎁 Offerte & Sconti</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">Esclusive per iscritti RistoflowBook</div>';
+    hdr.innerHTML='<div style="font-size:22px;font-weight:900">🎁 Offerte & Sconti</div><div style="font-size:13px;color:var(--text-2);margin-top:4px">Esclusive per iscritti Ospitalia</div>';
     wrap.appendChild(hdr);
     if(!offerte||offerte.length===0){
       var em=document.createElement("div"); em.className="empty-state";
