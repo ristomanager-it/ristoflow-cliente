@@ -77,7 +77,7 @@
     chiudiMenu();
     // la scheda del locale vive in locali.js: lo carico se serve
     if(typeof window.apriSchedaLocale !== "function"){
-      await new Promise(function(res){ var s=document.createElement("script"); s.src="js/locali.js?v=9"; s.onload=res; s.onerror=res; document.head.appendChild(s); });
+      await new Promise(function(res){ var s=document.createElement("script"); s.src="js/locali.js?v=10"; s.onload=res; s.onerror=res; document.head.appendChild(s); });
     }
     if(typeof window.apriSchedaLocale === "function") window.apriSchedaLocale(sedeId);
   };

@@ -208,7 +208,11 @@
       var rl=await fetch(window.EF_BASE+"/landing-media?a="+encodeURIComponent(sede.azienda_id)+"&s="+encodeURIComponent(sedeId)+"&limit=40");
       var jl=await rl.json();
       var visti={}; (galleriaPost||[]).forEach(function(p){visti[p.media_url]=1;});
-      var lib=(jl.images||[]).map(function(x){return x.url;}).filter(function(u){return u&&u.indexOf("/galleria/")>=0&&!visti[u];});
+      // galleria curata della sede (piatti e ambienti) dal database + foto del sito del locale (senza i cartelli con le frasi)
+      var rf=await supa.rpc("ospitalia_foto_sede",{p_sede:sedeId,p_limite:60});
+      var lib=((rf&&rf.data)||[]).map(function(x){return x.url;})
+        .concat((jl.images||[]).map(function(x){return x.url;}).filter(function(u){return u&&u.indexOf("/interviste/")<0;}));
+      lib=lib.filter(function(u){ if(!u||visti[u]) return false; visti[u]=1; return true; });
       galleriaPost=(galleriaPost||[]).concat(lib.map(function(u){return {media_url:u};}));
     }catch(e){}
     try{
@@ -223,8 +227,9 @@
     var sdCover=sede.cover_url||az.cover_url||az.logo_url||"";
     var sdLogo=sede.logo_url||az.logo_url||"";
     var sdDescrizione=sede.descrizione||az.descrizione||"";
-    var sdTipiCucina=(sede.tipo_cucina&&sede.tipo_cucina.length?sede.tipo_cucina:(az.tipo_cucina||[])).join(" · ");
-    var sdTags=sede.tags&&sede.tags.length?sede.tags:(az.tags||[]);
+    // etichette leggibili: "senza_glutine" -> "senza glutine"
+    var sdTipiCucina=(sede.tipo_cucina&&sede.tipo_cucina.length?sede.tipo_cucina:(az.tipo_cucina||[])).map(function(t){return String(t).replace(/_/g," ");}).join(" · ");
+    var sdTags=(sede.tags&&sede.tags.length?sede.tags:(az.tags||[])).map(function(t){return String(t).replace(/_/g," ");});
     var sdFascia=sede.fascia_prezzo||az.fascia_prezzo||"";
     var sdInstagram=sede.instagram||az.instagram||"";
     var sdTelefono=sede.telefono||az.telefono||"";
@@ -260,7 +265,14 @@
       '<div style="font-size:15px;font-weight:700;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(sede.nome||"")+'</div>'+
       (sdTelefono?'<a href="tel:'+esc(sdTelefono)+'" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;padding:5px 8px;border-radius:6px;text-decoration:none">📞</a>':'')+
       (sede.latitudine&&sede.longitudine?'<a href="https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent((sede.indirizzo||"")+" "+(sede.citta||""))+'" target="_blank" style="background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;padding:5px 8px;border-radius:6px;text-decoration:none">🗺️</a>':'');
-    wrap.appendChild(topBar);
+    // la testata dell'app fa gia' da barra: niente seconda barra scura, il titolo diventa il nome del locale
+    var rbt=document.getElementById("rb-top");
+    if(rbt){
+      rbt.innerHTML='<div class="rb-interna"><button class="rb-ico" onclick="navTo(\'locali\')" aria-label="Indietro"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(sede.nome||"")+'</span></div>'+
+        (sdTelefono?'<a class="rb-ico" href="tel:'+esc(sdTelefono)+'" aria-label="Chiama"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></a>':'')+
+        '<button class="rb-ico" onclick="rbApriMenu()" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>';
+    }
+
 
     // ── HERO stile Facebook: cover + logo circolare sovrapposto ──
     var coverUrl=sdCover;
