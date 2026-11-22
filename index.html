@@ -326,6 +326,7 @@
   /* testata: solo il nome del contesto a sinistra, menu a destra */
   .rb-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(8px + var(--safe-top)) 8px 6px 18px;background:var(--bg);flex-shrink:0;z-index:100;min-height:calc(var(--top-h) + var(--safe-top));}
   .rb-ctx{font:700 25px/1.15 var(--serif);color:var(--brand);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rb-tri{display:block;width:46px;height:5px;margin-top:5px;border-radius:3px;background:linear-gradient(90deg,#2f8a3e 0 33.3%,#ffffff 33.3% 66.6%,#ce2b37 66.6% 100%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);}
   .rb-interna{display:flex;align-items:center;gap:4px;flex:1;min-width:0;font:700 22px var(--serif);color:var(--brand);margin-left:-10px;}
   .rb-ico{width:48px;height:48px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:12px;border:none;background:transparent;cursor:pointer;color:var(--brand);}
   .rb-ico svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
@@ -466,7 +467,7 @@
 
 <!-- APP -->
 <div id="app-shell">
-  <header class="rb-top" id="rb-top"><div class="rb-ctx">Ospitalia</div></header>
+  <header class="rb-top" id="rb-top"><div class="rb-ctx">Ospitalia<span class="rb-tri" aria-hidden="true"></span></div></header>
   <div id="page-content"></div>
   <nav class="rb-bar">
     <button class="nav-item" data-page="scopri" onclick="navTo('scopri')"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg><span class="nav-label">Home</span></button>
@@ -592,7 +593,7 @@ window._supa     = window.supabase.createClient(window.SUPA_URL, window.SUPA_ANO
 </script>
 <script src="js/auth.js?v=4"></script>
 <script src="js/pubblica.js?v=2"></script>
-<script src="js/shell.js?v=6"></script>
-<script src="js/router.js?v=7"></script>
+<script src="js/shell.js?v=7"></script>
+<script src="js/router.js?v=8"></script>
 </body>
 </html>
