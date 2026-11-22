@@ -221,12 +221,9 @@
     // Controlla se può recensire
     var puoRecensire=false;
     if(window._ME){
-      var {data:pren}=await supa.from("prenotazioni_tavoli").select("id").eq("sede_id",sedeId).eq("rfbook_user_id",window._ME.id).eq("stato","completata").limit(1);
-      puoRecensire=pren&&pren.length>0;
-      if(puoRecensire){
-        var {data:miaRec}=await supa.from("recensioni").select("id").eq("sede_id",sedeId).eq("user_id",window._ME.id).limit(1);
-        if(miaRec&&miaRec.length>0) puoRecensire=false;
-      }
+      // recensisce solo chi e' stato davvero qui: lo decide il database (prenotazione arrivata o passaggio in cassa con la tessera)
+      var {data:pr}=await supa.rpc("ospitalia_puo_recensire",{p_sede:sedeId});
+      puoRecensire=!!(pr&&pr.ok);
     }
 
     c.innerHTML='';
@@ -498,7 +495,7 @@
     if(d.puoRecensire){
       h+='<button onclick="apriModalRecensione(\''+d.sedeId+'\',\''+esc(d.sede.nome||"")+'\')" style="width:100%;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:14px">✏️ Scrivi la tua recensione</button>';
     } else if(window._ME){
-      h+='<div style="background:#fef3c7;border-radius:8px;padding:10px 13px;font-size:12px;color:#92400e;margin-bottom:14px">⚠️ Puoi recensire dopo una visita verificata</div>';
+      h+='<div style="background:#fef3c7;border-radius:8px;padding:10px 13px;font-size:12px;color:#92400e;margin-bottom:14px">Recensisce solo chi è stato qui</div>';
     }
 
     // Lista recensioni
@@ -650,14 +647,20 @@
     var {error}=await supa.from("recensioni").insert({
       user_id:window._ME.id, sede_id:sedeId,
       azienda_id:sede?.azienda_id||window.AZIENDA,
-      voto, testo, verificata:true, fonte_verifica:"prenotazione_rfbook", visibile:true
+      voto, testo, visibile:true
     });
     if(btn){btn.textContent="Pubblica recensione";btn.disabled=false;}
-    if(error){alert("Errore: "+error.message);return;}
+    if(error){
+      var m=String(error.message||"");
+      if(m.indexOf("row-level security")>=0) alert("Puoi recensire solo un locale in cui sei stato: con una prenotazione o mostrando la tessera alla cassa.");
+      else if(m.indexOf("duplicate")>=0) alert("Hai già recensito questo locale.");
+      else alert("Errore: "+m);
+      return;
+    }
     document.getElementById("modal-pubblica").classList.remove("open");
     window._votoRec=0;
     setTimeout(function(){
-      alert("✅ Recensione pubblicata! Grazie.");
+      alert("Recensione pubblicata! +100 punti");
       apriSchedaLocale(sedeId);
     },200);
   };

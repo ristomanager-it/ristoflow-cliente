@@ -16,6 +16,7 @@
   var HOME = { scopri:1, home:1 };
 
   window.NOVITA_RFBOOK = [
+    { data:"22 novembre 2026", testo:"Recensioni verificate: recensisce solo chi è stato davvero nel locale, con una prenotazione o un passaggio in cassa con la tessera. Ogni recensione vale 100 punti." },
     { data:"22 novembre 2026", testo:"Nuova veste: menu laterale, barra in basso con Prenota, Pubblica, Messaggi e Tessera. Le spiegazioni ora sono tutte qui." }
   ];
 
@@ -76,7 +77,7 @@
     chiudiMenu();
     // la scheda del locale vive in locali.js: lo carico se serve
     if(typeof window.apriSchedaLocale !== "function"){
-      await new Promise(function(res){ var s=document.createElement("script"); s.src="js/locali.js?v=3"; s.onload=res; s.onerror=res; document.head.appendChild(s); });
+      await new Promise(function(res){ var s=document.createElement("script"); s.src="js/locali.js?v=6"; s.onload=res; s.onerror=res; document.head.appendChild(s); });
     }
     if(typeof window.apriSchedaLocale === "function") window.apriSchedaLocale(sedeId);
   };
@@ -111,6 +112,7 @@
       s("Le storie","I cerchi in alto sono le storie delle ultime 24 ore. Tocca un cerchio per aprirla a tutto schermo; tocca la foto per passare alla successiva. Il primo cerchio, con il +, serve a pubblicare la tua.") +
       s("Pubblicare","Tocca il + al centro della barra in basso e scegli cosa pubblicare: un momento, una ricetta, una recensione, un'offerta di lavoro o una storia.") +
       s("Prenotare","Tocca Prenota nella barra in basso: trovi i locali, puoi cercarli per nome o città e ordinarli per vicinanza o voto. Dalla scheda del locale scegli giorno, persone e orario.") +
+      s("Recensioni","Su Ospitalia recensisce solo chi è stato davvero nel locale: serve una prenotazione arrivata o un passaggio in cassa con la tessera. Una recensione per locale, che vale 100 punti. Si scrive dalla scheda del locale o dal + in basso.") +
       s("I miei locali","Nel menu ☰ trovi i locali che segui. Per seguire un locale apri la sua scheda e tocca Segui.") +
       s("Messaggi","Scrivi alle persone di Ospitalia. Il numero sulla barra indica le conversazioni con messaggi nuovi.") +
       s("Tessere e punti","Hai una tessera per ogni locale in cui sei cliente e una tessera Ospitalia che somma i punti di tutti. Mostra il codice alla cassa per raccogliere punti. Con i punti sali di livello: Bronzo, Argento, Oro, Platinum.") +
