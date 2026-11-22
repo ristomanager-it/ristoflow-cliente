@@ -32,6 +32,30 @@
     var sf=document.getElementById("step-form");
     sf.classList.remove("hidden"); sf.style.display="block";
     sf.innerHTML = buildForm(tipo);
+    if(tipo==="recensione") caricaLocaliRecensibili();
+  };
+
+  async function caricaLocaliRecensibili(){
+    var box=document.getElementById("rec-locali"); if(!box) return;
+    var {data:sedi}=await supa.from("sedi").select("id,nome,citta,logo_url").eq("visibile_in_book",true).eq("attiva",true).order("nome");
+    var ok=[];
+    for(var i=0;i<(sedi||[]).length;i++){
+      var r=await supa.rpc("ospitalia_puo_recensire",{p_sede:sedi[i].id});
+      if(r.data&&r.data.ok) ok.push(sedi[i]);
+    }
+    if(!ok.length){
+      box.innerHTML='<div style="font-size:16px;line-height:1.5;color:var(--text-2)">Qui recensisce solo chi è stato davvero nel locale. Dopo una prenotazione o un passaggio in cassa con la tessera, il locale comparirà qui.</div>';
+      return;
+    }
+    box.innerHTML=ok.map(function(s){
+      return '<button class="rb-voce" style="padding:0 4px" onclick="rbRecensisci(\''+esc(s.id)+'\',\''+esc(s.nome).replace(/'/g,"&#39;")+'\')"><span class="mini">'+(s.logo_url?'<img src="'+esc(s.logo_url)+'" alt="">':'')+'</span>'+esc(s.nome)+(s.citta?' · '+esc(s.citta):'')+'</button>';
+    }).join("");
+  }
+
+  window.rbRecensisci = async function(sedeId, nome){
+    chiudiModale();
+    await window.rbApriLocale(sedeId);
+    setTimeout(function(){ if(window.apriModalRecensione) window.apriModalRecensione(sedeId, nome); }, 400);
   };
 
   function buildForm(tipo){
@@ -49,13 +73,9 @@
       h+='<div class="upload-zone" onclick="apriUpload()"><div style="font-size:28px">📷</div><div style="font-size:13px;font-weight:700;color:var(--brand);margin-top:4px">Foto del piatto</div></div>';
       h+='<div id="preview-wrap"></div><button class="pub-btn" onclick="pubblica(\'ricetta\')">Pubblica ricetta</button>';
     } else if(tipo==="recensione"){
-      h+='<div style="font-size:14px;font-weight:700;margin-bottom:10px">Il tuo voto</div>';
-      h+='<div class="stella-sel" id="stella-sel">';
-      for(var i=1;i<=5;i++) h+='<span data-v="'+i+'" onclick="setVoto('+i+')">⭐</span>';
-      h+='</div>';
-      h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Racconta la tua esperienza..."></textarea>';
-      h+='<div style="font-size:12px;color:var(--text-3);margin-bottom:12px">✓ Verificata tramite visita registrata</div>';
-      h+='<button class="pub-btn" onclick="pubblica(\'recensione\')">Pubblica recensione</button>';
+      // recensioni solo verificate: si sceglie uno dei locali in cui si e' stati
+      h+='<div style="font-size:16px;font-weight:700;margin-bottom:10px">Quale locale vuoi recensire?</div>';
+      h+='<div id="rec-locali"><div class="page-loader"><div class="spinner"></div></div></div>';
     } else if(tipo==="lavoro"){
       h+='<input class="pub-input" id="pub-titolo" placeholder="Posizione (es. Chef, Cameriere...)"/>';
       h+='<textarea class="pub-textarea" id="pub-testo" placeholder="Descrizione, requisiti, orari..."></textarea>';
