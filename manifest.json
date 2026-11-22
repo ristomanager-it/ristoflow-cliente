@@ -1,13 +1,14 @@
 {
-  "name": "Ristoflow",
-  "short_name": "Ristoflow",
-  "description": "Il social della ristorazione",
+  "name": "Ospitalia",
+  "short_name": "Ospitalia",
+  "description": "L'ospitalità italiana: locali, hotel, sagre e associazioni",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f0f6fa",
-  "theme_color": "#0E5A7A",
+  "background_color": "#FBF8F2",
+  "theme_color": "#12302C",
   "orientation": "portrait",
+  "lang": "it",
   "icons": [
     {
       "src": "/favicon-192.png",
@@ -18,6 +19,12 @@
       "src": "/favicon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>RistoflowBook</title>
-  <link rel="manifest" href="/manifest.json"/>
+  <title>Ospitalia</title>
+  <link rel="manifest" href="/manifest.json?v=2"/>
   <meta name="theme-color" content="#FBF8F2"/>
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-  <link rel="apple-touch-icon" href="/favicon-192.png"/>
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+  <meta name="apple-mobile-web-app-title" content="Ospitalia"/>
   <link rel="icon" sizes="32x32" href="/favicon-32.png"/>
   <link rel="icon" href="/favicon.ico"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -394,10 +395,10 @@
 <div id="auth-screen" class="full-screen">
   <div class="auth-hero">
     <div class="auth-hero-logo">
-      <div class="auth-hero-icon">&#127869;&#65039;</div>
-      <div class="auth-hero-name"><span style="color:#fff">Risto</span><span style="color:#00c896">flow</span><span style="color:#f97316">Book</span></div>
+      <img src="/favicon-192.png" alt="" style="width:44px;height:44px;border-radius:11px">
+      <div class="auth-hero-name" style="color:#e9d3a3">Ospitalia</div>
     </div>
-    <div class="auth-hero-sub">Il social della ristorazione italiana</div>
+    <div class="auth-hero-sub">L'ospitalità italiana: locali, hotel, sagre e associazioni</div>
   </div>
   <div class="auth-card">
     <div class="auth-tabs">
@@ -465,7 +466,7 @@
 
 <!-- APP -->
 <div id="app-shell">
-  <header class="rb-top" id="rb-top"><div class="rb-ctx">RistoflowBook</div></header>
+  <header class="rb-top" id="rb-top"><div class="rb-ctx">Ospitalia</div></header>
   <div id="page-content"></div>
   <nav class="rb-bar">
     <button class="nav-item" data-page="scopri" onclick="navTo('scopri')"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg><span class="nav-label">Home</span></button>
@@ -589,9 +590,9 @@ window.AZIENDA   = "b331365f-17db-4dda-aa2f-77a09427fe42";
 window.EF_BASE   = window.SUPA_URL + "/functions/v1";
 window._supa     = window.supabase.createClient(window.SUPA_URL, window.SUPA_ANON);
 </script>
-<script src="js/auth.js?v=3"></script>
+<script src="js/auth.js?v=4"></script>
 <script src="js/pubblica.js?v=1"></script>
-<script src="js/shell.js?v=2"></script>
-<script src="js/router.js?v=3"></script>
+<script src="js/shell.js?v=3"></script>
+<script src="js/router.js?v=4"></script>
 </body>
 </html>
