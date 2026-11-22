@@ -124,7 +124,7 @@
       if(cover){
         h+='<div style="position:relative"><img src="'+esc(cover)+'" style="width:100%;height:150px;object-fit:cover;display:block"/>';
       } else {
-        var g=["linear-gradient(135deg,#0E5A7A,#1a8fb5)","linear-gradient(135deg,#0E5A7A,#00c896)","linear-gradient(135deg,#1a3a4a,#0E5A7A)"][Math.abs((s.id||"").charCodeAt(0))%3];
+        var g=["linear-gradient(135deg,#12302C,#1d4640)","linear-gradient(135deg,#12302C,#C9832E)","linear-gradient(135deg,#1a3a4a,#12302C)"][Math.abs((s.id||"").charCodeAt(0))%3];
         h+='<div style="position:relative"><div style="width:100%;height:150px;background:'+g+';display:flex;align-items:center;justify-content:center;font-size:40px">🍽️</div>';
       }
 
@@ -249,7 +249,7 @@
 
     // Cover photo
     var coverEl=document.createElement("div");
-    coverEl.style.cssText="width:100%;height:200px;overflow:hidden;background:linear-gradient(135deg,#0E5A7A,#1a8fb5);";
+    coverEl.style.cssText="width:100%;height:200px;overflow:hidden;background:linear-gradient(135deg,#12302C,#1d4640);";
     if(coverUrl){
       var coverImg=document.createElement("img");
       coverImg.src=coverUrl;

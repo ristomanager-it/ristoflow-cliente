@@ -35,8 +35,8 @@
   window.showApp = function(){
     hideAll();
     document.getElementById("app-shell").style.display="flex";
-    aggiornaTopAvatar();
-    window.navTo("locali");
+    // la bacheca si legge solo da iscritti: chi entra come ospite parte dai locali
+    window.navTo(window._ME ? "scopri" : "locali");
   };
 
   function aggiornaTopAvatar(){

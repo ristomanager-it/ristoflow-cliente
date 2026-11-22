@@ -301,7 +301,9 @@
     filtri.forEach(function(f){h+='<button class="filtro-btn'+(filtroAttivo===f.s?" active":"")+'" onclick="setFiltro(\''+f.s+'\')">'+f.i+' '+f.l+'</button>';});
     h+='</div></div>';
 
-    if(!posts||posts.length===0){
+    if((!posts||posts.length===0) && !ME){
+      h+='<div class="empty-state"><div class="empty-title">Entra per vedere la bacheca</div><button class="empty-btn" onclick="showAuth()">Accedi o registrati</button></div>';
+    } else if(!posts||posts.length===0){
       h+='<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-title">Nessun contenuto</div><div class="empty-sub">Sii il primo a pubblicare!</div><button class="empty-btn" onclick="apriPubblica()">Pubblica ora</button></div>';
     } else {
       posts.forEach(function(p){
