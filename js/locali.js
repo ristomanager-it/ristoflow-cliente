@@ -13,6 +13,15 @@
     return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
   }
 
+  // profili degli autori presi a parte: recensioni e post puntano ad auth.users, non a clienti_profilo
+  async function aggiungiProfili(righe){
+    var ids=(righe||[]).map(function(x){return x.user_id;}).filter(Boolean);
+    if(!ids.length) return;
+    var {data:pf}=await supa.from("clienti_profilo").select("user_id,nome_completo,avatar_url").in("user_id",ids);
+    var m={}; (pf||[]).forEach(function(p){m[p.user_id]=p;});
+    righe.forEach(function(x){ if(x.user_id&&m[x.user_id]) x.clienti_profilo=m[x.user_id]; });
+  }
+
   function stelleHTML(v,size){
     size=size||14;
     var h="";
@@ -185,13 +194,14 @@
 
     var [{data:sede},{data:recensioni},{data:postAzienda},{data:offerte},{data:galleriaPost}]=await Promise.all([
       supa.from("sedi").select("*,aziende(id,nome,logo_url,cover_url,tipo_locale,tipo_cucina,tags,fascia_prezzo,descrizione,telefono,sito_web,instagram,foto_galleria)").eq("id",sedeId).single(),
-      supa.from("recensioni").select("id,voto,testo,created_at,verificata,user_id,clienti_profilo(nome_completo,avatar_url)").eq("sede_id",sedeId).eq("visibile",true).order("verificata",{ascending:false}).order("created_at",{ascending:false}).limit(20),
+      supa.from("recensioni").select("id,voto,testo,created_at,verificata,user_id,autore").eq("sede_id",sedeId).eq("visibile",true).order("verificata",{ascending:false}).order("created_at",{ascending:false}).limit(20),
       supa.from("social_post").select("id,testo,media_url,tipo,created_at,reaz_fuoco,reaz_applauso,reaz_cuore").eq("azienda_id",(function(){return window._schedaAziendaId||"";}())).eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(10),
       supa.from("network_offerte").select("*").eq("attiva",true).eq("sede_id",sedeId).order("created_at",{ascending:false}).limit(5),
       supa.from("social_post").select("media_url").eq("sede_id",sedeId).eq("visibile",true).not("media_url","is",null).order("created_at",{ascending:false}).limit(12)
     ]);
 
     if(!sede){c.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-3)">Locale non trovato</div>';return;}
+    await aggiungiProfili(recensioni);
 
     var az=sede.aziende||{};
     window._schedaAziendaId=az.id||sede.azienda_id;
@@ -209,7 +219,8 @@
     var sdGalleria=(az.foto_galleria||[]);
 
     // Ricarica post azienda con id corretto
-    var {data:postAz}=await supa.from("social_post").select("id,testo,media_url,tipo,created_at,reaz_fuoco,reaz_applauso,reaz_cuore,clienti_profilo(nome_completo,avatar_url)").eq("azienda_id",az.id||sede.azienda_id).eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(10);
+    var {data:postAz}=await supa.from("social_post").select("id,testo,media_url,tipo,created_at,reaz_fuoco,reaz_applauso,reaz_cuore,user_id").eq("azienda_id",az.id||sede.azienda_id).eq("visibile",true).neq("tipo","storia").order("created_at",{ascending:false}).limit(10);
+    await aggiungiProfili(postAz);
 
     var avgVoto=recensioni&&recensioni.length>0?(recensioni.reduce(function(s,r){return s+(r.voto||0);},0)/recensioni.length):0;
     var recCount=recensioni?recensioni.length:0;
@@ -503,7 +514,7 @@
       h+='<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-title">Nessuna recensione ancora</div><div class="empty-sub">Sii il primo a condividere la tua esperienza</div></div>';
     } else {
       d.recensioni.forEach(function(r){
-        var nome=(r.clienti_profilo&&r.clienti_profilo.nome_completo)||"Utente";
+        var nome=(r.clienti_profilo&&r.clienti_profilo.nome_completo)||r.autore||"Ospite";
         var av=r.clienti_profilo&&r.clienti_profilo.avatar_url;
         h+='<div style="border-bottom:1px solid var(--border);padding:13px 0">';
         h+='<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">';
