@@ -307,7 +307,7 @@
       h+='<div class="empty-state"><div class="empty-icon">🍽️</div><div class="empty-title">Nessun contenuto</div><div class="empty-sub">Sii il primo a pubblicare!</div><button class="empty-btn" onclick="apriPubblica()">Pubblica ora</button></div>';
     } else {
       posts.forEach(function(p){
-        var autore=p.nome_completo||"Anonimo";
+        var autore=(p.tipo_autore==="locale"&&p.nome_locale)?p.nome_locale:(p.nome_completo||"Ospite");
         var locale=p.nome_locale||"";
         var miaR=myReaz[p.id]||null;
         var totR=(p.reaz_fuoco||0)+(p.reaz_applauso||0)+(p.reaz_cuore||0);

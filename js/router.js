@@ -114,7 +114,7 @@
     if(!_loaded[src]){
       await new Promise(function(resolve, reject){
         var s = document.createElement("script");
-        s.src = src + "?v=8";
+        s.src = src + "?v=9";
         s.onload = resolve;
         s.onerror = reject;
         document.head.appendChild(s);

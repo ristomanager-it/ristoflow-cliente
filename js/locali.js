@@ -202,6 +202,19 @@
 
     if(!sede){c.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-3)">Locale non trovato</div>';return;}
     await aggiungiProfili(recensioni);
+    // foto vere della libreria della sede (galleria curata del locale) + valutazioni su altri portali
+    var valEst=[];
+    try{
+      var rl=await fetch(window.EF_BASE+"/landing-media?a="+encodeURIComponent(sede.azienda_id)+"&s="+encodeURIComponent(sedeId)+"&limit=40");
+      var jl=await rl.json();
+      var visti={}; (galleriaPost||[]).forEach(function(p){visti[p.media_url]=1;});
+      var lib=(jl.images||[]).map(function(x){return x.url;}).filter(function(u){return u&&u.indexOf("/galleria/")>=0&&!visti[u];});
+      galleriaPost=(galleriaPost||[]).concat(lib.map(function(u){return {media_url:u};}));
+    }catch(e){}
+    try{
+      var rv=await supa.from("sedi_valutazioni_esterne").select("etichetta,piattaforma,voto,n_recensioni,url").eq("sede_id",sedeId).order("n_recensioni",{ascending:false});
+      valEst=rv.data||[];
+    }catch(e){}
 
     var az=sede.aziende||{};
     window._schedaAziendaId=az.id||sede.azienda_id;
@@ -364,7 +377,7 @@
 
     // Salva dati in window per uso nei tab
     window._schedaData={
-      sede, az, recensioni, postAz:postAz||[], offerte:offerte||[], galleriaPost:galleriaPost||[],
+      sede, az, recensioni, postAz:postAz||[], offerte:offerte||[], galleriaPost:galleriaPost||[], valEst:valEst,
       sedeId, puoRecensire, avgVoto, recCount,
       sdOrari, sdDescrizione, sdTags, sdFascia, sdTipiCucina, sdInstagram, sdTelefono, sdGalleria
     };
@@ -500,6 +513,17 @@
         h+='</div>';
       }
       h+='</div></div>';
+    }
+
+    // Valutazioni su altri portali: bollino con link (i testi restano sui portali)
+    if(d.valEst&&d.valEst.length){
+      h+='<div style="font:800 12px var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);margin:2px 0 8px">Su altri portali</div>';
+      d.valEst.forEach(function(v){
+        h+='<a href="'+esc(v.url||"#")+'" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding:10px 14px;border:1px solid var(--border);border-radius:14px;background:#fff;margin-bottom:8px;text-decoration:none;color:var(--text)">'+
+          '<span style="font-size:16px;font-weight:700">'+esc(v.etichetta||v.piattaforma)+'</span>'+
+          '<span style="font-size:16px;white-space:nowrap"><span style="color:#C9832E">★</span> <b>'+Number(v.voto||0).toFixed(1).replace(".",",")+'</b> · '+(v.n_recensioni||0)+' recensioni ›</span></a>';
+      });
+      h+='<div style="height:8px"></div>';
     }
 
     // Bottone scrivi recensione

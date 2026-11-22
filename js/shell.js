@@ -23,7 +23,7 @@
   window.rbDopoNav = function(page){
     var top = document.getElementById("rb-top"); if(!top) return;
     if(HOME[page] || !TITOLI[page]){
-      top.innerHTML = '<div class="rb-ctx">Ospitalia</div>' + bottoneMenu();
+      top.innerHTML = '<div class="rb-ctx">Ospitalia<span class="rb-tri" aria-hidden="true"></span></div>' + bottoneMenu();
     } else {
       top.innerHTML = '<div class="rb-interna"><button class="rb-ico" onclick="navTo(\'scopri\')" aria-label="Indietro">'+ICO.indietro+'</button><span>'+esc(TITOLI[page])+'</span></div>' + bottoneMenu();
     }
@@ -77,7 +77,7 @@
     chiudiMenu();
     // la scheda del locale vive in locali.js: lo carico se serve
     if(typeof window.apriSchedaLocale !== "function"){
-      await new Promise(function(res){ var s=document.createElement("script"); s.src="js/locali.js?v=8"; s.onload=res; s.onerror=res; document.head.appendChild(s); });
+      await new Promise(function(res){ var s=document.createElement("script"); s.src="js/locali.js?v=9"; s.onload=res; s.onerror=res; document.head.appendChild(s); });
     }
     if(typeof window.apriSchedaLocale === "function") window.apriSchedaLocale(sedeId);
   };
