@@ -5,7 +5,7 @@
 
   window.renderTessera = function(c){
     if(!window._ME){window.showAuth();return;}
-    c.innerHTML='<div class="pb-nav" id="tessera-wrap"><div style="padding:16px 16px 8px"><div style="font-size:22px;font-weight:900">🎟️ Le mie Tessere</div></div><div id="tessera-content"><div class="page-loader"><div class="spinner"></div></div></div></div>';
+    c.innerHTML='<div class="pb-nav" id="tessera-wrap"><div style="height:8px"></div><div id="tessera-content"><div class="page-loader"><div class="spinner"></div></div></div></div>';
     caricaTessere();
   };
 
@@ -35,7 +35,7 @@
     // ── TESSERA GLOBALE RISTOFLOW ────────────────────────────────────────────────
     h+='<div style="margin:0 16px 20px">';
     h+='<div style="font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Tessera Globale Ristoflow</div>';
-    h+='<div style="background:linear-gradient(135deg,#0a3f57 0%,#0E5A7A 50%,#1a8fb5 100%);border-radius:20px;padding:24px;color:#fff;box-shadow:0 8px 32px rgba(14,90,122,.35);position:relative;overflow:hidden">';
+    h+='<div style="background:linear-gradient(135deg,#0d2421 0%,#12302C 50%,#1d4640 100%);border-radius:20px;padding:24px;color:#fff;box-shadow:0 8px 32px rgba(18,48,44,.35);position:relative;overflow:hidden">';
     h+='<div style="position:absolute;top:-30px;right:-30px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.05)"></div>';
     h+='<div style="position:absolute;bottom:-20px;left:-20px;width:100px;height:100px;border-radius:50%;background:rgba(0,200,150,.08)"></div>';
     h+='<div style="font-size:10px;font-weight:700;opacity:.6;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">Rete Ristoflow</div>';
@@ -50,7 +50,7 @@
     // Barra progresso
     h+='<div style="background:#fff;border-radius:14px;padding:14px;margin-top:10px;box-shadow:0 2px 10px rgba(0,0,0,.05)">';
     h+='<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:6px"><span>'+livIco+' '+livGlobale+'</span><span>'+fmt(ptGlobali)+' / '+fmt(nextLiv)+'</span></div>';
-    h+='<div style="background:#f0f6fa;border-radius:999px;height:8px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,#0E5A7A,#00c896);border-radius:999px;width:'+pct+'%;transition:width .6s ease"></div></div>';
+    h+='<div style="background:#f0f6fa;border-radius:999px;height:8px;overflow:hidden"><div style="height:100%;background:linear-gradient(90deg,#12302C,#C9832E);border-radius:999px;width:'+pct+'%;transition:width .6s ease"></div></div>';
     h+='<div style="font-size:11px;color:#94a3b8;margin-top:5px;text-align:center">'+fmt(Math.max(0,nextLiv-ptGlobali))+' punti per raggiungere '+nextNome+'</div>';
     h+='</div>';
 
@@ -61,7 +61,7 @@
       h+='<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0f6fa">';
       h+='<span style="font-size:18px;width:28px;text-align:center">'+m[0]+'</span>';
       h+='<span style="flex:1;font-size:13px;font-weight:600;color:#374151">'+m[2]+'</span>';
-      h+='<span style="background:#e8f4f8;color:#0E5A7A;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:800">'+m[1]+' pt</span>';
+      h+='<span style="background:#e8f4f8;color:#12302C;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:800">'+m[1]+' pt</span>';
       h+='</div>';
     });
     h+='</div></div>';
@@ -91,7 +91,7 @@
         h+='<div style="background:#fff;border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07)">';
 
         // Header tessera locale
-        h+='<div style="background:linear-gradient(135deg,#1a3a4a,#0E5A7A);padding:18px 18px 14px;color:#fff;position:relative">';
+        h+='<div style="background:linear-gradient(135deg,#1a3a4a,#12302C);padding:18px 18px 14px;color:#fff;position:relative">';
         if(az.logo_url) h+='<img src="'+esc(az.logo_url)+'" style="position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:10px;object-fit:cover;border:2px solid rgba(255,255,255,.3)"/>';
         h+='<div style="font-size:10px;font-weight:700;opacity:.6;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Tessera Fedeltà</div>';
         h+='<div style="font-size:17px;font-weight:900;margin-bottom:2px">'+esc(nomeAz)+'</div>';
@@ -104,13 +104,13 @@
         // Stats tessera
         h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #f0f6fa">';
         [["📅",visite,"Visite"],["💶","€"+speso.toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:0}),"Speso"],["🎟️",fmt(pLocali),"Punti"]].forEach(function(s){
-          h+='<div style="padding:12px;text-align:center;border-right:1px solid #f0f6fa"><div style="font-size:16px">'+s[0]+'</div><div style="font-size:16px;font-weight:800;color:#0E5A7A">'+s[1]+'</div><div style="font-size:10px;color:#94a3b8;font-weight:600">'+s[2]+'</div></div>';
+          h+='<div style="padding:12px;text-align:center;border-right:1px solid #f0f6fa"><div style="font-size:16px">'+s[0]+'</div><div style="font-size:16px;font-weight:800;color:#12302C">'+s[1]+'</div><div style="font-size:10px;color:#94a3b8;font-weight:600">'+s[2]+'</div></div>';
         });
         h+='</div>';
 
         // QR code e azioni
         h+='<div style="padding:14px;display:flex;gap:10px">';
-        h+='<button onclick="apriSchedaLocale(\''+esc(t.azienda_id)+'\')" style="flex:1;padding:10px;background:#f0f6fa;color:#0E5A7A;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🏛️ Vai al locale</button>';
+        h+='<button onclick="apriSchedaLocale(\''+esc(t.azienda_id)+'\')" style="flex:1;padding:10px;background:#f0f6fa;color:#12302C;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">🏛️ Vai al locale</button>';
         h+='<button onclick="mostraQR(\''+esc(t.id)+'\')" style="flex:1;padding:10px;background:var(--brand);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">📱 Mostra QR</button>';
         h+='</div></div>';
       });
@@ -149,11 +149,11 @@
     if(!window.QRCode){
       var s=document.createElement("script"); s.src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
       s.onload=function(){
-        new window.QRCode(document.getElementById("qr-tessera"),{text:qrUrl,width:200,height:200,colorDark:"#0E5A7A",colorLight:"#fff"});
+        new window.QRCode(document.getElementById("qr-tessera"),{text:qrUrl,width:200,height:200,colorDark:"#12302C",colorLight:"#fff"});
       };
       document.head.appendChild(s);
     } else {
-      new window.QRCode(document.getElementById("qr-tessera"),{text:qrUrl,width:200,height:200,colorDark:"#0E5A7A",colorLight:"#fff"});
+      new window.QRCode(document.getElementById("qr-tessera"),{text:qrUrl,width:200,height:200,colorDark:"#12302C",colorLight:"#fff"});
     }
 
     var info=document.createElement("div"); info.style.cssText="font-size:12px;color:#64748b;margin-top:16px;padding:0 20px;text-align:center;line-height:1.5";

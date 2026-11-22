@@ -47,7 +47,7 @@
       } else if(ev==="SIGNED_OUT"){
         _ME = null; window._ME = null; window._socialME = null;
         // Torna alla lista locali come guest
-        window.navTo("locali");
+        window.navTo("scopri");
       }
     });
   }
@@ -64,9 +64,10 @@
     cultura:   "js/cultura.js",
     offerte:   "js/offerte.js",
     storie:    "js/storie.js",
+    istruzioni:"js/shell.js",
   };
 
-  var _loaded = {};
+  var _loaded = {"js/shell.js": true}; // shell.js e' gia' caricato da index.html
 
   window.navTo = function(page){
     // Se route richiede login e non loggato → mostra auth
@@ -77,9 +78,7 @@
     document.querySelectorAll(".nav-item").forEach(function(b){
       b.classList.toggle("active", b.dataset.page===page);
     });
-    var topTitle = document.getElementById("top-title");
-    var titles = {scopri:"RistoflowBook",locali:"Scopri Locali",tessera:"Tessera",profilo:"Profilo",messaggi:"Messaggi"};
-    if(topTitle && titles[page]) topTitle.textContent = titles[page];
+    if(window.rbDopoNav) window.rbDopoNav(page);
     var c = document.getElementById("page-content");
     c.scrollTop = 0;
     loadModule(page, c);
@@ -99,7 +98,7 @@
         '<div style="font-size:22px;margin-bottom:8px;">👋</div>' +
         '<div style="font-size:17px;font-weight:700;margin-bottom:6px;">Entra in RistoflowBook</div>' +
         '<div style="font-size:14px;color:#64748b;margin-bottom:20px;">Per '+(azione||"interagire")+' devi avere un profilo</div>' +
-        '<button onclick="window.showAuth();document.getElementById(\'login-prompt-overlay\').remove()" style="width:100%;padding:14px;background:#0E5A7A;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;">Accedi o Registrati</button>' +
+        '<button onclick="window.showAuth();document.getElementById(\'login-prompt-overlay\').remove()" style="width:100%;padding:14px;background:#12302C;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;">Accedi o Registrati</button>' +
         '<button onclick="document.getElementById(\'login-prompt-overlay\').remove()" style="width:100%;padding:12px;background:none;border:none;font-size:14px;color:#94a3b8;cursor:pointer;">Continua come ospite</button>' +
         '</div>';
       document.body.appendChild(overlay);
@@ -115,7 +114,7 @@
     if(!_loaded[src]){
       await new Promise(function(resolve, reject){
         var s = document.createElement("script");
-        s.src = src + "?v=2";
+        s.src = src + "?v=4";
         s.onload = resolve;
         s.onerror = reject;
         document.head.appendChild(s);
@@ -134,6 +133,7 @@
       cultura:  window.renderCultura,
       offerte:  window.renderOfferte,
       storie:   window.renderStorie,
+      istruzioni: window.renderIstruzioni,
     };
     var fn = fnMap[page];
     if(typeof fn === "function"){

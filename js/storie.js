@@ -94,7 +94,7 @@ window.seAddStickerPrompt=function(emoji,label){
   wrap.innerHTML='<div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:8px">'+label+'</div>'+
     '<input id="se-inline-inp" style="width:100%;padding:10px;border-radius:8px;border:none;font-size:15px;box-sizing:border-box;outline:none;" placeholder="Scrivi..."/>'+
     '<div style="display:flex;gap:8px;margin-top:10px;">'+
-    '<button onclick="seConfInlineInput(\''+emoji+'\')" style="flex:1;padding:10px;background:#0E5A7A;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;">Aggiungi</button>'+
+    '<button onclick="seConfInlineInput(\''+emoji+'\')" style="flex:1;padding:10px;background:#12302C;color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;">Aggiungi</button>'+
     '<button onclick="document.getElementById(\'se-inline-input-wrap\').remove()" style="padding:10px 16px;background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;">Annulla</button>'+
     '</div>';
   document.getElementById("storia-editor").appendChild(wrap);

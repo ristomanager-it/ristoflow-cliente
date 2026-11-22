@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>RistoflowBook</title>
   <link rel="manifest" href="/manifest.json"/>
-  <meta name="theme-color" content="#0E5A7A"/>
+  <meta name="theme-color" content="#FBF8F2"/>
   <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
   <link rel="apple-touch-icon" href="/favicon-192.png"/>
   <link rel="icon" sizes="32x32" href="/favicon-32.png"/>
   <link rel="icon" href="/favicon.ico"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -311,6 +311,78 @@
   .se-bottom-bar{position:absolute;bottom:0;left:0;right:0;padding:12px 16px calc(12px + var(--safe-bottom));display:flex;gap:8px;}
   .se-pubblica-btn{flex:1;padding:13px;background:var(--brand);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);}
   .se-musica-bar{position:absolute;bottom:130px;left:14px;right:14px;background:rgba(0,0,0,.7);border-radius:12px;padding:13px;color:#fff;}
+
+  /* ══════════ NUOVA VESTE RISTOFLOWBOOK (22/11/2026) ══════════
+     Palette: carta chiara, verde notte, ambra per le azioni. Tutto passa dalle variabili:
+     le pagine esistenti usano var(--brand) & co., quindi cambiano colore senza toccarle. */
+  :root{
+    --brand:#12302C; --brand-light:#EFE8DA; --brand-mid:#1d4640; --accent:#C9832E; --accent-testo:#8A5414;
+    --bg:#FBF8F2; --surface:#ffffff; --text:#1D2422; --text-2:#5D635F; --text-3:#7a7f7a; --border:#E8E1D4;
+    --font:'Manrope',-apple-system,system-ui,sans-serif; --serif:'Fraunces',Georgia,serif;
+    --top-h:64px; --nav-h:96px;
+  }
+  body{font-size:16px;}
+  /* testata: solo il nome del contesto a sinistra, menu a destra */
+  .rb-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(8px + var(--safe-top)) 8px 6px 18px;background:var(--bg);flex-shrink:0;z-index:100;min-height:calc(var(--top-h) + var(--safe-top));}
+  .rb-ctx{font:700 25px/1.15 var(--serif);color:var(--brand);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rb-interna{display:flex;align-items:center;gap:4px;flex:1;min-width:0;font:700 22px var(--serif);color:var(--brand);margin-left:-10px;}
+  .rb-ico{width:48px;height:48px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:12px;border:none;background:transparent;cursor:pointer;color:var(--brand);}
+  .rb-ico svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  /* barra in basso fissa, arrotondata, scura */
+  .rb-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + var(--safe-bottom));width:calc(100% - 24px);max-width:520px;height:72px;border-radius:26px;background:var(--brand);display:flex;align-items:center;justify-content:space-around;padding:0 4px;z-index:150;box-shadow:0 8px 28px rgba(18,48,44,.35);border:none;}
+  .rb-bar .nav-item{color:#c9d3cf;flex:1;min-height:56px;position:relative;gap:3px;padding:0;}
+  .rb-bar .nav-item svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .rb-bar .nav-label{font-size:12px;font-weight:700;}
+  .rb-bar .nav-item.active{color:#fff;}
+  .rb-bar .nav-item.active::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);position:absolute;bottom:-1px;}
+  .rb-bar .rb-centrale{width:68px;height:68px;border-radius:50%;background:var(--accent);margin-top:-34px;border:5px solid var(--bg);display:flex;align-items:center;justify-content:center;color:var(--text);flex:none;}
+  .rb-bar .rb-centrale svg{width:30px;height:30px;stroke-width:2.6;}
+  .rb-bar .nav-item.rb-c{flex:none;width:76px;}
+  .rb-bar .nav-item.rb-c.active::after{display:none;}
+  #rb-badge{position:absolute;top:2px;left:calc(50% + 6px);min-width:20px;height:20px;border-radius:10px;background:#d64a3a;color:#fff;font-size:12px;font-weight:800;line-height:20px;text-align:center;padding:0 5px;display:none;}
+  .pb-nav{padding-bottom:calc(var(--nav-h) + var(--safe-bottom) + 10px);}
+  /* menu laterale da destra */
+  #rb-velo{position:fixed;inset:0;background:rgba(18,48,44,.45);z-index:700;opacity:0;pointer-events:none;transition:opacity .2s;}
+  #rb-drawer{position:fixed;top:0;right:0;bottom:0;width:min(84vw,380px);background:var(--bg);z-index:701;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;padding:calc(12px + var(--safe-top)) 0 30px;box-shadow:-8px 0 30px rgba(0,0,0,.2);}
+  .rb-menu-aperto #rb-velo{opacity:1;pointer-events:auto;}
+  .rb-menu-aperto #rb-drawer{transform:none;}
+  .rb-dtt{display:flex;justify-content:space-between;align-items:center;padding:0 8px 4px 22px;font:700 21px var(--serif);color:var(--brand);}
+  .rb-gr{font:800 12px var(--font);letter-spacing:.1em;color:var(--text-2);text-transform:uppercase;padding:16px 22px 6px;}
+  .rb-voce{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:0 22px;font:600 17px var(--font);color:var(--text);background:none;border:none;text-align:left;cursor:pointer;}
+  .rb-voce:active{background:var(--brand-light);}
+  .rb-voce .mini{width:32px;height:32px;flex:none;border-radius:50%;background:var(--brand);overflow:hidden;}
+  .rb-voce .mini img{width:100%;height:100%;object-fit:cover;background:#fff;}
+  .rb-voce .mini.tutti{background:conic-gradient(var(--brand) 0 50%,var(--accent) 0);}
+  /* istruzioni */
+  .rb-ist{padding:4px 18px 0;}
+  .rb-ist h4{font:700 20px var(--serif);color:var(--brand);margin:22px 0 6px;}
+  .rb-ist p{font-size:16px;line-height:1.55;}
+  .rb-box{border:1px solid var(--border);border-radius:16px;background:#fff;padding:4px 16px;}
+  .rb-riga{padding:12px 0;border-bottom:1px solid var(--border);font-size:16px;line-height:1.45;}
+  .rb-riga:last-child{border:none;}
+  .rb-riga b{display:block;font-size:14px;color:var(--accent-testo);}
+  /* leggibilità per tutti: testo e pulsanti più grandi nelle pagine esistenti */
+  .post-nome,.locale-card-nome,.msg-conv-nome{font-size:16px;}
+  .post-sub,.msg-conv-preview,.locale-card-tipo{font-size:14px;}
+  .post-testo{font-size:16px;}
+  .storia-item{width:74px;}
+  .storia-ring{width:68px;height:68px;padding:3px;background:conic-gradient(var(--accent),#e3b36a,var(--brand),var(--accent));}
+  .storia-add-ring{width:68px;height:68px;border-color:var(--border);background:var(--brand-light);}
+  .storia-inner{border-width:3px;border-color:var(--bg);}
+  .storia-label{font-size:13px;}
+  .storie-wrap,.filtri-wrap{background:var(--bg);border-bottom:none;}
+  .filtro-btn{min-height:46px;padding:0 16px;font-size:15px;font-weight:600;}
+  .filtro-btn.active{background:var(--brand);border-color:var(--brand);}
+  .action-btn{min-height:46px;font-size:15px;}
+  .locale-action-btn{min-height:46px;font-size:15px;font-weight:700;}
+  .locale-card{border-radius:18px;}
+  .locale-card-nome,.profilo-nome-el,.modal-title{font-family:var(--serif);}
+  .auth-btn,.pub-btn,.completa-btn,.empty-btn,.se-pubblica-btn{min-height:48px;font-size:16px;font-weight:700;}
+  .pub-btn,.empty-btn,.se-pubblica-btn{background:var(--accent);color:var(--text);}
+  .auth-input,.pub-input,.pub-textarea,.completa-input{font-size:16px;min-height:50px;}
+  .auth-hero-name,.completa-title{font-family:var(--serif);}
+  .post-img{max-height:none;aspect-ratio:1/1;object-fit:cover;}
+  .feed-post{border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:14px;}
 </style>
 </head>
 <body>
@@ -393,22 +465,17 @@
 
 <!-- APP -->
 <div id="app-shell">
-  <div class="top-bar">
-    <div class="top-bar-logo"><span class="l-risto">Risto</span><span class="l-flow">flow</span><span class="l-book">Book</span></div>
-    <div class="top-bar-right">
-      <button class="top-btn notif-dot">&#128276;</button>
-      <button class="top-avatar-circle" id="top-av" onclick="navTo('profilo')">&#128100;</button>
-    </div>
-  </div>
+  <header class="rb-top" id="rb-top"><div class="rb-ctx">RistoflowBook</div></header>
   <div id="page-content"></div>
-  <nav class="bottom-nav">
-    <button class="nav-item" data-page="locali" onclick="navTo('locali')"><span class="nav-icon">&#127981;</span><span class="nav-label">Locali</span></button>
-    <button class="nav-item" data-page="scopri" onclick="navTo('scopri')"><span class="nav-icon">&#127968;</span><span class="nav-label">Feed</span></button>
-    <button class="nav-item" data-page="pubblica" onclick="apriPubblica()" style="overflow:visible;"><div class="nav-center-wrap">&#43;</div><span class="nav-label" style="margin-top:2px">Pubblica</span></button>
-    <button class="nav-item" data-page="tessera" onclick="navTo('tessera')"><span class="nav-icon">&#127915;</span><span class="nav-label">Tessera</span></button>
-    <button class="nav-item" data-page="profilo" onclick="navTo('profilo')"><span class="nav-icon">&#128100;</span><span class="nav-label">Profilo</span></button>
+  <nav class="rb-bar">
+    <button class="nav-item" data-page="scopri" onclick="navTo('scopri')"><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg><span class="nav-label">Home</span></button>
+    <button class="nav-item" data-page="locali" onclick="navTo('locali')"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span class="nav-label">Prenota</span></button>
+    <button class="nav-item rb-c" data-page="pubblica" onclick="apriPubblica()" aria-label="Pubblica"><span class="rb-centrale"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></button>
+    <button class="nav-item" data-page="messaggi" onclick="navTo('messaggi')"><span id="rb-badge"></span><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg><span class="nav-label">Messaggi</span></button>
+    <button class="nav-item" data-page="tessera" onclick="navTo('tessera')"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg><span class="nav-label">Tessera</span></button>
   </nav>
 </div>
+<div id="rb-velo"></div><aside id="rb-drawer"></aside>
 
 
 <!-- STORIA EDITOR FULLSCREEN -->
@@ -522,8 +589,9 @@ window.AZIENDA   = "b331365f-17db-4dda-aa2f-77a09427fe42";
 window.EF_BASE   = window.SUPA_URL + "/functions/v1";
 window._supa     = window.supabase.createClient(window.SUPA_URL, window.SUPA_ANON);
 </script>
-<script src="js/auth.js?v=1"></script>
+<script src="js/auth.js?v=3"></script>
 <script src="js/pubblica.js?v=1"></script>
-<script src="js/router.js?v=1"></script>
+<script src="js/shell.js?v=2"></script>
+<script src="js/router.js?v=3"></script>
 </body>
 </html>

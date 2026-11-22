@@ -12,7 +12,7 @@
     var altriIds=(convs||[]).map(function(c){return c.partecipante_1===ME.id?c.partecipante_2:c.partecipante_1;});
     var profiliMap={};
     if(altriIds.length){var{data:pf}=await supa.from("clienti_profilo").select("user_id,nome_completo,avatar_url").in("user_id",altriIds);(pf||[]).forEach(function(p){profiliMap[p.user_id]=p;});}
-    var h='<div class="pb-nav"><div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px"><div style="font-size:22px;font-weight:900">💬 Messaggi</div><button onclick="apriNuovaChat()" style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">+ Nuova</button></div>';
+    var h='<div class="pb-nav"><div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px"><div></div><button onclick="apriNuovaChat()" style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">+ Nuova</button></div>';
     if(!convs||convs.length===0){
       h+='<div class="empty-state"><div class="empty-icon">💬</div><div class="empty-title">Nessun messaggio</div><div class="empty-sub">Inizia una conversazione</div></div>';
     } else {
