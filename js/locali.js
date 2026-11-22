@@ -34,7 +34,7 @@
     }catch(e){}
 
     var [{data:sedi},{data:ratings}]=await Promise.all([
-      supa.from("sedi").select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,azienda_id,aziende(id,nome,logo_url,cover_url,tipo_locale,tipo_cucina,tags,fascia_prezzo,descrizione)").eq("attiva",true).eq("visibile_in_book",true).order("nome"),
+      supa.from("sedi").select("id,nome,indirizzo,citta,latitudine,longitudine,logo_url,cover_url,azienda_id,aziende(id,nome,logo_url,cover_url,tipo_locale,tipo_cucina,tags,fascia_prezzo,descrizione)").eq("attiva",true).eq("visibile_in_book",true).order("nome"),
       supa.from("recensioni").select("sede_id,voto").eq("visibile",true)
     ]);
 
@@ -112,7 +112,7 @@
     var h="";
     sedi.forEach(function(s){
       var az=s.aziende||{};
-      var cover=az.cover_url||s.logo_url||az.logo_url||"";
+      var cover=s.cover_url||az.cover_url||s.logo_url||az.logo_url||"";
       var tipiCucina=(az.tipo_cucina||[]).slice(0,2).join(" · ");
       var tags=(az.tags||[]).slice(0,3);
       var distLabel=s._dist?('<span style="font-size:12px;color:var(--brand);font-weight:600">📡 '+s._dist.toFixed(1)+' km</span>'):"";
@@ -213,7 +213,7 @@
 
     var avgVoto=recensioni&&recensioni.length>0?(recensioni.reduce(function(s,r){return s+(r.voto||0);},0)/recensioni.length):0;
     var recCount=recensioni?recensioni.length:0;
-    var cover=az.cover_url||s.logo_url||"";
+    var cover=sdCover;
     var galleria=az.foto_galleria||[];
     var tipiCucina=sdTipiCucina;
     var tags=sdTags;
